@@ -1,0 +1,10 @@
+<?xml version="1.0"?>
+<config xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="urn:magento:module:Magento_Backend:etc/menu.xsd">
+    <menu>
+        <add id="MerchantWarrior_Payment::merchant_warrior" title="Adyen" module="MerchantWarrior_Payment"
+             sortOrder="100" parent="Magento_Backend::system" resource="MerchantWarrior_Payment::merchant_warrior"/>
+        <add id="MerchantWarrior_Payment::notifications_overview" title="Notifications Overview"
+             module="MerchantWarrior_Payment" sortOrder="10" parent="MerchantWarrior_Payment::merchant_warrior"
+             action="merchant_warrior/notifications/overview" resource="MerchantWarrior_Payment::notifications_overview"/>
+    </menu>
+</config>
