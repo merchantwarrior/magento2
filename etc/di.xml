@@ -1,5 +1,10 @@
 <?xml version="1.0"?>
 <config xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="urn:magento:framework:ObjectManager/etc/config.xsd">
+    <preference for="MerchantWarrior\Payment\Api\RefundCardInterface"
+                type="MerchantWarrior\Payment\Model\Api\RefundCard" />
+    <preference for="MerchantWarrior\Payment\Api\ProcessVoidInterface"
+                type="MerchantWarrior\Payment\Model\Api\ProcessVoid" />
+
     <!-- Payment Method Facade configuration -->
     <virtualType name="MerchantWarriorPaymentPayFrameFacade" type="Adyen\Payment\Model\Method\Adapter">
         <arguments>
@@ -63,4 +68,21 @@
             <argument name="handler" xsi:type="object">MerchantWarriorPayFrameResponseHandlerComposite</argument>
         </arguments>
     </virtualType>
+
+    <type name="MerchantWarrior\Payment\Logger\MerchantWarriorLogger">
+        <arguments>
+            <argument name="name" xsi:type="string">MerchantWarriorLogger</argument>
+            <argument name="handlers"  xsi:type="array">
+                <item name="merchantWarriorDebug" xsi:type="object">MerchantWarrior\Payment\Logger\Handler\MerchantWarriorDebug</item>
+                <item name="merchantWarriorNotification" xsi:type="object">MerchantWarrior\Payment\Logger\Handler\MerchantWarriorNotification</item>
+                <item name="merchantWarriorResult" xsi:type="object">MerchantWarrior\Payment\Logger\Handler\MerchantWarriorResult</item>
+                <item name="merchantWarriorCronjob" xsi:type="object">MerchantWarrior\Payment\Logger\Handler\MerchantWarriorCronjob</item>
+                <item name="merchantWarriorInfo" xsi:type="object">MerchantWarrior\Payment\Logger\Handler\MerchantWarriorInfo</item>
+                <item name="merchantWarriorError" xsi:type="object">MerchantWarrior\Payment\Logger\Handler\MerchantWarriorError</item>
+                <item name="merchantWarriorWarning" xsi:type="object">MerchantWarrior\Payment\Logger\Handler\MerchantWarriorWarning</item>
+                <item name="system" xsi:type="object">Magento\Framework\Logger\Handler\System</item>
+                <item name="debug" xsi:type="object">Magento\Framework\Logger\Handler\Debug</item>
+            </argument>
+        </arguments>
+    </type>
 </config>

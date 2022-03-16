@@ -5,9 +5,8 @@
             <merchant_warrior_abstract>
                 <merchant_uuid>5ed5ccd4ebbe8</merchant_uuid>
                 <sandbox_mode>1</sandbox_mode>
-                <api_key_sandbox><![CDATA[xmgyxc0m]]></api_key_sandbox>
-                <api_passphrase_sandbox><![CDATA[ug4e6b1j]]></api_passphrase_sandbox>
-                <submit_url_sandbox>https://base.merchantwarrior.com/</submit_url_sandbox>
+                <api_key>xmgyxc0m</api_key>
+                <api_passphrase>ug4e6b1j</api_passphrase>
                 <debug>1</debug>
                 <group>merchant_warrior</group>
             </merchant_warrior_abstract>

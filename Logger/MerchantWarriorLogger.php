@@ -14,6 +14,7 @@ class MerchantWarriorLogger extends Logger
     const MERCHANT_WARRIOR_NOTIFICATION = 201;
     const MERCHANT_WARRIOR_RESULT = 202;
     const MERCHANT_WARRIOR_NOTIFICATION_CRONJOB = 203;
+    const MERCHANT_WARRIOR_WARNING = 301;
 
     /**
      * Logging levels from syslog protocol defined in RFC 5424

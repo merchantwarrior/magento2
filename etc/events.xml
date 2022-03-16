@@ -1,0 +1,16 @@
+<?xml version="1.0"?>
+<config xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+        xsi:noNamespaceSchemaLocation="urn:magento:framework:Event/etc/events.xsd">
+    <event name="merchant_warrior_post_before">
+        <observer name="debug_api_data_before"
+                  instance="MerchantWarrior\Payment\Observer\DebugObserver"/>
+    </event>
+    <event name="merchant_warrior_post_after_error">
+        <observer name="debug_api_data_after_error"
+                  instance="MerchantWarrior\Payment\Observer\DebugObserver"/>
+    </event>
+    <event name="merchant_warrior_post_after">
+        <observer name="debug_api_data_after"
+                  instance="MerchantWarrior\Payment\Observer\DebugObserver"/>
+    </event>
+</config>
