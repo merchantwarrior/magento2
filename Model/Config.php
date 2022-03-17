@@ -16,7 +16,7 @@ class Config
     /**#@+
      * Configuration constants
      */
-    const XML_PATH_IS_ENABLED = 'payment/merchant_warrior_payframe/active';
+    const XML_PATH_IS_ENABLED = 'payment/merchant_warrior_abstract/active';
     const XML_PATH_IS_SANDBOX_MODE_ENABLED = 'payment/merchant_warrior_abstract/sandbox_mode';
     /**#@-*/
 

@@ -9,9 +9,8 @@
                 <fieldset_css>complex</fieldset_css>
                 <frontend_model>MerchantWarrior\Payment\Block\Adminhtml\System\Config\Fieldset\Group</frontend_model>
                 <include path="MerchantWarrior_Payment::system/merchant_warrior_getting_started.xml"/>
-                <include path="MerchantWarrior_Payment::system/merchant_warrior_required_settings.xml"/>
+                <include path="MerchantWarrior_Payment::system/merchant_warrior_basic_settings.xml"/>
                 <include path="MerchantWarrior_Payment::system/merchant_warrior_configure_payment_methods.xml"/>
-                <!--<include path="Merchantwarrior_Payment::system/merchantwarrior_advanced_settings.xml"/>-->
             </group>
         </section>
     </system>

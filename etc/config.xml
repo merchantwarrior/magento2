@@ -3,6 +3,7 @@
     <default>
         <payment>
             <merchant_warrior_abstract>
+                <active>1</active>
                 <merchant_uuid>5ed5ccd4ebbe8</merchant_uuid>
                 <sandbox_mode>1</sandbox_mode>
                 <api_key>xmgyxc0m</api_key>
@@ -11,10 +12,10 @@
                 <group>merchant_warrior</group>
             </merchant_warrior_abstract>
             <merchant_warrior_payframe>
-                <model>MerchantWarriorPaymentPayFrameFacade</model>
+                <active>1</active>
+                <model>MerchantWarriorPayFrameFacade</model>
                 <title>Merchant Warrior PayFrame</title>
                 <payment_action>authorize</payment_action>
-                <active>1</active>
                 <is_gateway>1</is_gateway>
                 <can_use_checkout>1</can_use_checkout>
                 <can_authorize>1</can_authorize>

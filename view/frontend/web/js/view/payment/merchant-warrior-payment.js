@@ -1,9 +1,3 @@
-/**
- * Copyright © Magento, Inc. All rights reserved.
- * See COPYING.txt for license details.
- */
-
-/* @api */
 define([
     'uiComponent',
     'Magento_Checkout/js/model/payment/renderer-list'
@@ -13,7 +7,7 @@ define([
     rendererList.push(
         {
             type: 'merchant_warrior_payframe',
-            component: 'MerchantWarrior_Payment/js/view/payment/method-renderer/mw-payframe-method'
+            component: 'MerchantWarrior_Payment/js/view/payment/method-renderer/payframe'
         }
     );
 

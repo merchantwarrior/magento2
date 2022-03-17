@@ -12,29 +12,15 @@
                                         <item name="billing-step" xsi:type="array">
                                             <item name="children" xsi:type="array">
                                                 <item name="payment" xsi:type="array">
-                                                    <item name="payment" xsi:type="array">
-                                                        <item name="children" xsi:type="array">
-                                                            <item name="renders" xsi:type="array">
-                                                                <!-- merge payment method renders here -->
-                                                                <item name="children" xsi:type="array">
-                                                                    <item name="merchant_warrior_payment" xsi:type="array">
-                                                                        <item name="component" xsi:type="string">Adyen_Payment/js/view/payment/adyen-methods</item>
-                                                                        <item name="methods" xsi:type="array">
-                                                                            <item name="merchant_warrior_payframe" xsi:type="array">
-                                                                                <item name="isBillingAddressRequired" xsi:type="boolean">true</item>
-                                                                            </item>
-                                                                            <item name="adyen_cc" xsi:type="array">
-                                                                                <item name="isBillingAddressRequired" xsi:type="boolean">true</item>
-                                                                            </item>
-                                                                            <item name="adyen_hpp" xsi:type="array">
-                                                                                <item name="isBillingAddressRequired" xsi:type="boolean">true</item>
-                                                                            </item>
-                                                                            <item name="adyen_boleto" xsi:type="array">
-                                                                                <item name="isBillingAddressRequired" xsi:type="boolean">true</item>
-                                                                            </item>
-                                                                            <item name="adyen_pos_cloud" xsi:type="array">
-                                                                                <item name="isBillingAddressRequired" xsi:type="boolean">true</item>
-                                                                            </item>
+                                                    <item name="children" xsi:type="array">
+                                                        <item name="renders" xsi:type="array">
+                                                            <!-- merge payment method renders here -->
+                                                            <item name="children" xsi:type="array">
+                                                                <item name="merchant-warrior-payment" xsi:type="array">
+                                                                    <item name="component" xsi:type="string">MerchantWarrior_Payment/js/view/payment/merchant-warrior-payment</item>
+                                                                    <item name="methods" xsi:type="array">
+                                                                        <item name="merchant_warrior_payframe" xsi:type="array">
+                                                                            <item name="isBillingAddressRequired" xsi:type="boolean">true</item>
                                                                         </item>
                                                                     </item>
                                                                 </item>
