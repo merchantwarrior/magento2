@@ -4,6 +4,8 @@
                 type="MerchantWarrior\Payment\Model\Api\RefundCard" />
     <preference for="MerchantWarrior\Payment\Api\ProcessVoidInterface"
                 type="MerchantWarrior\Payment\Model\Api\ProcessVoid" />
+    <preference for="MerchantWarrior\Payment\Api\ProcessAuthInterface"
+                type="MerchantWarrior\Payment\Model\Api\ProcessAuth" />
 
     <!-- Payment Method Facade configuration -->
     <virtualType name="MerchantWarriorPaymentPayFrameFacade" type="Adyen\Payment\Model\Method\Adapter">

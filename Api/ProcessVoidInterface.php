@@ -4,6 +4,8 @@ declare(strict_types=1);
 
 namespace MerchantWarrior\Payment\Api;
 
+use Magento\Framework\Exception\LocalizedException;
+
 /**
  * Interface ProcessVoidInterface
  */
@@ -21,6 +23,7 @@ interface ProcessVoidInterface
      * @param string $transactionId
      *
      * @return array
+     * @throws LocalizedException
      */
     public function execute(string $transactionId): array;
 }

@@ -64,6 +64,8 @@ class Debugger
      */
     public function setData(array $data): Debugger
     {
+        $data = $this->clearData($data);
+
         $this->debugData->addData($data);
 
         return $this;
@@ -79,18 +81,14 @@ class Debugger
         if ($this->config->isDebuggerEnabled()) {
             $this->logger->addMerchantWarriorDebug('Start Log: ==================');
 
-            if ($this->debugData->hasData('method')) {
-                $this->logger->addMerchantWarriorDebug('Method: ' . $this->debugData->getData('method'));
-                $this->debugData->unsetData('method');
+            if ($this->debugData->hasData('responseCode')) {
+                $this->logger->addMerchantWarriorDebug('Response Code: ' . $this->debugData->getData('responseCode'));
+                $this->debugData->unsetData('responseCode');
             }
 
-            if ($this->debugData->hasData('status')) {
-                $this->logger->addMerchantWarriorDebug('Status: ' . $this->debugData->getData('status'));
-                $this->debugData->unsetData('status');
-            }
-
-            if ($this->debugData->hasData('error')) {
-                $this->logger->addMerchantWarriorDebug('Error: ' . $this->debugData->getData('error'));
+            if ($this->debugData->hasData('responseMessage')) {
+                $this->logger->addMerchantWarriorDebug('Response Message: ' . $this->debugData->getData('responseMessage'));
+                $this->debugData->unsetData('responseMessage');
             }
 
             $this->logger->addMerchantWarriorDebug(
@@ -116,5 +114,23 @@ class Debugger
             return $date->setTimestamp($callTime)->format('Y-m-d H:i:s');
         }
         return null;
+    }
+
+    /**
+     * Clear data from secure info
+     *
+     * @param array $data
+     *
+     * @return array
+     */
+    private function clearData(array $data): array
+    {
+        if (isset($data['passed_data']['apiKey'])) {
+            $data['passed_data']['apiKey'] = '*****';
+        }
+        if (isset($data['call_time'])) {
+            $data['call_time'] = $this->getFormattedDate($data['call_time']);
+        }
+        return $data;
     }
 }

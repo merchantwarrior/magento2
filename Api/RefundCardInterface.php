@@ -4,6 +4,8 @@ declare(strict_types=1);
 
 namespace MerchantWarrior\Payment\Api;
 
+use Magento\Framework\Exception\LocalizedException;
+
 /**
  * Interface RefundCardInterface
  */
@@ -18,17 +20,18 @@ interface RefundCardInterface
     /**
      * Execute refund card
      *
-     * @param float $transactionAmount
+     * @param string $transactionAmount
      * @param string $currency
      * @param string $transactionId
-     * @param float $refundAmount
+     * @param string $refundAmount
      *
      * @return array
+     * @throws LocalizedException
      */
     public function execute(
-        float $transactionAmount,
+        string $transactionAmount,
         string $currency,
         string $transactionId,
-        float $refundAmount
+        string $refundAmount
     ): array;
 }

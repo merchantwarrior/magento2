@@ -7,41 +7,24 @@ namespace MerchantWarrior\Payment\Model\Api;
 use Magento\Framework\DataObject;
 use Magento\Framework\HTTP\ClientInterface;
 use Magento\Framework\Event\ManagerInterface;
+use Magento\Framework\Xml\Parser;
 use Magento\Framework\Serialize\SerializerInterface;
 use Magento\Framework\Stdlib\DateTime\TimezoneInterface;
 use MerchantWarrior\Payment\Model\Config;
 use MerchantWarrior\Payment\Model\HashGenerator;
 
-abstract class AbstractApi
+abstract class RequestApi implements RequestApiInterface
 {
+    /**#@+
+     * Request Mode
+     */
+    const REQUEST_MODE_JSON = true;
+    /**#@-*/
+
     /**#@+
      * Success response code
      */
     const SUCCESS_CODE = 0;
-    /**#@-*/
-
-    /**#@+
-     * Authorization keys
-     */
-    const MERCHANT_USER_ID = 'merchantUUID';
-    const API_KEY = 'apiKey';
-    /**#@-*/
-
-    /**#@+
-     * Post params
-     */
-    const METHOD = 'method';
-    const TRANSACTION_ID = 'transactionID';
-    const TRANSACTION_AMOUNT = 'transactionAmount';
-    const TRANSACTION_CURRENCY = 'transactionCurrency';
-    const REFUND_AMOUNT = 'refundAmount';
-    /**#@-*/
-
-    /**#@+
-     * MerchantWarrior Api URL
-     */
-    const API_SANDBOX_URL = 'https://base.merchantwarrior.com/post/';
-    const API_LIVE_URL = 'https://api.merchantwarrior.com/post/';
     /**#@-*/
 
     /**
@@ -73,6 +56,11 @@ abstract class AbstractApi
      * @var HashGenerator
      */
     protected HashGenerator $hashGenerator;
+
+    /**
+     * @var Parser
+     */
+    protected Parser $xmlParser;
 
     /**
      * @var bool
@@ -108,6 +96,7 @@ abstract class AbstractApi
      * @param ManagerInterface $manager
      * @param TimezoneInterface $timezone
      * @param SerializerInterface $serializer
+     * @param Parser $xmlParser
      */
     public function __construct(
         Config $config,
@@ -115,7 +104,8 @@ abstract class AbstractApi
         ClientInterface $client,
         ManagerInterface $manager,
         TimezoneInterface $timezone,
-        SerializerInterface $serializer
+        SerializerInterface $serializer,
+        Parser $xmlParser
     ) {
         $this->config = $config;
         $this->hashGenerator = $hashGenerator;
@@ -123,6 +113,7 @@ abstract class AbstractApi
         $this->eventManager = $manager;
         $this->timezone = $timezone;
         $this->serializer = $serializer;
+        $this->xmlParser = $xmlParser;
     }
 
     /**
@@ -151,13 +142,19 @@ abstract class AbstractApi
         try {
             $this->beforeCall($data);
 
-            $this->client->addHeader('MW-API-VERSION', '2.0');
-            $this->client->addHeader('content-type', 'application/json');
+            if (self::REQUEST_MODE_JSON) {
+                $this->client->addHeader('MW-API-VERSION', '2.0');
+                $this->client->addHeader('content-type', 'application/json');
+            }
             $this->client->setOption((string)CURLOPT_CUSTOMREQUEST, 'POST');
 
-            $this->client->post($this->getApiUrl(), $this->serializer->serialize($data));
+            if (self::REQUEST_MODE_JSON) {
+                $this->client->post($this->getApiUrl(), $this->serializer->serialize($data));
+            } else {
+                $this->client->post($this->getApiUrl(), $data);
+            }
 
-            $this->afterCall();
+            $this->afterCall($key);
         } catch (\Exception $e) {
             $this->eventManager->dispatch(
                 'merchant_warrior_post_after_error',
@@ -242,7 +239,16 @@ abstract class AbstractApi
 
         $result = $this->client->getBody();
         if (!empty($result)) {
-            $result = $this->serializer->unserialize($result);
+            if (self::REQUEST_MODE_JSON) {
+                $result = $this->serializer->unserialize($result);
+            } else {
+                try {
+                    $result = $this->xmlParser->loadXML($result)->xmlToArray();
+                    $result = $result['mwResponse'];
+                } catch (\Exception $e) {
+                    $result = [];
+                }
+            }
             $this->response[$key] = (!is_array($result)) ? new DataObject([$result]) : new DataObject($result);
         }
         return $this->response[$key];
@@ -255,16 +261,27 @@ abstract class AbstractApi
      *
      * @return string|null
      */
-    protected function getErrorMessage(string $key): ?string
+    protected function getResponseMessage(string $key): ?string
     {
-        if (!$this->getResponse($key)->isEmpty()
-            && ($responseCode = $this->getResponse($key)->hasData('responseCode'))
-        ) {
-            if ($responseCode != 0) {
-                return $this->getResponse($key)->getData('responseMessage');
-            }
+        if ($this->getResponse($key)->isEmpty()) {
+            return null;
         }
-        return null;
+        return $this->getResponse($key)->getData('responseMessage');
+    }
+
+    /**
+     * Get response message
+     *
+     * @param string $key
+     *
+     * @return string|null
+     */
+    protected function getResponseCode(string $key): ?string
+    {
+        if ($this->getResponse($key)->isEmpty()) {
+            return null;
+        }
+        return $this->getResponse($key)->getData('responseCode');
     }
 
     /**
@@ -290,9 +307,11 @@ abstract class AbstractApi
     /**
      * Call additional functions after api call
      *
+     * @param string $key
+     *
      * @return void
      */
-    protected function afterCall(): void
+    protected function afterCall(string $key): void
     {
         $this->status = $this->client->getStatus();
 
@@ -301,7 +320,7 @@ abstract class AbstractApi
             [
                 'method'        => __METHOD__,
                 'status'        => $this->status,
-                'response_data' => $this->client->getBody(),
+                'response_data' => $this->getResponse($key)->toArray(),
                 'call_time'     => $this->getCallTime(),
             ]
         );

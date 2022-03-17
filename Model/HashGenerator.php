@@ -4,9 +4,10 @@ declare(strict_types=1);
 
 namespace MerchantWarrior\Payment\Model;
 
+use MerchantWarrior\Payment\Api\ProcessAuthInterface;
 use MerchantWarrior\Payment\Api\ProcessVoidInterface;
 use MerchantWarrior\Payment\Api\RefundCardInterface;
-use MerchantWarrior\Payment\Model\Api\AbstractApi;
+use MerchantWarrior\Payment\Model\Api\RequestApiInterface;
 
 class HashGenerator
 {
@@ -33,12 +34,14 @@ class HashGenerator
      */
     public function execute(array $data): string
     {
-        switch ($data[AbstractApi::METHOD]) {
-            case RefundCardInterface::API_METHOD:
-                $hash = $this->prepareQueryTypeHash($data);
-                break;
+        $hash = '';
+        switch ($data[RequestApiInterface::METHOD]) {
             case ProcessVoidInterface::API_METHOD:
                 $hash = $this->prepareVoidTypeHash($data);
+                break;
+            case ProcessAuthInterface::API_METHOD:
+            case RefundCardInterface::API_METHOD:
+                $hash = $this->prepareTransactionTypeHash($data);
                 break;
         }
         return $hash;
@@ -46,6 +49,7 @@ class HashGenerator
 
     /**
      * Prepare hash for query type
+     * Algorythm: md5(apiPassphrase) + merchantUUID + transactionID OR transactionReferenceID
      *
      * @param array $data
      *
@@ -54,14 +58,34 @@ class HashGenerator
     private function prepareQueryTypeHash(array $data): string
     {
         $apiPassPhrase = $this->config->getPassPhrase();
+        $merchantUUID  = $this->config->getMerchantUserId();
 
-        $merchantUUID = $this->config->getMerchantUserId();
+        $transactionID = $data[RequestApiInterface::TRANSACTION_ID];
 
-        $transactionID = $data[AbstractApi::TRANSACTION_ID];
+        $hash = md5($apiPassPhrase) . $merchantUUID . $transactionID;
 
-        $hash = md5($apiPassPhrase) . strtolower($merchantUUID . $transactionID);
+        return md5(strtolower($hash));
+    }
 
-        return md5($hash);
+    /**
+     * Prepare hash for transaction type
+     * Params: md5(apiPassphrase) + merchantUUID + transactionAmount + transactionCurrency
+     *
+     * @param array $data
+     *
+     * @return string
+     */
+    private function prepareTransactionTypeHash(array $data): string
+    {
+        $apiPassPhrase = $this->config->getPassPhrase();
+        $merchantUUID  = $this->config->getMerchantUserId();
+
+        $transactionAmount   = $data[RequestApiInterface::TRANSACTION_AMOUNT];
+        $transactionCurrency = $data[RequestApiInterface::TRANSACTION_CURRENCY];
+
+        $hash = md5($apiPassPhrase) . $merchantUUID . $transactionAmount . $transactionCurrency;
+
+        return md5(strtolower($hash));
     }
 
     /**
@@ -74,10 +98,9 @@ class HashGenerator
     private function prepareVoidTypeHash(array $data): string
     {
         $apiPassPhrase = $this->config->getPassPhrase();
+        $merchantUUID  = $this->config->getMerchantUserId();
 
-        $merchantUUID = $this->config->getMerchantUserId();
-
-        $transactionID = $data[AbstractApi::TRANSACTION_ID];
+        $transactionID = $data[RequestApiInterface::TRANSACTION_ID];
 
         $hash = md5($apiPassPhrase) . strtolower($merchantUUID . $transactionID);
 

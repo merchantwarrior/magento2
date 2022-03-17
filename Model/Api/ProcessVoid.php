@@ -5,15 +5,15 @@ declare(strict_types=1);
 namespace MerchantWarrior\Payment\Model\Api;
 
 use MerchantWarrior\Payment\Api\ProcessVoidInterface;
-use MerchantWarrior\Payment\Api\RefundCardInterface;
 use Magento\Framework\Exception\LocalizedException;
 
-class ProcessVoid extends AbstractApi implements ProcessVoidInterface
+class ProcessVoid extends RequestApi implements ProcessVoidInterface
 {
     /**
      * @inheritdoc
      */
-    public function execute(string $transactionId): array {
+    public function execute(string $transactionId): array
+    {
         if (!$this->config->isEnabled()) {
             return [];
         }
@@ -30,21 +30,18 @@ class ProcessVoid extends AbstractApi implements ProcessVoidInterface
      * @param array $data
      *
      * @return array
+     * @throws LocalizedException
      */
     private function sendRequest(array $data): array
     {
         $data = $this->formData($data);
 
-        $this->sendPostRequest(RefundCardInterface::API_METHOD, $data);
+        $this->sendPostRequest(self::API_METHOD, $data);
 
-        if ($this->getStatus() === 200 && !$this->getResponse(RefundCardInterface::API_METHOD)->isEmpty()) {
-            return $this->getResponse(RefundCardInterface::API_METHOD)->toArray();
+        if ($this->getResponseCode(self::API_METHOD) !== '0') {
+            throw new LocalizedException(__($this->getResponseMessage(self::API_METHOD)));
         }
-
-        if ($errorMessage = $this->getErrorMessage(RefundCardInterface::API_METHOD)) {
-            throw new LocalizedException(__($errorMessage));
-        }
-        return [];
+        return $this->getResponse(self::API_METHOD)->toArray();
     }
 
     /**
@@ -57,6 +54,6 @@ class ProcessVoid extends AbstractApi implements ProcessVoidInterface
      */
     private function validate(string $date): void
     {
-
+        // TODO: Add additional validation
     }
 }

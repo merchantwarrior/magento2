@@ -9,20 +9,25 @@
         <field id="merchant_uuid" translate="label" type="text" sortOrder="10" showInDefault="1" showInWebsite="1"
                showInStore="1">
             <label>Merchant UUID</label>
+            <tooltip>If you don't know your Merchant UUID, you can find it in your Merchant Warrior account. Navigate to
+                Settings => Merchant Settings.
+            </tooltip>
             <config_path>payment/merchant_warrior_abstract/merchant_uuid</config_path>
        </field>
         <field id="api_key" translate="label" type="obscure" sortOrder="20" showInDefault="1" showInWebsite="1"
                showInStore="1">
             <label>API Key</label>
             <backend_model>Magento\Config\Model\Config\Backend\Encrypted</backend_model>
+            <tooltip>If you don't know your Merchant UUID, you can find it in your Merchant Warrior account. Navigate to
+                Settings => Merchant Settings.
+            </tooltip>
             <config_path>payment/merchant_warrior_abstract/api_key</config_path>
         </field>
         <field id="api_passphrase" translate="label" type="obscure" sortOrder="30" showInDefault="1" showInWebsite="1"
                showInStore="1">
             <label>API Passphrase</label>
-            <tooltip>If you don't know your Client Key, you can find it in your Test Customer Area. Navigate to
-                Developers => API Credentials and click on your webservice user. Find your Client Key in the
-                "Authentication" section.
+            <tooltip>If you don't know your Merchant UUID, you can find it in your Merchant Warrior account. Navigate to
+                Settings => Merchant Settings.
             </tooltip>
             <backend_model>Magento\Config\Model\Config\Backend\Encrypted</backend_model>
             <config_path>payment/merchant_warrior_abstract/api_passphrase</config_path>
