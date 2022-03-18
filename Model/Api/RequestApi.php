@@ -123,10 +123,7 @@ abstract class RequestApi implements RequestApiInterface
      */
     public function getApiUrl(): string
     {
-        if ($this->config->isSandBoxModeEnabled()) {
-            return self::API_SANDBOX_URL;
-        }
-        return self::API_LIVE_URL;
+        return $this->config->getApiUrl() . 'post/';
     }
 
     /**

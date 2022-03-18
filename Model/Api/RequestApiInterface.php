@@ -17,13 +17,6 @@ interface RequestApiInterface
     /**#@-*/
 
     /**#@+
-     * MerchantWarrior Api URL
-     */
-    const API_SANDBOX_URL = 'https://base.merchantwarrior.com/post/';
-    const API_LIVE_URL = 'https://api.merchantwarrior.com/post/';
-    /**#@-*/
-
-    /**#@+
      * Post params
      */
     const METHOD = 'method';

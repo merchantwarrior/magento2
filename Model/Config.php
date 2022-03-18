@@ -14,6 +14,13 @@ use Magento\Store\Model\StoreManagerInterface;
 class Config
 {
     /**#@+
+     * MerchantWarrior Api URL
+     */
+    const API_SANDBOX_URL = 'https://base.merchantwarrior.com/';
+    const API_LIVE_URL = 'https://api.merchantwarrior.com/';
+    /**#@-*/
+
+    /**#@+
      * Configuration constants
      */
     const XML_PATH_IS_ENABLED = 'payment/merchant_warrior_abstract/active';
@@ -160,6 +167,17 @@ class Config
             ScopeInterface::SCOPE_STORE,
             $this->getStoreId()
         );
+    }
+
+    /**
+     * Get API Url
+     *
+     * @return string
+     */
+    public function getApiUrl(): string
+    {
+        return ($this->isSandBoxModeEnabled())
+            ? self::API_SANDBOX_URL : self::API_LIVE_URL;
     }
 
     /**

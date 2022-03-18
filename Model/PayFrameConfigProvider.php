@@ -49,10 +49,11 @@ class PayFrameConfigProvider implements ConfigProviderInterface
         return $this->method->isAvailable() ? [
             'payment' => [
                 self::CODE => [
-                    'enabled' => $this->config->isEnabled(),
-                    'uuid' => $this->config->getMerchantUserId(),
-                    'apiKey' => $this->config->getApiKey(),
-                    'submitURL' => ''
+                    'enabled'   => $this->config->isEnabled(),
+                    'uuid'      => $this->config->getMerchantUserId(),
+                    'apiKey'    => $this->config->getApiKey(),
+                    'src'       => 'https://secure.merchantwarrior.com/payframe/', // camp | prod | production
+                    'submitURL' => $this->config->getApiUrl() . 'payframe/'
                 ]
             ],
         ] : [];
