@@ -52,10 +52,32 @@ class PayFrameConfigProvider implements ConfigProviderInterface
                     'enabled'   => $this->config->isEnabled(),
                     'uuid'      => $this->config->getMerchantUserId(),
                     'apiKey'    => $this->config->getApiKey(),
-                    'src'       => 'https://secure.merchantwarrior.com/payframe/', // camp | prod | production
-                    'submitURL' => $this->config->getApiUrl() . 'payframe/'
+                    'payframeSrc' => $this->getPayFrameSrc(),
+                    'submitURL'   => $this->getSubmitUrl(),
+                    'allowedTypeCards' => ''
                 ]
             ],
         ] : [];
+    }
+
+    /**
+     * Get pay frame src URL
+     *
+     * @return string
+     */
+    private function getPayFrameSrc(): string
+    {
+        return $this->config->isSandBoxModeEnabled()
+            ? 'https://securetest.merchantwarrior.com/payframe/' : 'https://secure.merchantwarrior.com/payframe/';
+    }
+
+    /**
+     * Get submit URL
+     *
+     * @return string
+     */
+    private function getSubmitUrl(): string
+    {
+        return $this->config->getApiUrl() . 'payframe/';
     }
 }

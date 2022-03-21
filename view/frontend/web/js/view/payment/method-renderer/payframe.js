@@ -1,7 +1,10 @@
 define([
+    'jquery',
     'Magento_Checkout/js/view/payment/default',
+    'MerchantWarrior_Payment/js/action/place-order',
+    'MerchantWarrior_Payment/js/action/process-card',
     'payframeLib'
-], function (Component) {
+], function ($, Component, placeOrderAction, processCardAction) {
     'use strict';
 
     return Component.extend({
@@ -27,6 +30,20 @@ define([
             }.bind(this));
         },
 
+        /**
+         * After render action
+         */
+        initForm: function () {
+            if (this.isChecked() === 'merchant_warrior_payframe') {
+                this._initMwPayFrame();
+            }
+        },
+
+        /**
+         * Initialize Pay Frame object
+         *
+         * @private
+         */
         _initMwPayFrame: function () {
             let style = {
                 backgroundColor: '#ffbfec',
@@ -42,63 +59,91 @@ define([
                 fieldHeight: '60px',
             };
 
-            // this._getPaymentConfig('src')
-
-            this.mwPayframe = new payframe(
+            this.mwPayframe = this._initPayFrame(
                 this._getPaymentConfig('uuid'),
                 this._getPaymentConfig('apiKey'),
                 this.mwCardDivId,
-                'camp',
+                this._getPaymentConfig('payframeSrc'),
                 this._getPaymentConfig('submitURL'),
                 style,
                 "Visa, Diners Club, Mastercard"
             );
 
-            this.mwPayframe.mwCallback = function() {
-                //Example of success and error scenarios below
-                if (this.threeDS) {
-                    processResponseEvent(method, arguments, tdsCheck);
-                } else {
-                    console.log('Failed to get payframeToken');
-                    if (this.mwPayframe.responseCode == -2 || this.mwPayframe.responseCode == -3) {
-                        console.log('Validation failed - ' + this.mwPayframe.responseMessage);
-                    }
-                    //processResponseEvent(method, arguments);
-                }
-            }.bind(this);
-
-            this.mwPayframe.loading = function() {
-                // let mwIframe = document.getElementById(this.mwIframeID),
-                //     cardDiv = document.getElementById(this.mwCardDivId);
-
-                // Hide the payframe during load operations
-                // mwIframe.style.visibility = 'hidden';
-
-                // Assign the parent div the same dimensions as the payframe
-                // let height = mwIframe.height,
-                //     width = mwIframe.width;
-                //
-                // cardDiv.style.height = height;
-                // cardDiv.style.width = width;
-                //
-                // // Place a loading animation in the center of the payframe
-                // cardDiv.style.background = "url('https://secure.merchantwarrior.com/inc/image/loading_gif.gif') center center no-repeat";
-            }.bind(this);
-
-            this.mwPayframe.loaded = function() {
-                // button.style.visibility = "visible";
-                // let mwIframe = document.getElementById(this.mwIframeID),
-                //     cardDiv = document.getElementById(this.mwCardDivId);
-                // // Remove the loading animation after the payframe has completed its operations and display the payframe
-                // cardDiv.style.background = 'none';
-                // if (mwIframe) {
-                //     mwIframe.style.visibility = 'visible';
-                // }
-            }.bind(this);
+            this.mwPayframe.mwCallback = (
+                tokenStatus, payframeToken, payframeKey
+            ) => this._payFrameCallback(
+                tokenStatus, payframeToken, payframeKey
+            );
+            this.mwPayframe.loading = () => this._payFrameLoading();
+            this.mwPayframe.loaded = () => this._payFrameLoaded();
 
             this.mwPayframe.deploy();
         },
 
+        /**
+         * Params:
+         * - uuid - UserUUID
+         * - apiKey - ApiKEY
+         * - payFrameDivId - id of frame
+         * - payframeSrc
+         * - submitUrl
+         * - iframeStyle
+         * - acceptedCardTypesInput - with empty: only Visa and Mastercard will be accepted.
+         * - methodInput - addCard | getPayframeToken, by default: getPayframeToken
+         *
+         * @type {payframe}
+         */
+        _initPayFrame: function (uuid, apiKey, payFrameDivId, payframeSrc, submitUrl, iframeStyle, acceptedCardTypes) {
+            return new payframe(uuid, apiKey, payFrameDivId, payframeSrc, submitUrl, iframeStyle, acceptedCardTypes);
+        },
+
+        _payFrameCallback: function (tokenStatus, payframeToken, payframeKey) {
+            debugger;
+            if (tokenStatus === 'HAS_TOKEN') {
+                document.getElementById('payframeToken').value = payframeToken;
+                document.getElementById('payframeKey').value = payframeKey;
+                //Set other fields, then submit form to server for processCard transaction
+                var formData = $("#paymentForm").serialize();
+                var formUrl = '/submitServer.php'; // processCard
+
+                $.when(processCardAction()).fail(() => {
+                    this.mwPayframe.reset();
+                }).done((response) => {
+                    // var xmlDoc = $.parseXML(data);
+                    var responseCode = response.getElementsByTagName("responseCode")[0].childNodes[0].nodeValue;
+                    var responseMessage = response.getElementsByTagName("responseMessage")[0].childNodes[0].nodeValue;
+                    if(responseCode == 0 && responseMessage == 'Transaction approved') {
+                        mwPayframe.reset();
+                    } else if(responseMessage == 'Transaction declined') {
+                        console.log('Transaction Declined - Please enter a different card');
+                        mwPayframe.reset();
+                    }
+
+                    this.mwPayframe.reset();
+                })
+            } else {
+                if (this.mwPayframe.responseCode == -2 || this.mwPayframe.responseCode == -3) {
+                    console.log('Validation failed - ' + this.mwPayframe.responseMessage);
+                }
+            }
+        },
+
+        _payFrameLoading: function () {
+
+        },
+
+        _payFrameLoaded: function () {
+
+        },
+
+        /**
+         * Get config param
+         *
+         * @param key
+         *
+         * @return {*}
+         * @private
+         */
         _getPaymentConfig: function (key) {
             return window.checkoutConfig.payment.merchant_warrior_payframe[key];
         },
@@ -110,6 +155,30 @@ define([
          */
         isActive: function () {
             return window.checkoutConfig.payment.merchant_warrior_payframe.enabled;
+        },
+
+        /**
+         * Save order
+         */
+        placeOrder: function (data, event) {
+            let placeOrder;
+
+            if (event) {
+                event.preventDefault();
+            }
+
+            if (this.validate()) {
+                this.mwPayframe.submitPayframe();
+
+                return ;
+
+                placeOrder = placeOrderAction(this.getData());
+
+                $.when(placeOrder).fail(() => {}).done(this.afterPlaceOrder.bind(this));
+
+                return true;
+            }
+            return false;
         }
     });
 });

@@ -16,7 +16,7 @@
             <!-- ko template: getTemplate() --><!-- /ko -->
             <!--/ko-->
         </div>
-        <div class="cardData" id="payframe-card-data"></div>
+        <div class="cardData" id="payframe-card-data" afterRender="initForm"></div>
         <div class="checkout-agreements-block">
             <!-- ko foreach: $parent.getRegion('before-place-order') -->
             <!-- ko template: getTemplate() --><!-- /ko -->
