@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace MerchantWarrior\Payment\Api;
+namespace MerchantWarrior\Payment\Api\Direct;
 
 use Magento\Framework\Exception\LocalizedException;
 

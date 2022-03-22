@@ -123,18 +123,19 @@ abstract class RequestApi implements RequestApiInterface
      */
     public function getApiUrl(): string
     {
-        return $this->config->getApiUrl() . 'post/';
+        return $this->config->getApiUrl();
     }
 
     /**
      * Send post request data
      *
      * @param string $key
+     * @param string $url
      * @param array $data
      *
      * @return void
      */
-    protected function sendPostRequest(string $key, array $data): void
+    protected function sendPostRequest(string $key, string $url, array $data): void
     {
         try {
             $this->beforeCall($data);
@@ -146,9 +147,9 @@ abstract class RequestApi implements RequestApiInterface
             $this->client->setOption((string)CURLOPT_CUSTOMREQUEST, 'POST');
 
             if (self::REQUEST_MODE_JSON) {
-                $this->client->post($this->getApiUrl(), $this->serializer->serialize($data));
+                $this->client->post($this->getApiUrl() . $url, $this->serializer->serialize($data));
             } else {
-                $this->client->post($this->getApiUrl(), $data);
+                $this->client->post($this->getApiUrl() . $url, $data);
             }
 
             $this->afterCall($key);

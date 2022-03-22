@@ -1,17 +1,32 @@
 define([
     'jquery',
     'Magento_Checkout/js/view/payment/default',
+    'Magento_Customer/js/customer-data',
+    'Magento_Checkout/js/model/quote',
     'MerchantWarrior_Payment/js/action/place-order',
     'MerchantWarrior_Payment/js/action/process-card',
     'payframeLib'
-], function ($, Component, placeOrderAction, processCardAction) {
+], function ($, Component, customerData, quote, placeOrderAction, processCardAction) {
     'use strict';
 
     return Component.extend({
         defaults: {
             template: 'MerchantWarrior_Payment/payment/mw_payframe',
             mwIframeID: 'mwIframe',
-            mwCardDivId: 'payframe-card-data'
+            mwCardDivId: 'payframe-card-data',
+            frameStyle: {
+                backgroundColor: '#ffbfec',
+                textColor: '#f963cd',
+                border: '3px solid #f963cd',
+                fontFamily: 'Arial',
+                errorTextColor: 'red',
+                errorBorderColor: 'red',
+                fontSize: '18px',
+                width: '400px',
+                cardTypeDisplay: 'right',
+                padding: '5px',
+                fieldHeight: '60px'
+            }
         },
         mwPayframe: '',
         method: 'getPayframeToken', // change this to getPayframeToken for payment payframe
@@ -45,27 +60,13 @@ define([
          * @private
          */
         _initMwPayFrame: function () {
-            let style = {
-                backgroundColor: '#ffbfec',
-                textColor: '#f963cd',
-                border: '3px solid #f963cd',
-                fontFamily: 'Arial',
-                errorTextColor: 'red',
-                errorBorderColor: 'red',
-                fontSize: '18px',
-                width: '400px',
-                cardTypeDisplay: 'right',
-                padding: '5px',
-                fieldHeight: '60px',
-            };
-
             this.mwPayframe = this._initPayFrame(
                 this._getPaymentConfig('uuid'),
                 this._getPaymentConfig('apiKey'),
                 this.mwCardDivId,
                 this._getPaymentConfig('payframeSrc'),
                 this._getPaymentConfig('submitURL'),
-                style,
+                this.frameStyle,
                 "Visa, Diners Club, Mastercard"
             );
 
@@ -98,29 +99,50 @@ define([
         },
 
         _payFrameCallback: function (tokenStatus, payframeToken, payframeKey) {
-            debugger;
             if (tokenStatus === 'HAS_TOKEN') {
-                document.getElementById('payframeToken').value = payframeToken;
-                document.getElementById('payframeKey').value = payframeKey;
-                //Set other fields, then submit form to server for processCard transaction
-                var formData = $("#paymentForm").serialize();
-                var formUrl = '/submitServer.php'; // processCard
 
-                $.when(processCardAction()).fail(() => {
+                // let postData = {
+                //     'payframeToken': payframeToken,
+                //     'payframeKey': payframeKey,
+                //     'transactionAmount': '1.00',
+                //     'transactionCurrency': 'AUD',
+                //     'transactionProduct': 'Test Product',
+                //     'customerName': 'Test Customer',
+                //     'customerCountry': 'AU',
+                //     'customerState': 'QLD',
+                //     'customerCity': 'Brisbane',
+                //     'customerAddress': '123 Test Street',
+                //     'customerPostCode': '4000',
+                //     'customerPhone': '61731665489',
+                //     'customerEmail': 'mw@emailaddress.com',
+                //     'customerIP': '1.1.1.1'
+                // };
+
+                let postData = {
+                    payframeToken: payframeToken,
+                    payframeKey: payframeKey,
+                    cartId: quote.getQuoteId(),
+                    email: quote.guestEmail,
+                    billingAddress: quote.billingAddress()
+                };
+
+                $.when(
+                    processCardAction(postData)
+                ).fail(() => {
                     this.mwPayframe.reset();
                 }).done((response) => {
-                    // var xmlDoc = $.parseXML(data);
-                    var responseCode = response.getElementsByTagName("responseCode")[0].childNodes[0].nodeValue;
-                    var responseMessage = response.getElementsByTagName("responseMessage")[0].childNodes[0].nodeValue;
-                    if(responseCode == 0 && responseMessage == 'Transaction approved') {
-                        mwPayframe.reset();
-                    } else if(responseMessage == 'Transaction declined') {
-                        console.log('Transaction Declined - Please enter a different card');
-                        mwPayframe.reset();
-                    }
-
                     this.mwPayframe.reset();
-                })
+                    // var xmlDoc = $.parseXML(data);
+                    // var responseCode = response.getElementsByTagName("responseCode")[0].childNodes[0].nodeValue;
+                    // var responseMessage = response.getElementsByTagName("responseMessage")[0].childNodes[0].nodeValue;
+                    // if(responseCode == 0 && responseMessage == 'Transaction approved') {
+                    //     mwPayframe.reset();
+                    // } else if(responseMessage == 'Transaction declined') {
+                    //     console.log('Transaction Declined - Please enter a different card');
+                    //     mwPayframe.reset();
+                    // }
+
+                });
             } else {
                 if (this.mwPayframe.responseCode == -2 || this.mwPayframe.responseCode == -3) {
                     console.log('Validation failed - ' + this.mwPayframe.responseMessage);

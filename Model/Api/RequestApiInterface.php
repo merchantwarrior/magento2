@@ -23,7 +23,7 @@ interface RequestApiInterface
     /**#@-*/
 
     /**#@+
-     * Api Method constants
+     * Api Direct Method constants
      */
     const TRANSACTION_AMOUNT = 'transactionAmount';
     const TRANSACTION_CURRENCY = 'transactionCurrency';
@@ -43,5 +43,12 @@ interface RequestApiInterface
     const PAYMENT_CARD_CSC = 'paymentCardCSC';
     const TRANSACTION_ID = 'transactionID';
     const REFUND_AMOUNT = 'refundAmount';
+    /**#@-*/
+
+    /**#@+
+     * Api Payframe Method constants
+     */
+    const PAYFRAME_KEY = 'payframeKey';
+    const PAYFRAME_TOKEN = 'payframeToken';
     /**#@-*/
 }

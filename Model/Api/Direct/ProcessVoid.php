@@ -2,32 +2,26 @@
 
 declare(strict_types=1);
 
-namespace MerchantWarrior\Payment\Model\Api;
+namespace MerchantWarrior\Payment\Model\Api\Direct;
 
-use MerchantWarrior\Payment\Api\RefundCardInterface;
 use Magento\Framework\Exception\LocalizedException;
+use MerchantWarrior\Payment\Api\Direct\ProcessVoidInterface;
+use MerchantWarrior\Payment\Model\Api\RequestApi;
 
-class RefundCard extends RequestApi implements RefundCardInterface
+class ProcessVoid extends RequestApi implements ProcessVoidInterface
 {
     /**
      * @inheritdoc
      */
-    public function execute(
-        string $transactionAmount,
-        string $currency,
-        string $transactionId,
-        string $refundAmount
-    ): array {
+    public function execute(string $transactionId): array
+    {
         if (!$this->config->isEnabled()) {
             return [];
         }
 
         return $this->sendRequest([
             self::METHOD => self::API_METHOD,
-            self::TRANSACTION_AMOUNT => $transactionAmount,
-            self::TRANSACTION_CURRENCY => $currency,
-            self::TRANSACTION_ID => $transactionId,
-            self::REFUND_AMOUNT => $refundAmount
+            self::TRANSACTION_ID => $transactionId
         ]);
     }
 
@@ -43,7 +37,7 @@ class RefundCard extends RequestApi implements RefundCardInterface
     {
         $data = $this->formData($data);
 
-        $this->sendPostRequest(self::API_METHOD, $data);
+        $this->sendPostRequest(self::API_METHOD, 'post/', $data);
 
         if ($this->getResponseCode(self::API_METHOD) !== '0') {
             throw new LocalizedException(__($this->getResponseMessage(self::API_METHOD)));
@@ -61,6 +55,6 @@ class RefundCard extends RequestApi implements RefundCardInterface
      */
     private function validate(string $date): void
     {
-        // TODO: Add additonal validation for data
+        // TODO: Add additional validation
     }
 }

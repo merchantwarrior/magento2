@@ -2,12 +2,13 @@
 
 declare(strict_types=1);
 
-namespace MerchantWarrior\Payment\Model\Api;
+namespace MerchantWarrior\Payment\Model\Api\Payframe;
 
-use MerchantWarrior\Payment\Api\ProcessAuthInterface;
 use Magento\Framework\Exception\LocalizedException;
+use MerchantWarrior\Payment\Api\Payframe\ProcessCardInterface;
+use MerchantWarrior\Payment\Model\Api\RequestApi;
 
-class ProcessAuth extends RequestApi implements ProcessAuthInterface
+class ProcessCard extends RequestApi implements ProcessCardInterface
 {
     /**
      * @inheritdoc
@@ -37,7 +38,7 @@ class ProcessAuth extends RequestApi implements ProcessAuthInterface
     {
         $data = $this->formData($data);
 
-        $this->sendPostRequest(self::API_METHOD, $data);
+        $this->sendPostRequest(self::API_METHOD, 'payframe/', $data);
 
         if ($this->getResponseCode(self::API_METHOD) !== '0') {
             throw new LocalizedException(__($this->getResponseMessage(self::API_METHOD)));
@@ -55,20 +56,12 @@ class ProcessAuth extends RequestApi implements ProcessAuthInterface
      */
     private function validate(array $data): void
     {
-        if (!isset($data[self::PAYMENT_CARD_NUMBER])) {
-            throw new LocalizedException(__('You must enter card number!'));
+        if (!isset($data[self::PAYFRAME_KEY])) {
+            throw new LocalizedException(__('Your card is incorrect!'));
         }
 
-        if (!isset($data[self::PAYMENT_CARD_CSC])) {
-            throw new LocalizedException(__('You must enter card CSC code!'));
-        }
-
-        if (!isset($data[self::PAYMENT_CARD_EXPIRY])) {
-            throw new LocalizedException(__('You must enter card expiry date!'));
-        }
-
-        if (!isset($data[self::PAYMENT_CARD_NAME])) {
-            throw new LocalizedException(__('You must enter card name!'));
+        if (!isset($data[self::PAYFRAME_TOKEN])) {
+            throw new LocalizedException(__('Your card is incorrect!'));
         }
     }
 }
