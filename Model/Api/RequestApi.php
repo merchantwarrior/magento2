@@ -117,25 +117,14 @@ abstract class RequestApi implements RequestApiInterface
     }
 
     /**
-     * Get base API url
-     *
-     * @return string
-     */
-    public function getApiUrl(): string
-    {
-        return $this->config->getApiUrl();
-    }
-
-    /**
      * Send post request data
      *
      * @param string $key
-     * @param string $url
      * @param array $data
      *
      * @return void
      */
-    protected function sendPostRequest(string $key, string $url, array $data): void
+    protected function sendPostRequest(string $key, array $data): void
     {
         try {
             $this->beforeCall($data);
@@ -147,9 +136,9 @@ abstract class RequestApi implements RequestApiInterface
             $this->client->setOption((string)CURLOPT_CUSTOMREQUEST, 'POST');
 
             if (self::REQUEST_MODE_JSON) {
-                $this->client->post($this->getApiUrl() . $url, $this->serializer->serialize($data));
+                $this->client->post($this->getApiUrl(), $this->serializer->serialize($data));
             } else {
-                $this->client->post($this->getApiUrl() . $url, $data);
+                $this->client->post($this->getApiUrl(), $data);
             }
 
             $this->afterCall($key);
@@ -283,7 +272,7 @@ abstract class RequestApi implements RequestApiInterface
     }
 
     /**
-     * Do actions before send request
+     * Do action before send request
      *
      * @param array $data
      *
@@ -294,7 +283,6 @@ abstract class RequestApi implements RequestApiInterface
         $this->eventManager->dispatch(
             'merchant_warrior_post_before',
             [
-                'method'      => __METHOD__,
                 'api_url'     => $this->getApiUrl(),
                 'passed_data' => $data,
                 'call_time'   => $this->getCallTime(),
@@ -316,7 +304,6 @@ abstract class RequestApi implements RequestApiInterface
         $this->eventManager->dispatch(
             'merchant_warrior_post_after',
             [
-                'method'        => __METHOD__,
                 'status'        => $this->status,
                 'response_data' => $this->getResponse($key)->toArray(),
                 'call_time'     => $this->getCallTime(),

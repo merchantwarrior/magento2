@@ -27,6 +27,16 @@ class ProcessAuth extends RequestApi implements ProcessAuthInterface
     }
 
     /**
+     * Get base API url
+     *
+     * @return string
+     */
+    protected function getApiUrl(): string
+    {
+        return $this->config->getApiUrl() . 'post/';
+    }
+
+    /**
      * Set request
      *
      * @param array $data
@@ -38,7 +48,7 @@ class ProcessAuth extends RequestApi implements ProcessAuthInterface
     {
         $data = $this->formData($data);
 
-        $this->sendPostRequest(self::API_METHOD, 'post/',  $data);
+        $this->sendPostRequest(self::API_METHOD,  $data);
 
         if ($this->getResponseCode(self::API_METHOD) !== '0') {
             throw new LocalizedException(__($this->getResponseMessage(self::API_METHOD)));

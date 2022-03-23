@@ -1,12 +1,13 @@
 define([
     'jquery',
+    'ko',
     'Magento_Checkout/js/view/payment/default',
     'Magento_Customer/js/customer-data',
     'Magento_Checkout/js/model/quote',
     'MerchantWarrior_Payment/js/action/place-order',
     'MerchantWarrior_Payment/js/action/process-card',
     'payframeLib'
-], function ($, Component, customerData, quote, placeOrderAction, processCardAction) {
+], function ($, ko, Component, customerData, quote, placeOrderAction, processCardAction) {
     'use strict';
 
     return Component.extend({
@@ -26,7 +27,8 @@ define([
                 cardTypeDisplay: 'right',
                 padding: '5px',
                 fieldHeight: '60px'
-            }
+            },
+            transactionResult: ''
         },
         mwPayframe: '',
         method: 'getPayframeToken', // change this to getPayframeToken for payment payframe
@@ -39,7 +41,7 @@ define([
             this._super();
 
             this.isChecked.subscribe(function(methodCode) {
-                if (methodCode === 'merchant_warrior_payframe') {
+                if (methodCode === this.item.method) {
                     this._initMwPayFrame();
                 }
             }.bind(this));
@@ -100,24 +102,6 @@ define([
 
         _payFrameCallback: function (tokenStatus, payframeToken, payframeKey) {
             if (tokenStatus === 'HAS_TOKEN') {
-
-                // let postData = {
-                //     'payframeToken': payframeToken,
-                //     'payframeKey': payframeKey,
-                //     'transactionAmount': '1.00',
-                //     'transactionCurrency': 'AUD',
-                //     'transactionProduct': 'Test Product',
-                //     'customerName': 'Test Customer',
-                //     'customerCountry': 'AU',
-                //     'customerState': 'QLD',
-                //     'customerCity': 'Brisbane',
-                //     'customerAddress': '123 Test Street',
-                //     'customerPostCode': '4000',
-                //     'customerPhone': '61731665489',
-                //     'customerEmail': 'mw@emailaddress.com',
-                //     'customerIP': '1.1.1.1'
-                // };
-
                 let postData = {
                     payframeToken: payframeToken,
                     payframeKey: payframeKey,
@@ -128,21 +112,33 @@ define([
 
                 $.when(
                     processCardAction(postData)
-                ).fail(() => {
-                    this.mwPayframe.reset();
-                }).done((response) => {
-                    this.mwPayframe.reset();
-                    // var xmlDoc = $.parseXML(data);
-                    // var responseCode = response.getElementsByTagName("responseCode")[0].childNodes[0].nodeValue;
-                    // var responseMessage = response.getElementsByTagName("responseMessage")[0].childNodes[0].nodeValue;
-                    // if(responseCode == 0 && responseMessage == 'Transaction approved') {
-                    //     mwPayframe.reset();
-                    // } else if(responseMessage == 'Transaction declined') {
-                    //     console.log('Transaction Declined - Please enter a different card');
-                    //     mwPayframe.reset();
-                    // }
+                ).fail(
+                    (response) => {
+                        response =  JSON.parse(response);
+                        // TODO: Add showing error messages
+                        console.log('Transaction Declined - Please enter a different card');
+                    }
+                ).done(
+                    (response) => {
+                        response =  JSON.parse(response);
+                        if (response === 0) {
+                            console.log(response.message);
+                        } else {
+                            debugger;
 
-                });
+                            this.mwPayframe.reset();
+                            this.transactionResult = response.data;
+
+                            $.when(
+                                placeOrderAction(this.getData())
+                            ).fail(
+                                () => {}
+                            ).done(
+                                this.afterPlaceOrder.bind(this)
+                            );
+                        }
+                    }
+                );
             } else {
                 if (this.mwPayframe.responseCode == -2 || this.mwPayframe.responseCode == -3) {
                     console.log('Validation failed - ' + this.mwPayframe.responseMessage);
@@ -180,25 +176,27 @@ define([
         },
 
         /**
+         * Get payment data
+         *
+         * @return {{additional_data: {transaction_result: *}, method}}
+         */
+        getData: function() {
+            return {
+                'method': this.item.method,
+                'additional_data': this.transactionResult
+            };
+        },
+
+        /**
          * Save order
          */
         placeOrder: function (data, event) {
-            let placeOrder;
-
             if (event) {
                 event.preventDefault();
             }
 
             if (this.validate()) {
                 this.mwPayframe.submitPayframe();
-
-                return ;
-
-                placeOrder = placeOrderAction(this.getData());
-
-                $.when(placeOrder).fail(() => {}).done(this.afterPlaceOrder.bind(this));
-
-                return true;
             }
             return false;
         }

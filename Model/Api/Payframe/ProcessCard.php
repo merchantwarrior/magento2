@@ -7,6 +7,7 @@ namespace MerchantWarrior\Payment\Model\Api\Payframe;
 use Magento\Framework\Exception\LocalizedException;
 use MerchantWarrior\Payment\Api\Payframe\ProcessCardInterface;
 use MerchantWarrior\Payment\Model\Api\RequestApi;
+use MerchantWarrior\Payment\Model\Config;
 
 class ProcessCard extends RequestApi implements ProcessCardInterface
 {
@@ -27,6 +28,17 @@ class ProcessCard extends RequestApi implements ProcessCardInterface
     }
 
     /**
+     * Get base API url
+     *
+     * @return string
+     */
+    protected function getApiUrl(): string
+    {
+        // return $this->config->getApiUrl() . 'payframe/';
+        return Config::API_LIVE_URL . 'payframe/';
+    }
+
+    /**
      * Set request
      *
      * @param array $data
@@ -38,7 +50,7 @@ class ProcessCard extends RequestApi implements ProcessCardInterface
     {
         $data = $this->formData($data);
 
-        $this->sendPostRequest(self::API_METHOD, 'payframe/', $data);
+        $this->sendPostRequest(self::API_METHOD, $data);
 
         if ($this->getResponseCode(self::API_METHOD) !== '0') {
             throw new LocalizedException(__($this->getResponseMessage(self::API_METHOD)));

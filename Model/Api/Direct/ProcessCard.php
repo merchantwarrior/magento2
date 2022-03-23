@@ -5,31 +5,25 @@ declare(strict_types=1);
 namespace MerchantWarrior\Payment\Model\Api\Direct;
 
 use Magento\Framework\Exception\LocalizedException;
-use MerchantWarrior\Payment\Api\Direct\RefundCardInterface;
+use MerchantWarrior\Payment\Api\Direct\ProcessCardInterface;
 use MerchantWarrior\Payment\Model\Api\RequestApi;
 
-class RefundCard extends RequestApi implements RefundCardInterface
+class ProcessCard extends RequestApi implements ProcessCardInterface
 {
     /**
      * @inheritdoc
      */
-    public function execute(
-        string $transactionAmount,
-        string $currency,
-        string $transactionId,
-        string $refundAmount
-    ): array {
+    public function execute(array $transactionParams): array
+    {
         if (!$this->config->isEnabled()) {
             return [];
         }
 
-        return $this->sendRequest([
-            self::METHOD => self::API_METHOD,
-            self::TRANSACTION_AMOUNT => $transactionAmount,
-            self::TRANSACTION_CURRENCY => $currency,
-            self::TRANSACTION_ID => $transactionId,
-            self::REFUND_AMOUNT => $refundAmount
-        ]);
+        $this->validate($transactionParams);
+
+        $transactionParams[self::METHOD] = self::API_METHOD;
+
+        return $this->sendRequest($transactionParams);
     }
 
     /**
@@ -65,13 +59,19 @@ class RefundCard extends RequestApi implements RefundCardInterface
     /**
      * Validate
      *
-     * @param string $date
+     * @param array $data
      *
      * @return void
      * @throws LocalizedException
      */
-    private function validate(string $date): void
+    private function validate(array $data): void
     {
-        // TODO: Add additonal validation for data
+        if (!isset($data[self::PAYFRAME_KEY])) {
+            throw new LocalizedException(__('Your card is incorrect!'));
+        }
+
+        if (!isset($data[self::PAYFRAME_TOKEN])) {
+            throw new LocalizedException(__('Your card is incorrect!'));
+        }
     }
 }

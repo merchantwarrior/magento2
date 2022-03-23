@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace MerchantWarrior\Payment\Model\Payment\Process;
 
+use Magento\Framework\Serialize\SerializerInterface;
 use Magento\Quote\Api\CartRepositoryInterface;
 use Magento\Quote\Api\Data\AddressInterface;
 use Magento\Quote\Api\GuestBillingAddressManagementInterface;
@@ -13,6 +14,7 @@ use Magento\Quote\Model\QuoteIdMaskFactory;
 use Magento\Quote\Api\Data\CartInterface;
 use MerchantWarrior\Payment\Api\Payment\Process\CardInterface;
 use MerchantWarrior\Payment\Api\Payframe\ProcessCardInterface;
+use MerchantWarrior\Payment\Model\Api\RequestApiInterface;
 
 class Card implements CardInterface
 {
@@ -42,24 +44,32 @@ class Card implements CardInterface
     private ProcessCardInterface $processCard;
 
     /**
+     * @var SerializerInterface
+     */
+    private SerializerInterface $serializer;
+
+    /**
      * @param GuestBillingAddressManagementInterface $billingAddressManagement
      * @param GuestCartManagementInterface $cartManagement
      * @param QuoteIdMaskFactory $quoteIdMaskFactory
      * @param CartRepositoryInterface $cartRepository
      * @param ProcessCardInterface $processCard
+     * @param SerializerInterface $serializer
      */
     public function __construct(
         GuestBillingAddressManagementInterface $billingAddressManagement,
         GuestCartManagementInterface $cartManagement,
         QuoteIdMaskFactory $quoteIdMaskFactory,
         CartRepositoryInterface $cartRepository,
-        ProcessCardInterface $processCard
+        ProcessCardInterface $processCard,
+        SerializerInterface $serializer
     ) {
         $this->billingAddressManagement = $billingAddressManagement;
         $this->cartManagement = $cartManagement;
         $this->quoteIdMaskFactory = $quoteIdMaskFactory;
         $this->cartRepository = $cartRepository;
         $this->processCard = $processCard;
+        $this->serializer = $serializer;
     }
 
     /**
@@ -72,6 +82,28 @@ class Card implements CardInterface
         string $email,
         AddressInterface $billingAddress = null
     ): string {
+        $result = [
+            'status' => 0,
+            'data' => [
+                "cardExpiryYear" => "21",
+                "responseMessage" => "Transaction approved",
+                "transactionReferenceID" => "12345",
+                "cardType" => "mc",
+                "responseCode" => "0",
+                "authCode" => "731357421",
+                "transactionAmount" => "1.00",
+                "authResponseCode" => "08",
+                "transactionID" => "1336-20be3569-b600-11e6-b9c3-005056b209e0",
+                "receiptNo" => "731357421",
+                "cardExpiryMonth" => "05",
+                "customHash" => "65b172551b7d3a0706c0ce5330c98470",
+                "authSettledDate" => "2016-11-29",
+                "paymentCardNumber" => "512345XXXXXX2346",
+                "authMessage" => "Honour with identification"
+            ]
+        ];
+        return $this->serializer->serialize($result);
+
         $quoteIdMask = $this->quoteIdMaskFactory->create()->load($cartId, 'masked_id');
         /** @var Quote $quote */
         $quote = $this->cartRepository->getActive($quoteIdMask->getQuoteId());
@@ -85,15 +117,52 @@ class Card implements CardInterface
             $quote->getBillingAddress()->setEmail($email);
         }
 
-        $transactionData = [
-            'payframeToken'     => $payframeToken,
-            'payframeKey'       => $payframeKey
+        try {
+            $transactionData = [
+                RequestApiInterface::PAYFRAME_TOKEN => $payframeToken,
+                RequestApiInterface::PAYFRAME_KEY => $payframeKey
+            ];
+
+            $transactionData = $this->formTransactionData($transactionData, $quote);
+            $transactionData = $this->formCustomerData($transactionData, $quote, $billingAddress);
+
+            $result = $this->processCard->execute($transactionData);
+
+            $result = [
+                'status' => 0,
+                'message' => $result->getData()
+            ];
+        } catch (\Exception $e) {
+            $result = [
+                'status' => 0,
+                'message' => $e->getMessage()
+            ];
+        }
+
+        $result = [
+            'status' => 0,
+            'data' => [
+                "custom1" => [],
+                "cardExpiryYear" => "21",
+                "custom2" => [],
+                "custom3" => [],
+                "responseMessage" => "Transaction approved",
+                "transactionReferenceID" => "12345",
+                "cardType" => "mc",
+                "responseCode" => "0",
+                "authCode" => "731357421",
+                "transactionAmount" => "1.00",
+                "authResponseCode" => "08",
+                "transactionID" => "1336-20be3569-b600-11e6-b9c3-005056b209e0",
+                "receiptNo" => "731357421",
+                "cardExpiryMonth" => "05",
+                "customHash" => "65b172551b7d3a0706c0ce5330c98470",
+                "authSettledDate" => "2016-11-29",
+                "paymentCardNumber" => "512345XXXXXX2346",
+                "authMessage" => "Honour with identification"
+            ]
         ];
-        $transactionData = $this->formData($transactionData, $quote, $billingAddress);
-
-        $result = $this->processCard->execute($transactionData);
-
-        return '';
+        return $this->serializer->serialize($result);
     }
 
     /**
@@ -102,9 +171,39 @@ class Card implements CardInterface
      * @param array $transactionData
      * @param CartInterface $quote
      * @param AddressInterface $billingAddress
+     *
      * @return array
      */
-    private function formData(array $transactionData, CartInterface $quote, AddressInterface $billingAddress)
+    private function formCustomerData(
+        array $transactionData,
+        CartInterface $quote,
+        AddressInterface $billingAddress
+    ): array {
+        $customerName = $billingAddress->getFirstname() . ' ' . $billingAddress->getLastname();
+        $customerAddress = implode(', ', $billingAddress->getStreet());
+        $data = [
+            RequestApiInterface::CUSTOMER_NAME      => $customerName,
+            RequestApiInterface::CUSTOMER_COUNTRY   => $billingAddress->getCountryId(),
+            RequestApiInterface::CUSTOMER_STATE     => $billingAddress->getRegion(),
+            RequestApiInterface::CUSTOMER_CITY      => $billingAddress->getCity(),
+            RequestApiInterface::CUSTOMER_ADDRESS   => $customerAddress,
+            RequestApiInterface::CUSTOMER_POST_CODE => $billingAddress->getPostcode(),
+            RequestApiInterface::CUSTOMER_PHONE     => $billingAddress->getTelephone(),
+            RequestApiInterface::CUSTOMER_EMAIL     => $billingAddress->getEmail(),
+            RequestApiInterface::CUSTOMER_IP        => $quote->getRemoteIp(),
+        ];
+        return array_merge($transactionData, $data);
+    }
+
+    /**
+     * Form transaction data
+     *
+     * @param array $transactionData
+     * @param CartInterface $quote
+     *
+     * @return array
+     */
+    private function formTransactionData(array $transactionData, CartInterface $quote): array
     {
         $items = [];
         foreach ($quote->getItems() as $item) {
@@ -112,21 +211,10 @@ class Card implements CardInterface
         }
         $product = implode(',', $items);
 
-        $data = [
-            'transactionAmount'     => $quote->getGrandTotal(),
-            'transactionCurrency'   => $quote->getGlobalCurrencyCode(),
-            'transactionProduct'    => $product,
-            'customerName'      => $billingAddress->getFirstname() . ' ' . $billingAddress->getLastname(),
-            'customerCountry'   => $billingAddress->getCountryId(),
-            'customerState'     => $billingAddress->getRegion(),
-            'customerCity'      => $billingAddress->getCity(),
-            'customerAddress'   => $billingAddress->getStreet(),
-            'customerPostCode'  => $billingAddress->getPostcode(),
-            'customerPhone'     => $billingAddress->getTelephone(),
-            'customerEmail'     => $billingAddress->getEmail(),
-            'customerIP'        => $quote->getRemoteIp(),
-        ];
+        $transactionData[RequestApiInterface::TRANSACTION_AMOUNT]   = $quote->getGrandTotal();
+        $transactionData[RequestApiInterface::TRANSACTION_CURRENCY] = $quote->getGlobalCurrencyCode();
+        $transactionData[RequestApiInterface::TRANSACTION_PRODUCT]  = $product;
 
-        return array_merge($transactionData, $data);
+        return $transactionData;
     }
 }

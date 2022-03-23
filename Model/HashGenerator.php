@@ -7,6 +7,7 @@ namespace MerchantWarrior\Payment\Model;
 use MerchantWarrior\Payment\Api\Direct\ProcessAuthInterface;
 use MerchantWarrior\Payment\Api\Direct\ProcessVoidInterface;
 use MerchantWarrior\Payment\Api\Direct\RefundCardInterface;
+use MerchantWarrior\Payment\Api\Payframe\ProcessCardInterface as PayframeProcessCardInterface;
 use MerchantWarrior\Payment\Model\Api\RequestApiInterface;
 
 class HashGenerator
@@ -41,6 +42,7 @@ class HashGenerator
                 break;
             case ProcessAuthInterface::API_METHOD:
             case RefundCardInterface::API_METHOD:
+            case PayframeProcessCardInterface::API_METHOD:
                 $hash = $this->prepareTransactionTypeHash($data);
                 break;
         }

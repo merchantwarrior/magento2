@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace MerchantWarrior\Payment\Api\Payframe;
+namespace MerchantWarrior\Payment\Api\Direct;
 
 use Magento\Framework\Exception\LocalizedException;
 
@@ -18,7 +18,7 @@ interface ProcessCardInterface
     /**#@-*/
 
     /**
-     * Execute process Card for Payframe
+     * Execute process Card for Direct API
      *
      * Expected params:
      * [
