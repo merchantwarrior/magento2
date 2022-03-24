@@ -29,8 +29,8 @@
             <config_path>payment/merchant_warrior_payframe/order_status</config_path>
         </field>
         <field id="cctypes" translate="label" type="multiselect" sortOrder="40" showInDefault="1" showInWebsite="1" showInStore="0">
-            <label>Credit Card Types</label>
-            <source_model>MerchantWarrior\Payment\Model\Config\Source\CcType</source_model>
+            <label>Accepted Cards</label>
+            <source_model>MerchantWarrior\Payment\Model\Config\Source\MerchantWarriorCcType</source_model>
             <config_path>payment/merchant_warrior_payframe/cctypes</config_path>
         </field>
         <group id="merchant_warrior_payframe_country_specific" translate="label" showInDefault="1" showInWebsite="1" sortOrder="50">

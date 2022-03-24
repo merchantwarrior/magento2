@@ -75,7 +75,7 @@ class PayFrameConfigProvider implements ConfigProviderInterface
                     'apiKey'    => $this->config->getApiKey(),
                     'payframeSrc' => $this->getPayFrameSrc(),
                     'submitURL'   => $this->getSubmitUrl(),
-                    'allowedTypeCards' => '',
+                    'allowedTypeCards' => $this->config->getAllowedTypeCards(),
                     'successPage' => $this->urlBuilder->getUrl(
                         'checkout/onepage/success',
                         [

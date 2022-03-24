@@ -33,7 +33,7 @@
                 <can_deny_payment>1</can_deny_payment>
                 <allowspecific>0</allowspecific>
                 <sort_order>2</sort_order>
-                <cctypes>AE,VI,MC,DI,DN,UN</cctypes>
+                <cctypes>VISA,MASTERCARD</cctypes>
                 <useccv>1</useccv>
                 <order_status>processing</order_status>
                 <group>merchant_warrior</group>

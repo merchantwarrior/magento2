@@ -24,6 +24,7 @@ class Config
      * Configuration constants
      */
     const XML_PATH_IS_ENABLED = 'payment/merchant_warrior_abstract/active';
+    const XML_PATH_ALLOWED_CC = 'payment/merchant_warrior_payframe/cctypes';
     const XML_PATH_IS_SANDBOX_MODE_ENABLED = 'payment/merchant_warrior_abstract/sandbox_mode';
     /**#@-*/
 
@@ -33,6 +34,12 @@ class Config
     const XML_CREDENTIALS_MERCHANT_USER_ID = 'payment/merchant_warrior_abstract/merchant_uuid';
     const XML_CREDENTIALS_API_KEY = 'payment/merchant_warrior_abstract/api_key';
     const XML_CREDENTIALS_API_PASS_PHRASE = 'payment/merchant_warrior_abstract/api_passphrase';
+    /**#@-*/
+
+    /**#@+
+     * Configuration for PayFrame constants
+     */
+    const XML_PATH_PAYFRAME_ALLOWED_CC = 'payment/merchant_warrior_payframe/cctypes';
     /**#@-*/
 
     /**#@+
@@ -153,6 +160,20 @@ class Config
             return $this->encryptor->decrypt($value);
         }
         return null;
+    }
+
+    /**
+     * Get list of allowed Credit Cards
+     *
+     * @return null|string
+     */
+    public function getAllowedTypeCards(): ?string
+    {
+        return $this->scopeConfig->getValue(
+            self::XML_PATH_PAYFRAME_ALLOWED_CC,
+            ScopeInterface::SCOPE_STORE,
+            $this->getStoreId()
+        );
     }
 
     /**

@@ -1,13 +1,15 @@
 define([
     'jquery',
     'ko',
+    'underscore',
     'Magento_Checkout/js/view/payment/default',
     'Magento_Customer/js/customer-data',
     'Magento_Checkout/js/model/quote',
+    'Magento_Catalog/js/price-utils',
     'MerchantWarrior_Payment/js/action/place-order',
     'MerchantWarrior_Payment/js/action/process-card',
     'payframeLib'
-], function ($, ko, Component, customerData, quote, placeOrderAction, processCardAction) {
+], function ($, ko, _, Component, customerData, quote, priceUtils, placeOrderAction, processCardAction) {
     'use strict';
 
     return Component.extend({
@@ -31,6 +33,9 @@ define([
             transactionResult: ''
         },
         mwPayframe: '',
+        tdsCheck: '',
+        payframeToken: '',
+        payframeKey: '',
         method: 'getPayframeToken', // change this to getPayframeToken for payment payframe
         threeDS: false, // this will only work with the getPayframeToken method
 
@@ -69,9 +74,8 @@ define([
                 this._getPaymentConfig('payframeSrc'),
                 this._getPaymentConfig('submitURL'),
                 this.frameStyle,
-                "Visa, Diners Club, Mastercard"
+                this._getPaymentConfig('allowedTypeCards')
             );
-
             this.mwPayframe.mwCallback = (
                 tokenStatus, payframeToken, payframeKey
             ) => this._payFrameCallback(
@@ -80,10 +84,24 @@ define([
             this.mwPayframe.loading = () => this._payFrameLoading();
             this.mwPayframe.loaded = () => this._payFrameLoaded();
 
+            this.tdsCheck = this._initTdsCheck(
+                this._getPaymentConfig('uuid'),
+                this._getPaymentConfig('apiKey'),
+                this.mwCardDivId,
+                this._getPaymentConfig('submitURL'),
+                {
+                    width: '500px',
+                    subFrame: true
+                }
+            );
+            this.tdsCheck.mwCallback = (liabilityShifted, tdsToken) => this._tdsCallBack(liabilityShifted, tdsToken);
+
             this.mwPayframe.deploy();
         },
 
         /**
+         * Init PayFrame function
+         *
          * Params:
          * - uuid - UserUUID
          * - apiKey - ApiKEY
@@ -94,50 +112,55 @@ define([
          * - acceptedCardTypesInput - with empty: only Visa and Mastercard will be accepted.
          * - methodInput - addCard | getPayframeToken, by default: getPayframeToken
          *
-         * @type {payframe}
+         * @return {payframe}
+         * @private
          */
         _initPayFrame: function (uuid, apiKey, payFrameDivId, payframeSrc, submitUrl, iframeStyle, acceptedCardTypes) {
             return new payframe(uuid, apiKey, payFrameDivId, payframeSrc, submitUrl, iframeStyle, acceptedCardTypes);
         },
 
+        /**
+         * Init TDS Check function
+         *
+         * @param uuid
+         * @param apiKey
+         * @param tdsDivId
+         * @param submitUrl
+         * @param tstStyle
+         *
+         * @return {tdsCheck}
+         * @private
+         */
+        _initTdsCheck: function (uuid, apiKey, tdsDivId, submitUrl, tstStyle) {
+            return new tdsCheck(uuid, apiKey, tdsDivId, submitUrl, tstStyle);
+        },
+
+        /**
+         * Init PayFrame CallBack function
+         *
+         * @param tokenStatus
+         * @param payframeToken
+         * @param payframeKey
+         *
+         * @private
+         */
         _payFrameCallback: function (tokenStatus, payframeToken, payframeKey) {
-            if (tokenStatus === 'HAS_TOKEN') {
-                let postData = {
-                    payframeToken: payframeToken,
-                    payframeKey: payframeKey,
-                    cartId: quote.getQuoteId(),
-                    email: quote.guestEmail,
-                    billingAddress: quote.billingAddress()
-                };
+            if (tokenStatus === 'HAS_TOKEN' && payframeToken && payframeKey) {
+                this.payframeToken = payframeToken;
+                this.payframeKey = payframeKey;
 
-                $.when(
-                    processCardAction(postData)
-                ).fail(
-                    (response) => {
-                        response =  JSON.parse(response);
-                        // TODO: Add showing error messages
-                        console.log('Transaction Declined - Please enter a different card');
-                    }
-                ).done(
-                    (response) => {
-                        response =  JSON.parse(response);
-                        if (response === 0) {
-                            console.log(response.message);
-                        } else {
-                            debugger;
-
-                            this.mwPayframe.reset();
-                            this.transactionResult = response.data;
-
-                            $.when(
-                                placeOrderAction(this.getData())
-                            ).fail(
-                                () => {}
-                            ).done(
-                                this.afterPlaceOrder.bind(this)
-                            );
-                        }
-                    }
+                // If you want the tdsCheck to use the same loading
+                // or loaded functions as the mwPayframe, call link() on the tdsCheck object
+                this.tdsCheck.link(this.mwPayframe);
+                // When you have the payframeToken and payframeKey, call checkTDS,
+                // passing in the payframeToken, payframeKey, transactionAmount, transactionCurrency
+                // and transactionProduct
+                this.tdsCheck.checkTDS(
+                    this.payframeToken,
+                    this.payframeKey,
+                    this.getFormattedPrice(quote.totals().grand_total),
+                    quote.totals().base_currency_code,
+                    this.getItemsSku()
                 );
             } else {
                 if (this.mwPayframe.responseCode == -2 || this.mwPayframe.responseCode == -3) {
@@ -155,6 +178,34 @@ define([
         },
 
         /**
+         * TDS Callback function
+         *
+         * @param liabilityShifted
+         * @param tdsToken
+         *
+         * @private
+         */
+        _tdsCallBack: function (liabilityShifted, tdsToken) {
+            if (liabilityShifted) {
+                // If the bank has taken liability for the transaction,
+                // submit the tdsToken with a processCard or processAuth transaction
+                this.processCardAction(tdsToken);
+            } else {
+                if (
+                    this.tdsCheck.mwTDSMessage === 'Cardholder not enrolled in 3DS'
+                    && this.tdsCheck.mwTDSResult === ''
+                ) {
+                    this.processCardAction('');
+                }
+
+                if (this.tdsCheck.mwTDSResult === 'error') {
+                    alert(this.tdsCheck.mwTDSMessage);
+                }
+                this.tdsCheck.destroy();
+            }
+        },
+
+        /**
          * Get config param
          *
          * @param key
@@ -164,6 +215,99 @@ define([
          */
         _getPaymentConfig: function (key) {
             return window.checkoutConfig.payment.merchant_warrior_payframe[key];
+        },
+
+        /**
+         * Reset payment form
+         *
+         * @private
+         */
+        _resetForm: function () {
+            this.payframeToken = '';
+            this.payframeKey = '';
+
+            this.mwPayframe.reset();
+        },
+
+        /**
+         * Process card action
+         *
+         * @param tdsToken
+         */
+        processCardAction: function (tdsToken) {
+            let postData = {
+                payframeToken: this.payframeToken,
+                payframeKey: this.payframeKey,
+                tdsToken: tdsToken,
+                cartId: quote.getQuoteId(),
+                email: quote.guestEmail,
+                billingAddress: quote.billingAddress()
+            };
+
+            debugger;
+
+            $.when(
+                processCardAction(postData)
+            ).fail(
+                (response) => {
+                    response =  JSON.parse(response);
+                    // TODO: Add showing error messages
+                    console.log('Transaction Declined - Please enter a different card');
+                }
+            ).done(
+                (response) => {
+                    response = JSON.parse(response);
+                    if (response === 0) {
+                        console.log(response.message);
+                    } else {
+                        debugger;
+
+                        this._resetForm();
+
+                        this.transactionResult = response.data;
+
+                        $.when(
+                            placeOrderAction(this.getData())
+                        ).fail(
+                            () => {}
+                        ).done(
+                            this.afterPlaceOrder.bind(this)
+                        );
+                    }
+                }
+            );
+        },
+
+        /**
+         * @param {*} price
+         * @return {*|String}
+         */
+        getFormattedPrice: function (price) {
+            return priceUtils.formatPrice(
+                price,
+                {
+                    decimalSymbol: ".",
+                    groupLength: 3,
+                    groupSymbol: ",",
+                    integerRequired: false,
+                    pattern: "%s",
+                    precision: 2,
+                    requiredPrecision: 2
+                }
+            );
+        },
+
+        /**
+         * Form items skus list
+         *
+         * @return {string}
+         */
+        getItemsSku: function () {
+            let skus = '';
+            _.each(quote.getItems(), (item) => {
+                skus += item.sku + ', ';
+            });
+            return skus;
         },
 
         /**
