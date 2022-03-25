@@ -127,6 +127,14 @@ class PaymentMethod extends Adapter implements MethodInterface
     /**
      * @inheritdoc
      */
+    public function authorize(InfoInterface $payment, $amount)
+    {
+        return parent::authorize($payment, $amount);
+    }
+
+    /**
+     * @inheritdoc
+     */
     public function cancel(InfoInterface $payment, $amount = null)
     {
         // TODO: Add cancel functionality

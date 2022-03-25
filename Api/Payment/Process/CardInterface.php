@@ -16,6 +16,7 @@ interface CardInterface
      *
      * @param string $payframeToken
      * @param string $payframeKey
+     * @param string $tdsToken
      * @param string $cartId
      * @param string $email
      * @param AddressInterface|null $billingAddress
@@ -25,6 +26,7 @@ interface CardInterface
     public function execute(
         string $payframeToken,
         string $payframeKey,
+        string $tdsToken,
         string $cartId,
         string $email,
         AddressInterface $billingAddress = null
