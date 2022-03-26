@@ -235,14 +235,31 @@ define([
          * @param tdsToken
          */
         processCardAction: function (tdsToken) {
-            let postData = {
+            this.transactionResult = {
                 payframeToken: this.payframeToken,
                 payframeKey: this.payframeKey,
                 tdsToken: tdsToken,
                 cartId: quote.getQuoteId(),
-                email: quote.guestEmail,
-                billingAddress: quote.billingAddress()
+                email: quote.guestEmail
             };
+
+            $.when(
+                placeOrderAction(this.getData())
+            ).fail(
+                () => {
+                    this.afterPlaceOrder.bind(this);
+                }
+            ).done(
+                () => {
+                    this.afterPlaceOrder.bind(this);
+                }
+            ).always(
+                () => {
+                    this._resetForm();
+                }
+            );
+
+            return;
 
             debugger;
 

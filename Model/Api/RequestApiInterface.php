@@ -50,5 +50,6 @@ interface RequestApiInterface
      */
     const PAYFRAME_KEY = 'payframeKey';
     const PAYFRAME_TOKEN = 'payframeToken';
+    const PAYFRAME_THREE_DS_TOKEN = 'threeDSToken';
     /**#@-*/
 }

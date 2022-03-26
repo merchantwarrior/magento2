@@ -13,4 +13,8 @@
         <observer name="debug_api_data_after"
                   instance="MerchantWarrior\Payment\Observer\DebugObserver"/>
     </event>
+    <event name="payment_method_assign_data_merchant_warrior_payframe">
+        <observer name="merchant_warrior_payframe_data_assign"
+                  instance="MerchantWarrior\Payment\Observer\MWPDataAssignObserver" />
+    </event>
 </config>

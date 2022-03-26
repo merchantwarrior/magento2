@@ -78,6 +78,7 @@ class Card implements CardInterface
     public function execute(
         string $payframeToken,
         string $payframeKey,
+        string $tdsToken,
         string $cartId,
         string $email,
         AddressInterface $billingAddress = null
@@ -102,6 +103,7 @@ class Card implements CardInterface
                 "authMessage" => "Honour with identification"
             ]
         ];
+
         return $this->serializer->serialize($result);
 
         $quoteIdMask = $this->quoteIdMaskFactory->create()->load($cartId, 'masked_id');
@@ -122,6 +124,10 @@ class Card implements CardInterface
                 RequestApiInterface::PAYFRAME_TOKEN => $payframeToken,
                 RequestApiInterface::PAYFRAME_KEY => $payframeKey
             ];
+
+            if (!empty($tdsToken)) {
+                $transactionData[RequestApiInterface::PAYFRAME_THREE_DS_TOKEN] = $tdsToken;
+            }
 
             $transactionData = $this->formTransactionData($transactionData, $quote);
             $transactionData = $this->formCustomerData($transactionData, $quote, $billingAddress);
