@@ -5,8 +5,9 @@ declare(strict_types=1);
 namespace MerchantWarrior\Payment\Gateway\Request;
 
 use Magento\Payment\Gateway\Request\BuilderInterface;
+use MerchantWarrior\Payment\Model\Api\RequestApiInterface;
 
-class CustomerDataBuilder implements BuilderInterface
+class CustomerDataBuilder extends AbstractDataBuilder implements BuilderInterface
 {
     /**
      * Add shopper data into request
@@ -17,6 +18,16 @@ class CustomerDataBuilder implements BuilderInterface
      */
     public function build(array $buildSubject): array
     {
-        return [];
+        $paymentDO = $this->readPayment($buildSubject);
+
+        $order = $paymentDO->getOrder();
+        $billingAddress = $order->getBillingAddress();
+
+        $customerName = $billingAddress->getFirstname() . ' ' . $billingAddress->getLastname();
+        return [
+            RequestApiInterface::CUSTOMER_NAME      => $customerName,
+            RequestApiInterface::CUSTOMER_PHONE     => $billingAddress->getTelephone(),
+            RequestApiInterface::CUSTOMER_EMAIL     => $billingAddress->getEmail()
+        ];
     }
 }

@@ -52,7 +52,7 @@ class CheckoutResponseValidator extends AbstractValidator
         $paymentDataObjectInterface = SubjectReader::readPayment($validationSubject);
         $payment = $paymentDataObjectInterface->getPayment();
 
-        $payment->setAdditionalInformation('3dActive', false);
+        // $payment->setAdditionalInformation('3dActive', false);
         $isValid = true;
         $errorMessages = [];
 
@@ -86,7 +86,6 @@ class CheckoutResponseValidator extends AbstractValidator
                     break;
                 case "Refused":
                     $errorMsg = __('The payment is REFUSED.');
-                    // this will result the specific error
                     throw new LocalizedException($errorMsg);
                 default:
                     $errorMsg = __('Error with payment method please select different payment method.');

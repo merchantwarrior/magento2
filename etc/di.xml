@@ -69,7 +69,7 @@
         <arguments>
             <argument name="requestBuilder" xsi:type="object">MerchantWarriorPaymentPayFrameAuthorizeRequest</argument>
             <argument name="transferFactory" xsi:type="object">MerchantWarrior\Payment\Gateway\Http\TransferFactory</argument>
-            <argument name="client" xsi:type="object">MerchantWarrior\Payment\Gateway\Http\Client\TransactionPayment</argument>
+            <argument name="client" xsi:type="object">MerchantWarrior\Payment\Gateway\Http\Client\PayFrame\TransactionPayment</argument>
             <argument name="validator" xsi:type="object">CheckoutResponseValidator</argument>
             <argument name="handler" xsi:type="object">MerchantWarriorPayFrameResponseHandler</argument>
         </arguments>
@@ -80,8 +80,9 @@
         <arguments>
             <argument name="builders" xsi:type="array">
                 <item name="customer" xsi:type="string">MerchantWarrior\Payment\Gateway\Request\CustomerDataBuilder</item>
-                <item name="customerip" xsi:type="string">MerchantWarrior\Payment\Gateway\Request\CustomerIpDataBuilder</item>
+                <item name="customer_ip" xsi:type="string">MerchantWarrior\Payment\Gateway\Request\CustomerIpDataBuilder</item>
                 <item name="address" xsi:type="string">MerchantWarrior\Payment\Gateway\Request\AddressDataBuilder</item>
+                <item name="transaction" xsi:type="string">MerchantWarrior\Payment\Gateway\Request\TransactionDataBuilder</item>
             </argument>
         </arguments>
     </virtualType>

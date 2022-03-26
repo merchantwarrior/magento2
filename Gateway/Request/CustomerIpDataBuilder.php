@@ -5,11 +5,12 @@ declare(strict_types=1);
 namespace MerchantWarrior\Payment\Gateway\Request;
 
 use Magento\Payment\Gateway\Request\BuilderInterface;
+use MerchantWarrior\Payment\Model\Api\RequestApiInterface;
 
 /**
  * Class CustomerDataBuilder
  */
-class CustomerIpDataBuilder implements BuilderInterface
+class CustomerIpDataBuilder extends AbstractDataBuilder implements BuilderInterface
 {
     /**
      * Builds ENV request
@@ -20,6 +21,12 @@ class CustomerIpDataBuilder implements BuilderInterface
      */
     public function build(array $buildSubject): array
     {
-        return [];
+        $paymentDO = $this->readPayment($buildSubject);
+
+        $order = $paymentDO->getOrder();
+
+        return [
+            RequestApiInterface::CUSTOMER_IP => $order->getRemoteIp()
+        ];
     }
 }

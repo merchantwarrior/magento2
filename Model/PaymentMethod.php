@@ -14,6 +14,7 @@ use Magento\Payment\Gateway\Validator\ValidatorPoolInterface;
 use Magento\Payment\Model\InfoInterface;
 use Magento\Payment\Model\MethodInterface;
 use Magento\Payment\Model\Method\Adapter;
+use Magento\Payment\Observer\AbstractDataAssignObserver;
 use Magento\Quote\Api\Data\CartInterface;
 use Psr\Log\LoggerInterface;
 
@@ -39,6 +40,11 @@ class PaymentMethod extends Adapter implements MethodInterface
      * @var Config
      */
     private Config $config;
+
+    /**
+     * @var DataObject|null
+     */
+    private ?DataObject $data = null;
 
     /**
      * @param ManagerInterface $eventManager
@@ -127,43 +133,27 @@ class PaymentMethod extends Adapter implements MethodInterface
     /**
      * @inheritdoc
      */
-    public function authorize(InfoInterface $payment, $amount)
+    public function assignData(DataObject $data)
     {
-        return parent::authorize($payment, $amount);
-    }
+        $this->data = $data;
 
-    /**
-     * @inheritdoc
-     */
-    public function cancel(InfoInterface $payment, $amount = null)
-    {
-        // TODO: Add cancel functionality
-    }
+        $this->eventManager->dispatch(
+            'payment_method_assign_data_' . $this->getCode(),
+            [
+                AbstractDataAssignObserver::METHOD_CODE => $this,
+                AbstractDataAssignObserver::MODEL_CODE => $this->getInfoInstance(),
+                AbstractDataAssignObserver::DATA_CODE => $data
+            ]
+        );
 
-    /**
-     * @inheritdoc
-     */
-    public function cancelInvoice($invoice)
-    {
-        return $this;
-    }
-
-    /**
-     * @inheritdoc
-     */
-    public function refund(InfoInterface $payment, $amount)
-    {
-        $this->cancel($payment, $amount);
-
-        return $this;
-    }
-
-    /**
-     * @inheritdoc
-     */
-    public function void(InfoInterface $payment)
-    {
-        $this->cancel($payment);
+        $this->eventManager->dispatch(
+            'payment_method_assign_data',
+            [
+                AbstractDataAssignObserver::METHOD_CODE => $this,
+                AbstractDataAssignObserver::MODEL_CODE => $this->getInfoInstance(),
+                AbstractDataAssignObserver::DATA_CODE => $data
+            ]
+        );
 
         return $this;
     }
