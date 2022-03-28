@@ -11,19 +11,16 @@ use Magento\Payment\Gateway\Command\CommandPoolInterface;
 use Magento\Payment\Gateway\Config\ValueHandlerPoolInterface;
 use Magento\Payment\Gateway\Data\PaymentDataObjectFactory;
 use Magento\Payment\Gateway\Validator\ValidatorPoolInterface;
-use Magento\Payment\Model\InfoInterface;
-use Magento\Payment\Model\MethodInterface;
 use Magento\Payment\Model\Method\Adapter;
-use Magento\Payment\Observer\AbstractDataAssignObserver;
 use Magento\Quote\Api\Data\CartInterface;
 use Psr\Log\LoggerInterface;
 
-class PaymentMethod extends Adapter implements MethodInterface
+class PaymentMethod extends Adapter
 {
     /**#@+
      * Method code constant
      */
-    const METHOD_CODE = 'merchant_warrior_payframe';
+    public const METHOD_CODE = 'merchant_warrior';
     /**#@-*/
 
     /**
@@ -40,11 +37,6 @@ class PaymentMethod extends Adapter implements MethodInterface
      * @var Config
      */
     private Config $config;
-
-    /**
-     * @var DataObject|null
-     */
-    private ?DataObject $data = null;
 
     /**
      * @param ManagerInterface $eventManager
@@ -128,33 +120,5 @@ class PaymentMethod extends Adapter implements MethodInterface
         );
 
         return $checkResult->getData('is_available');
-    }
-
-    /**
-     * @inheritdoc
-     */
-    public function assignData(DataObject $data)
-    {
-        $this->data = $data;
-
-        $this->eventManager->dispatch(
-            'payment_method_assign_data_' . $this->getCode(),
-            [
-                AbstractDataAssignObserver::METHOD_CODE => $this,
-                AbstractDataAssignObserver::MODEL_CODE => $this->getInfoInstance(),
-                AbstractDataAssignObserver::DATA_CODE => $data
-            ]
-        );
-
-        $this->eventManager->dispatch(
-            'payment_method_assign_data',
-            [
-                AbstractDataAssignObserver::METHOD_CODE => $this,
-                AbstractDataAssignObserver::MODEL_CODE => $this->getInfoInstance(),
-                AbstractDataAssignObserver::DATA_CODE => $data
-            ]
-        );
-
-        return $this;
     }
 }

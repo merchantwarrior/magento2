@@ -23,29 +23,30 @@ class Config
     /**#@+
      * Configuration constants
      */
-    const XML_PATH_IS_ENABLED = 'payment/merchant_warrior_abstract/active';
+    const XML_PATH_ACTIVE = 'payment/merchant_warrior/active';
     const XML_PATH_ALLOWED_CC = 'payment/merchant_warrior_payframe/cctypes';
-    const XML_PATH_IS_SANDBOX_MODE_ENABLED = 'payment/merchant_warrior_abstract/sandbox_mode';
+    const XML_PATH_IS_SANDBOX_MODE_ENABLED = 'payment/merchant_warrior/sandbox_mode';
     /**#@-*/
 
     /**#@+
      * Configuration for credentials
      */
-    const XML_CREDENTIALS_MERCHANT_USER_ID = 'payment/merchant_warrior_abstract/merchant_uuid';
-    const XML_CREDENTIALS_API_KEY = 'payment/merchant_warrior_abstract/api_key';
-    const XML_CREDENTIALS_API_PASS_PHRASE = 'payment/merchant_warrior_abstract/api_passphrase';
+    const XML_CREDENTIALS_MERCHANT_USER_ID = 'payment/merchant_warrior/merchant_uuid';
+    const XML_CREDENTIALS_API_KEY = 'payment/merchant_warrior/api_key';
+    const XML_CREDENTIALS_API_PASS_PHRASE = 'payment/merchant_warrior/api_passphrase';
     /**#@-*/
 
     /**#@+
      * Configuration for PayFrame constants
      */
+    const XML_PATH_PAYFRAME_ACTIVE = 'payment/merchant_warrior/active';
     const XML_PATH_PAYFRAME_ALLOWED_CC = 'payment/merchant_warrior_payframe/cctypes';
     /**#@-*/
 
     /**#@+
      * Configuration debugger constants
      */
-    const XML_DEBUGGER_IS_ENABLED = 'payment/merchant_warrior_abstract/debug';
+    const XML_DEBUGGER_IS_ENABLED = 'payment/merchant_warrior/debug';
     /**#@-*/
 
     /**
@@ -88,7 +89,7 @@ class Config
     public function isEnabled(): bool
     {
         $isEnabled = (bool)$this->scopeConfig->isSetFlag(
-            self::XML_PATH_IS_ENABLED,
+            self::XML_PATH_ACTIVE,
             ScopeInterface::SCOPE_STORE,
             $this->getStoreId()
         );
@@ -163,11 +164,26 @@ class Config
     }
 
     /**
+     * Check is Pay Frame method active
+     *
+     * @return bool
+     */
+    public function isPayFrameActive(): bool
+    {
+        $result = $this->scopeConfig->getValue(
+            self::XML_PATH_PAYFRAME_ACTIVE,
+            ScopeInterface::SCOPE_STORE,
+            $this->getStoreId()
+        );
+        return ($this->isEnabled() && $result);
+    }
+
+    /**
      * Get list of allowed Credit Cards
      *
      * @return null|string
      */
-    public function getAllowedTypeCards(): ?string
+    public function getPayFrameAllowedTypeCards(): ?string
     {
         return $this->scopeConfig->getValue(
             self::XML_PATH_PAYFRAME_ALLOWED_CC,

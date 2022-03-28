@@ -3,7 +3,7 @@
     <type name="Magento\Checkout\Model\CompositeConfigProvider">
         <arguments>
             <argument name="configProviders" xsi:type="array">
-                <item name="mw_payframe_config_provider" xsi:type="object">MerchantWarrior\Payment\Model\PayFrameConfigProvider</item>
+                <item name="mw_payframe_config_provider" xsi:type="object">MerchantWarrior\Payment\Model\Ui\PayFrame\ConfigProvider</item>
             </argument>
         </arguments>
     </type>

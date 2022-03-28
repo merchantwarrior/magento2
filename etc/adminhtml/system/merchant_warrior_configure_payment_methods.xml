@@ -6,6 +6,6 @@
         <label><![CDATA[Configure Payment Methods]]></label>
         <frontend_model>Magento\Config\Block\System\Config\Form\Fieldset</frontend_model>
         <include path="MerchantWarrior_Payment::system/merchant_warrior_payframe.xml"/>
-        <include path="MerchantWarrior_Payment::system/merchant_warrior_payid.xml"/>
+<!--        <include path="MerchantWarrior_Payment::system/merchant_warrior_payid.xml"/>-->
     </group>
 </include>
