@@ -20,9 +20,9 @@ class ProcessCard extends RequestApi implements ProcessCardInterface
             return [];
         }
 
-        $this->validate($transactionParams);
-
         $transactionParams[self::METHOD] = self::API_METHOD;
+
+        $this->validate($transactionParams);
 
         return $this->sendRequest($transactionParams);
     }
@@ -34,8 +34,7 @@ class ProcessCard extends RequestApi implements ProcessCardInterface
      */
     protected function getApiUrl(): string
     {
-        // return $this->config->getApiUrl() . 'payframe/';
-        return Config::API_LIVE_URL . 'payframe/';
+        return $this->config->getApiUrl() . 'payframe/';
     }
 
     /**
@@ -53,7 +52,11 @@ class ProcessCard extends RequestApi implements ProcessCardInterface
         $this->sendPostRequest(self::API_METHOD, $data);
 
         if ($this->getResponseCode(self::API_METHOD) !== '0') {
-            throw new LocalizedException(__($this->getResponseMessage(self::API_METHOD)));
+            throw new LocalizedException(
+                __($this->getResponseMessage(self::API_METHOD)),
+                null,
+                $this->getResponseCode(self::API_METHOD)
+            );
         }
         return $this->getResponse(self::API_METHOD)->toArray();
     }

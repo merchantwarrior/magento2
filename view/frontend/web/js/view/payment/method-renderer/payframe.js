@@ -71,6 +71,8 @@ define([
          * @private
          */
         _initMwPayFrame: function () {
+            $('#' + this.mwCardDivId).html('');
+
             this.mwPayframe = this._initPayFrame(
                 this._getPaymentConfig('uuid'),
                 this._getPaymentConfig('apiKey'),
@@ -231,7 +233,7 @@ define([
             this.payframeToken = '';
             this.payframeKey = '';
 
-            this.mwPayframe.reset();
+            this._initMwPayFrame();
         },
 
         /**

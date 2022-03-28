@@ -42,55 +42,23 @@ class CheckoutResponseValidator extends AbstractValidator
     }
 
     /**
-     * @param array $validationSubject
+     * @param array $validationSubject = [ 'payment' => '', 'amount' => '', 'response' => '' ]
+     *
      * @return ResultInterface
      * @throws LocalizedException
      */
-    public function validate(array $validationSubject)
+    public function validate(array $validationSubject): ResultInterface
     {
         $response = SubjectReader::readResponse($validationSubject);
         $paymentDataObjectInterface = SubjectReader::readPayment($validationSubject);
         $payment = $paymentDataObjectInterface->getPayment();
 
-        // $payment->setAdditionalInformation('3dActive', false);
-        $isValid = true;
         $errorMessages = [];
 
-        // validate result
-        if (!empty($response['resultCode'])) {
-            $resultCode = $response['resultCode'];
-            $payment->setAdditionalInformation('resultCode', $resultCode);
-
-            if (!empty($response['action'])) {
-                $payment->setAdditionalInformation('action', $response['action']);
-            } else {
-                // No further action needed, so payment result is conclusive
-                $this->checkoutSession->unsPendingPayment();
-            }
-
-            switch ($resultCode) {
-                case "Authorised":
-                case "Received":
-                    // Save cc_type if available in the response
-                    if (!empty($response['additionalData']['paymentMethod'])) {
-//                        $payment->setAdditionalInformation('cc_type', $ccType);
-//                        $payment->setCcType($ccType);
-                    }
-                    break;
-                case "IdentifyShopper":
-                case "ChallengeShopper":
-                case "PresentToShopper":
-                case 'Pending':
-                case "RedirectShopper":
-                    // nothing extra
-                    break;
-                case "Refused":
-                    $errorMsg = __('The payment is REFUSED.');
-                    throw new LocalizedException($errorMsg);
-                default:
-                    $errorMsg = __('Error with payment method please select different payment method.');
-                    throw new LocalizedException($errorMsg);
-            }
+        if (isset($response['responseCode']) && $response['responseCode'] === '0') {
+            $payment->setAdditionalInformation('responseMessage', $response['responseMessage']);
+            $payment->setAdditionalInformation('transactionID', $response['transactionID']);
+            $payment->setAdditionalInformation('paymentCardNumber', $response['paymentCardNumber']);
         } else {
             if (!empty($response['error'])) {
                 $this->logger->error($response['error']);
@@ -100,6 +68,6 @@ class CheckoutResponseValidator extends AbstractValidator
             throw new LocalizedException($errorMsg);
         }
 
-        return $this->createResult($isValid, $errorMessages);
+        return $this->createResult(true, $errorMessages);
     }
 }

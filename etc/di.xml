@@ -104,6 +104,7 @@
                 <item name="customer_ip" xsi:type="string">MerchantWarrior\Payment\Gateway\Request\CustomerIpDataBuilder</item>
                 <item name="address" xsi:type="string">MerchantWarrior\Payment\Gateway\Request\AddressDataBuilder</item>
                 <item name="transaction" xsi:type="string">MerchantWarrior\Payment\Gateway\Request\TransactionDataBuilder</item>
+                <item name="mw_transaction_data" xsi:type="string">MerchantWarrior\Payment\Gateway\Request\PayFrameTransactionDataBuilder</item>
             </argument>
         </arguments>
     </virtualType>

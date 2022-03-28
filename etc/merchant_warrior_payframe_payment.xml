@@ -2,9 +2,13 @@
 
 <payment xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
          xsi:noNamespaceSchemaLocation="urn:magento:module:MerchantWarrior_Payment:etc/merchant_warrior_payment.xsd">
-    <merchant_warrior_credit_cards>
+    <merchant_warrior_payframe_credit_cards>
         <type id="AE" order="0">
             <label>American Express</label>
+            <code_alt>amex</code_alt>
+        </type>
+        <type id="AM" order="0">
+            <label>Amex</label>
             <code_alt>amex</code_alt>
         </type>
         <type id="VI" order="10">
@@ -35,5 +39,5 @@
             <label>UnionPay</label>
             <code_alt>cup</code_alt>
         </type>
-    </merchant_warrior_credit_cards>
+    </merchant_warrior_payframe_credit_cards>
 </payment>

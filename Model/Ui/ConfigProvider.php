@@ -9,7 +9,6 @@ use Magento\Framework\UrlInterface;
 use Magento\Payment\Helper\Data as PaymentHelper;
 use Magento\Payment\Model\MethodInterface;
 use MerchantWarrior\Payment\Model\Config;
-use MerchantWarrior\Payment\Model\PaymentMethod;
 use Magento\Checkout\Model\ConfigProviderInterface;
 
 class ConfigProvider implements ConfigProviderInterface
@@ -17,7 +16,7 @@ class ConfigProvider implements ConfigProviderInterface
     /**#@+
      * Method code constant
      */
-    public const METHOD_CODE = PaymentMethod::METHOD_CODE;
+    public const METHOD_CODE = 'merchant_warrior';
     /**#@-*/
 
     /**

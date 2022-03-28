@@ -9,7 +9,6 @@ use Magento\Framework\UrlInterface;
 use Magento\Payment\Helper\Data as PaymentHelper;
 use Magento\Payment\Model\MethodInterface;
 use MerchantWarrior\Payment\Model\Config;
-use MerchantWarrior\Payment\Model\PaymentMethod;
 use Magento\Checkout\Model\ConfigProviderInterface;
 
 class ConfigProvider implements ConfigProviderInterface
@@ -17,7 +16,7 @@ class ConfigProvider implements ConfigProviderInterface
     /**#@+
      * Method code constant
      */
-    public const METHOD_CODE = PaymentMethod::METHOD_CODE . '_payframe';
+    public const METHOD_CODE = 'merchant_warrior_payframe';
     public const CC_VAULT_CODE = self::METHOD_CODE . '_vault';
     /**#@-*/
 
@@ -81,7 +80,7 @@ class ConfigProvider implements ConfigProviderInterface
                     'apiKey'    => $this->config->getApiKey(),
                     'payframeSrc' => $this->getPayFrameSrc(),
                     'submitURL'   => $this->getSubmitUrl(),
-                    'allowedTypeCards' => $this->config->getPayFrameAllowedTypeCards(),
+                    'allowedTypeCards' => $this->getAllowrdCCList(),
                     'successPage' => $this->urlBuilder->getUrl(
                         'checkout/onepage/success',
                         [
@@ -91,6 +90,42 @@ class ConfigProvider implements ConfigProviderInterface
                 ]
             ],
         ] : [];
+    }
+
+    private function getAllowrdCCList()
+    {
+        $allowedCreditCards = $this->config->getPayFrameAllowedTypeCards();
+        $allowedCreditCards = explode(',', $allowedCreditCards);
+        $creditCards = [];
+
+        foreach ($allowedCreditCards as $card) {
+            switch ($card) {
+                case 'VI':
+                    $creditCards[] = 'Visa';
+                    break;
+                case 'MC':
+                    $creditCards[] = 'MasterCard';
+                    break;
+                case 'AE':
+                    $creditCards[] = 'American Express';
+                    break;
+                case 'DN':
+                    $creditCards[] = 'Diners Club';
+                    break;
+                case 'JCB':
+                    $creditCards[] = 'JCB';
+                    break;
+                case 'UN':
+                    $creditCards[] = 'UnionPay';
+                    break;
+                case 'AM':
+                    $creditCards[] = 'Amex';
+                    break;
+                case 'DI':
+                    $creditCards[] = 'Discover';
+            }
+        }
+        return implode(',', $creditCards);
     }
 
     /**

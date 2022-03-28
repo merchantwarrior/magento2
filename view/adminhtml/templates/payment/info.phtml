@@ -1,0 +1,19 @@
+<br>
+<?php if ($this->shouldDisplayMWSection()): ?>
+    <table class="admin__table-secondary order-information-table payment-info">
+        <tbody>
+            <?php if ($transactionID = $this->getTransactionID()): ?>
+                <tr>
+                    <th><?= __('Transaction ID') ?></th>
+                    <td><?= __($transactionID) ?></td>
+                </tr>
+            <?php endif; ?>
+            <?php if ($paymentCardNumber = $this->getPaymentCardNumber()): ?>
+                <tr>
+                    <th><?= __('Payment Cad Number') ?></th>
+                    <td><?= __($paymentCardNumber) ?></td>
+                </tr>
+            <?php endif; ?>
+        </tbody>
+    </table>
+<?php endif; ?>
