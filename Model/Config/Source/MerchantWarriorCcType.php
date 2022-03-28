@@ -12,18 +12,27 @@ use Magento\Payment\Model\Source\Cctype;
 class MerchantWarriorCcType extends Cctype
 {
     /**
+     * @inheritDoc
+     */
+    public function getAllowedTypes(): array
+    {
+        return ['VI', 'MC', 'AE', 'DI', 'JCB', 'MI', 'DN'];
+    }
+
+    /**
      * @inheritdoc
      */
     public function toOptionArray(): array
     {
-        return [
-            ['value' => 'VISA', 'label' => 'Visa'],
-            ['value' => 'MASTERCARD', 'label' => 'MasterCard'],
-            ['value' => 'AMEX', 'label' => 'AMEX'],
-            ['value' => 'DINERS', 'label' => 'Diners'],
-            ['value' => 'DISCOVER', 'label' => 'Discover'],
-            ['value' => 'JCB', 'label' => 'JCB'],
-            ['value' => 'UNIONPAY', 'label' => 'UnionPay']
-        ];
+        $allowed = $this->getAllowedTypes();
+        $options = [];
+
+        foreach ($this->_paymentConfig->getCcTypes() as $code => $name) {
+            if (in_array($code, $allowed, true)) {
+                $options[] = ['value' => $code, 'label' => $name];
+            }
+        }
+
+        return $options;
     }
 }

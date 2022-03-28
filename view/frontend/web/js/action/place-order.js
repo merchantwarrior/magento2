@@ -38,7 +38,7 @@ define(
                 JSON.stringify(payload)
             ).done(
                 (response) => {
-                    var clearData = {
+                    let clearData = {
                         'selectedShippingAddress': null,
                         'shippingAddressFromData': null,
                         'newCustomerShippingAddress': null,

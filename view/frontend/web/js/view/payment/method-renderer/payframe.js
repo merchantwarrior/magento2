@@ -45,6 +45,10 @@ define([
         initialize: function () {
             this._super();
 
+            if (!this.isActive()) {
+                return;
+            }
+
             this.isChecked.subscribe(function(methodCode) {
                 if (methodCode === this.item.method) {
                     this._initMwPayFrame();
@@ -67,6 +71,8 @@ define([
          * @private
          */
         _initMwPayFrame: function () {
+            $('#' + this.mwCardDivId).html('');
+
             this.mwPayframe = this._initPayFrame(
                 this._getPaymentConfig('uuid'),
                 this._getPaymentConfig('apiKey'),
@@ -208,9 +214,9 @@ define([
         /**
          * Get config param
          *
-         * @param key
+         * @param {string} key - parameter array key
          *
-         * @return {*}
+         * @return {*} - return string|int variables
          * @private
          */
         _getPaymentConfig: function (key) {
@@ -220,19 +226,22 @@ define([
         /**
          * Reset payment form
          *
+         * @return {void}
          * @private
          */
         _resetForm: function () {
             this.payframeToken = '';
             this.payframeKey = '';
 
-            this.mwPayframe.reset();
+            this._initMwPayFrame();
         },
 
         /**
          * Process card action
          *
-         * @param tdsToken
+         * @param {string} tdsToken - 3DS token
+         *
+         * @return {void}
          */
         processCardAction: function (tdsToken) {
             this.transactionResult = {
@@ -258,46 +267,14 @@ define([
                     this._resetForm();
                 }
             );
-
-            return;
-
-            debugger;
-
-            $.when(
-                processCardAction(postData)
-            ).fail(
-                (response) => {
-                    response =  JSON.parse(response);
-                    // TODO: Add showing error messages
-                    console.log('Transaction Declined - Please enter a different card');
-                }
-            ).done(
-                (response) => {
-                    response = JSON.parse(response);
-                    if (response === 0) {
-                        console.log(response.message);
-                    } else {
-                        debugger;
-
-                        this._resetForm();
-
-                        this.transactionResult = response.data;
-
-                        $.when(
-                            placeOrderAction(this.getData())
-                        ).fail(
-                            () => {}
-                        ).done(
-                            this.afterPlaceOrder.bind(this)
-                        );
-                    }
-                }
-            );
         },
 
         /**
-         * @param {*} price
-         * @return {*|String}
+         * Format price
+         *
+         * @param {*} price - price, ex: 10.15
+         *
+         * @return {*|String} - return formatted price, 10 -> 10.00
          */
         getFormattedPrice: function (price) {
             return priceUtils.formatPrice(
@@ -330,10 +307,14 @@ define([
         /**
          * Returns payment method instructions.
          *
-         * @return {*}
+         * @return {boolean} - is enabled
          */
         isActive: function () {
-            return window.checkoutConfig.payment.merchant_warrior_payframe.enabled;
+            if (window.checkoutConfig.payment.merchant_warrior_payframe
+                && window.checkoutConfig.payment.merchant_warrior_payframe.active) {
+                return true;
+            }
+            return false;
         },
 
         /**

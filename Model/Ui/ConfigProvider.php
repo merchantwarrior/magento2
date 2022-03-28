@@ -2,23 +2,27 @@
 
 declare(strict_types=1);
 
-namespace MerchantWarrior\Payment\Model;
+namespace MerchantWarrior\Payment\Model\Ui;
 
-use Magento\Checkout\Model\ConfigProviderInterface;
 use Magento\Framework\App\RequestInterface;
 use Magento\Framework\UrlInterface;
 use Magento\Payment\Helper\Data as PaymentHelper;
 use Magento\Payment\Model\MethodInterface;
+use MerchantWarrior\Payment\Model\Config;
+use Magento\Checkout\Model\ConfigProviderInterface;
 
-class PayFrameConfigProvider implements ConfigProviderInterface
+class ConfigProvider implements ConfigProviderInterface
 {
-    const CODE = PaymentMethod::METHOD_CODE;
-    const CC_VAULT_CODE = PaymentMethod::METHOD_CODE . '_vault';
+    /**#@+
+     * Method code constant
+     */
+    public const METHOD_CODE = 'merchant_warrior';
+    /**#@-*/
 
     /**
      * @var string[]
      */
-    protected $methodCode = PaymentMethod::METHOD_CODE;
+    protected $methodCode = self::METHOD_CODE;
 
     /**
      * @var Config
@@ -69,19 +73,10 @@ class PayFrameConfigProvider implements ConfigProviderInterface
 
         return $paymentMethod->isAvailable() ? [
             'payment' => [
-                self::CODE => [
+                self::METHOD_CODE => [
                     'enabled'   => $this->config->isEnabled(),
                     'uuid'      => $this->config->getMerchantUserId(),
-                    'apiKey'    => $this->config->getApiKey(),
-                    'payframeSrc' => $this->getPayFrameSrc(),
-                    'submitURL'   => $this->getSubmitUrl(),
-                    'allowedTypeCards' => $this->config->getAllowedTypeCards(),
-                    'successPage' => $this->urlBuilder->getUrl(
-                        'checkout/onepage/success',
-                        [
-                            '_secure' => $this->getRequest()->isSecure()
-                        ]
-                    )
+                    'apiKey'    => $this->config->getApiKey()
                 ]
             ],
         ] : [];
@@ -99,27 +94,6 @@ class PayFrameConfigProvider implements ConfigProviderInterface
         } catch (\Exception $e) {
             return null;
         }
-    }
-
-    /**
-     * Get pay frame src URL
-     *
-     * @return string
-     */
-    private function getPayFrameSrc(): string
-    {
-        return $this->config->isSandBoxModeEnabled()
-            ? 'https://securetest.merchantwarrior.com/payframe/' : 'https://secure.merchantwarrior.com/payframe/';
-    }
-
-    /**
-     * Get submit URL
-     *
-     * @return string
-     */
-    private function getSubmitUrl(): string
-    {
-        return $this->config->getApiUrl() . 'payframe/';
     }
 
     /**

@@ -8,12 +8,12 @@
         </xs:annotation>
         <xs:complexType>
             <xs:all>
-                <xs:element name="merchant_warrior_credit_cards" type="merchant_warrior_credit_cardsType" minOccurs="0" />
+                <xs:element name="merchant_warrior_payframe_credit_cards" type="merchant_warrior_payframe_credit_cardsType" minOccurs="0" />
             </xs:all>
         </xs:complexType>
     </xs:element>
 
-    <xs:complexType name="merchant_warrior_credit_cardsType">
+    <xs:complexType name="merchant_warrior_payframe_credit_cardsType">
         <xs:annotation>
             <xs:documentation>
                 The containing node for a list of credit card types.
