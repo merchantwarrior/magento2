@@ -10,43 +10,44 @@ use Magento\Framework\Encryption\EncryptorInterface;
 use Magento\Store\Model\ScopeInterface;
 use Magento\Store\Model\Store;
 use Magento\Store\Model\StoreManagerInterface;
+use Magento\Framework\Config\DataInterface;
 
 class Config
 {
     /**#@+
      * MerchantWarrior Api URL
      */
-    const API_SANDBOX_URL = 'https://base.merchantwarrior.com/';
-    const API_LIVE_URL = 'https://api.merchantwarrior.com/';
+    public const API_SANDBOX_URL = 'https://base.merchantwarrior.com/';
+    public const API_LIVE_URL = 'https://api.merchantwarrior.com/';
     /**#@-*/
 
     /**#@+
      * Configuration constants
      */
-    const XML_PATH_ACTIVE = 'payment/merchant_warrior/active';
+    public const XML_PATH_ACTIVE = 'payment/merchant_warrior/active';
     const XML_PATH_ALLOWED_CC = 'payment/merchant_warrior_payframe/cctypes';
-    const XML_PATH_IS_SANDBOX_MODE_ENABLED = 'payment/merchant_warrior/sandbox_mode';
+    public const XML_PATH_IS_SANDBOX_MODE_ENABLED = 'payment/merchant_warrior/sandbox_mode';
     /**#@-*/
 
     /**#@+
      * Configuration for credentials
      */
-    const XML_CREDENTIALS_MERCHANT_USER_ID = 'payment/merchant_warrior/merchant_uuid';
-    const XML_CREDENTIALS_API_KEY = 'payment/merchant_warrior/api_key';
-    const XML_CREDENTIALS_API_PASS_PHRASE = 'payment/merchant_warrior/api_passphrase';
+    public const XML_CREDENTIALS_MERCHANT_USER_ID = 'payment/merchant_warrior/merchant_uuid';
+    public const XML_CREDENTIALS_API_KEY = 'payment/merchant_warrior/api_key';
+    public const XML_CREDENTIALS_API_PASS_PHRASE = 'payment/merchant_warrior/api_passphrase';
     /**#@-*/
 
     /**#@+
      * Configuration for PayFrame constants
      */
-    const XML_PATH_PAYFRAME_ACTIVE = 'payment/merchant_warrior/active';
-    const XML_PATH_PAYFRAME_ALLOWED_CC = 'payment/merchant_warrior_payframe/cctypes';
+    public const XML_PATH_PAYFRAME_ACTIVE = 'payment/merchant_warrior/active';
+    public const XML_PATH_PAYFRAME_ALLOWED_CC = 'payment/merchant_warrior_payframe/cctypes';
     /**#@-*/
 
     /**#@+
      * Configuration debugger constants
      */
-    const XML_DEBUGGER_IS_ENABLED = 'payment/merchant_warrior/debug';
+    public const XML_DEBUGGER_IS_ENABLED = 'payment/merchant_warrior/debug';
     /**#@-*/
 
     /**
@@ -65,20 +66,28 @@ class Config
     protected EncryptorInterface $encryptor;
 
     /**
+     * @var DataInterface
+     */
+    protected DataInterface $dataStorage;
+
+    /**
      * Config constructor.
      *
      * @param ScopeConfigInterface $scopeConfig
      * @param StoreManagerInterface $storeManager
      * @param EncryptorInterface $encryptor
+     * @param DataInterface $dataStorage
      */
     public function __construct(
         ScopeConfigInterface $scopeConfig,
         StoreManagerInterface $storeManager,
-        EncryptorInterface $encryptor
+        EncryptorInterface $encryptor,
+        DataInterface $dataStorage
     ) {
         $this->scopeConfig = $scopeConfig;
         $this->storeManager = $storeManager;
         $this->encryptor = $encryptor;
+        $this->dataStorage = $dataStorage;
     }
 
     /**
@@ -181,15 +190,19 @@ class Config
     /**
      * Get list of allowed Credit Cards
      *
-     * @return null|string
+     * @return array
      */
-    public function getPayFrameAllowedTypeCards(): ?string
+    public function getPayFrameAllowedTypeCards(): array
     {
-        return $this->scopeConfig->getValue(
+        $cards = $this->scopeConfig->getValue(
             self::XML_PATH_PAYFRAME_ALLOWED_CC,
             ScopeInterface::SCOPE_STORE,
             $this->getStoreId()
         );
+        if ($cards) {
+            return explode(',', $cards);
+        }
+        return [];
     }
 
     /**
@@ -215,6 +228,17 @@ class Config
     {
         return ($this->isSandBoxModeEnabled())
             ? self::API_SANDBOX_URL : self::API_LIVE_URL;
+    }
+
+    /**
+     * Get list of credit card types
+     *
+     * @return array
+     * @api
+     */
+    public function getCcTypes(): array
+    {
+        return $this->dataStorage->get('credit_cards');
     }
 
     /**
