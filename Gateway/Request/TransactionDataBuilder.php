@@ -5,13 +5,12 @@ declare(strict_types=1);
 namespace MerchantWarrior\Payment\Gateway\Request;
 
 use Magento\Payment\Gateway\Data\OrderAdapterInterface;
-use Magento\Payment\Gateway\Request\BuilderInterface;
 use MerchantWarrior\Payment\Model\Api\RequestApiInterface;
 
 /**
  * Transaction data builder
  */
-class TransactionDataBuilder extends AbstractDataBuilder implements BuilderInterface
+class TransactionDataBuilder extends AbstractDataBuilder
 {
     /**
      * Add delivery\billing details into request
@@ -27,7 +26,7 @@ class TransactionDataBuilder extends AbstractDataBuilder implements BuilderInter
         $order = $paymentDO->getOrder();
 
         return [
-            RequestApiInterface::TRANSACTION_AMOUNT   => $order->getGrandTotalAmount(),
+            RequestApiInterface::TRANSACTION_AMOUNT   => $this->getTransactionAmount($order),
             RequestApiInterface::TRANSACTION_CURRENCY => $order->getCurrencyCode(),
             RequestApiInterface::TRANSACTION_PRODUCT  => $this->getProductData($order)
         ];
@@ -47,5 +46,19 @@ class TransactionDataBuilder extends AbstractDataBuilder implements BuilderInter
             $items[] = $item->getSku();
         }
         return implode(',', $items);
+    }
+
+    /**
+     * Get formatted amount
+     *
+     * @param OrderAdapterInterface $order
+     *
+     * @return string
+     */
+    private function getTransactionAmount(OrderAdapterInterface $order): string
+    {
+        $price = (float)$order->getGrandTotalAmount();
+
+        return number_format($price, 2, '.', '');
     }
 }

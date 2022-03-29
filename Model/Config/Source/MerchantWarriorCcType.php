@@ -4,19 +4,25 @@ declare(strict_types=1);
 
 namespace MerchantWarrior\Payment\Model\Config\Source;
 
-use Magento\Payment\Model\Source\Cctype;
+use Magento\Framework\Data\OptionSourceInterface;
+use MerchantWarrior\Payment\Model\Config;
 
 /**
  * List of allowed Credit Cards
  */
-class MerchantWarriorCcType extends Cctype
+class MerchantWarriorCcType implements OptionSourceInterface
 {
     /**
-     * @inheritDoc
+     * @var Config
      */
-    public function getAllowedTypes(): array
+    private Config $config;
+
+    /**
+     * @param Config $config
+     */
+    public function __construct(Config $config)
     {
-        return ['VI', 'MC', 'AE', 'DI', 'JCB', 'MI', 'DN'];
+        $this->config = $config;
     }
 
     /**
@@ -24,15 +30,13 @@ class MerchantWarriorCcType extends Cctype
      */
     public function toOptionArray(): array
     {
-        $allowed = $this->getAllowedTypes();
         $options = [];
-
-        foreach ($this->_paymentConfig->getCcTypes() as $code => $name) {
-            if (in_array($code, $allowed, true)) {
-                $options[] = ['value' => $code, 'label' => $name];
-            }
+        foreach ($this->config->getCcTypes() as $code => $name) {
+            $options[] = [
+                'value' => $code,
+                'label' => $name['name']
+            ];
         }
-
         return $options;
     }
 }

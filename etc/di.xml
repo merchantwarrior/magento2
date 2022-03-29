@@ -9,8 +9,30 @@
                 type="MerchantWarrior\Payment\Model\Api\Direct\ProcessAuth" />
     <preference for="MerchantWarrior\Payment\Api\Payframe\ProcessCardInterface"
                 type="MerchantWarrior\Payment\Model\Api\Payframe\ProcessCard" />
+    <preference for="MerchantWarrior\Payment\Api\Payframe\ProcessAuthInterface"
+                type="MerchantWarrior\Payment\Model\Api\Payframe\ProcessAuth" />
     <preference for="MerchantWarrior\Payment\Api\Payment\Process\CardInterface"
                 type="MerchantWarrior\Payment\Model\Payment\Process\Card" />
+
+
+    <type name="MerchantWarrior\Payment\Model\Config\Reader">
+        <arguments>
+            <argument name="fileName" xsi:type="string">merchant_warrior_payment.xml</argument>
+            <argument name="converter" xsi:type="object">MerchantWarrior\Payment\Model\Config\Converter</argument>
+            <argument name="schemaLocator" xsi:type="object">MerchantWarrior\Payment\Model\Config\SchemaLocator</argument>
+        </arguments>
+    </type>
+    <virtualType name="MerchantWarrior\Payment\Model\Config\Data" type="Magento\Framework\Config\Data">
+        <arguments>
+            <argument name="reader" xsi:type="object">MerchantWarrior\Payment\Model\Config\Reader\Proxy</argument>
+            <argument name="cacheId" xsi:type="string">merchant_warrior_payment_config</argument>
+        </arguments>
+    </virtualType>
+    <type name="MerchantWarrior\Payment\Model\Config">
+        <arguments>
+            <argument name="dataStorage" xsi:type="object">MerchantWarrior\Payment\Model\Config\Data</argument>
+        </arguments>
+    </type>
 
     <!-- Payment Method Facade configuration -->
     <virtualType name="MerchantWarriorFacade" type="Magento\Payment\Model\Method\Adapter">
@@ -39,7 +61,10 @@
     <!-- Braintree validators infrastructure -->
     <virtualType name="MerchantWarriorValidatorPool" type="Magento\Payment\Gateway\Validator\ValidatorPool">
         <arguments>
-            <argument name="validators" xsi:type="array"></argument>
+            <argument name="validators" xsi:type="array">
+                <item name="global" xsi:type="string">MerchantWarrior\Payment\Gateway\Validator\GlobalValidator</item>
+                <item name="availability" xsi:type="string">MerchantWarrior\Payment\Gateway\Validator\AvailabilityValidator</item>
+            </argument>
         </arguments>
     </virtualType>
     <!-- Braintree validators infrastructure -->
@@ -90,9 +115,10 @@
         <arguments>
             <argument name="requestBuilder" xsi:type="object">MerchantWarriorPaymentPayFrameAuthorizeRequest</argument>
             <argument name="transferFactory" xsi:type="object">MerchantWarrior\Payment\Gateway\Http\TransferFactory</argument>
-            <argument name="client" xsi:type="object">MerchantWarrior\Payment\Gateway\Http\Client\PayFrame\TransactionPayment</argument>
+            <argument name="client" xsi:type="object">MerchantWarrior\Payment\Gateway\Http\Client\PayFrame\TransactionAuthorize</argument>
             <argument name="validator" xsi:type="object">CheckoutResponseValidator</argument>
             <argument name="handler" xsi:type="object">MerchantWarriorPayFrameResponseHandler</argument>
+            <argument name="errorMessageMapper" xsi:type="object">MerchantWarrior\Payment\Gateway\ErrorMapper\VirtualErrorMessageMapper</argument>
         </arguments>
     </virtualType>
 
@@ -120,8 +146,23 @@
     <!-- Capture Request -->
     <virtualType name="MerchantWarriorPaymentCaptureCommand" type="Magento\Payment\Gateway\Command\GatewayCommand">
         <arguments>
+            <argument name="requestBuilder" xsi:type="object">MerchantWarriorPaymentPayFrameCaptureRequest</argument>
+            <argument name="transferFactory" xsi:type="object">MerchantWarrior\Payment\Gateway\Http\TransferFactory</argument>
+            <argument name="client" xsi:type="object">MerchantWarrior\Payment\Gateway\Http\Client\PayFrame\TransactionCapture</argument>
+            <argument name="validator" xsi:type="object">CheckoutResponseValidator</argument>
+            <argument name="handler" xsi:type="object">MerchantWarriorPayFrameResponseHandler</argument>
+            <argument name="errorMessageMapper" xsi:type="object">MerchantWarrior\Payment\Gateway\ErrorMapper\VirtualErrorMessageMapper</argument>
+        </arguments>
+    </virtualType>
+
+    <virtualType name="MerchantWarriorPaymentPayFrameCaptureRequest" type="Magento\Payment\Gateway\Request\BuilderComposite">
+        <arguments>
             <argument name="builders" xsi:type="array">
-                <item name="capture" xsi:type="string">MerchantWarrior\Payment\Gateway\Request\CaptureDataBuilder</item>
+                <item name="customer" xsi:type="string">MerchantWarrior\Payment\Gateway\Request\CustomerDataBuilder</item>
+                <item name="customer_ip" xsi:type="string">MerchantWarrior\Payment\Gateway\Request\CustomerIpDataBuilder</item>
+                <item name="address" xsi:type="string">MerchantWarrior\Payment\Gateway\Request\AddressDataBuilder</item>
+                <item name="transaction" xsi:type="string">MerchantWarrior\Payment\Gateway\Request\TransactionDataBuilder</item>
+                <item name="mw_transaction_data" xsi:type="string">MerchantWarrior\Payment\Gateway\Request\PayFrameTransactionDataBuilder</item>
             </argument>
         </arguments>
     </virtualType>
@@ -141,6 +182,24 @@
             <argument name="builders" xsi:type="array">
                 <item name="refund" xsi:type="string">MerchantWarrior\Payment\Gateway\Request\CancelDataBuilder</item>
             </argument>
+        </arguments>
+    </virtualType>
+
+    <!-- Merchant Warrior error code mapper -->
+    <virtualType name="MerchantWarrior\Payment\Gateway\ErrorMapper\VirtualConfigReader" type="Magento\Payment\Gateway\ErrorMapper\VirtualConfigReader">
+        <arguments>
+            <argument name="fileName" xsi:type="string">mw_error_mapping.xml</argument>
+        </arguments>
+    </virtualType>
+    <virtualType name="MerchantWarrior\Payment\Gateway\ErrorMapper\VirtualMappingData" type="Magento\Payment\Gateway\ErrorMapper\MappingData">
+        <arguments>
+            <argument name="reader" xsi:type="object">MerchantWarrior\Payment\Gateway\ErrorMapper\VirtualConfigReader</argument>
+            <argument name="cacheId" xsi:type="string">mw_error_mapper</argument>
+        </arguments>
+    </virtualType>
+    <virtualType name="MerchantWarrior\Payment\Gateway\ErrorMapper\VirtualErrorMessageMapper" type="Magento\Payment\Gateway\ErrorMapper\ErrorMessageMapper">
+        <arguments>
+            <argument name="messageMapping" xsi:type="object">MerchantWarrior\Payment\Gateway\ErrorMapper\VirtualMappingData</argument>
         </arguments>
     </virtualType>
 

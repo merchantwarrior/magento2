@@ -80,7 +80,7 @@ class ConfigProvider implements ConfigProviderInterface
                     'apiKey'    => $this->config->getApiKey(),
                     'payframeSrc' => $this->getPayFrameSrc(),
                     'submitURL'   => $this->getSubmitUrl(),
-                    'allowedTypeCards' => $this->getAllowrdCCList(),
+                    'allowedTypeCards' => $this->getAllowedCCList(),
                     'successPage' => $this->urlBuilder->getUrl(
                         'checkout/onepage/success',
                         [
@@ -92,37 +92,20 @@ class ConfigProvider implements ConfigProviderInterface
         ] : [];
     }
 
-    private function getAllowrdCCList()
+    /**
+     * Get allowed CC List
+     *
+     * @return string|null
+     */
+    private function getAllowedCCList(): ?string
     {
         $allowedCreditCards = $this->config->getPayFrameAllowedTypeCards();
-        $allowedCreditCards = explode(',', $allowedCreditCards);
-        $creditCards = [];
+        $cardsTypes = $this->config->getCcTypes();
 
+        $creditCards = [];
         foreach ($allowedCreditCards as $card) {
-            switch ($card) {
-                case 'VI':
-                    $creditCards[] = 'Visa';
-                    break;
-                case 'MC':
-                    $creditCards[] = 'MasterCard';
-                    break;
-                case 'AE':
-                    $creditCards[] = 'American Express';
-                    break;
-                case 'DN':
-                    $creditCards[] = 'Diners Club';
-                    break;
-                case 'JCB':
-                    $creditCards[] = 'JCB';
-                    break;
-                case 'UN':
-                    $creditCards[] = 'UnionPay';
-                    break;
-                case 'AM':
-                    $creditCards[] = 'Amex';
-                    break;
-                case 'DI':
-                    $creditCards[] = 'Discover';
+            if (isset($cardsTypes[$card])) {
+                $creditCards[] = $cardsTypes[$card]['code_alt'];
             }
         }
         return implode(',', $creditCards);

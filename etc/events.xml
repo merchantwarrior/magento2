@@ -17,4 +17,8 @@
         <observer name="merchant_warrior_payframe_data_assign"
                   instance="MerchantWarrior\Payment\Observer\MWPDataAssignObserver" />
     </event>
+    <event name="payment_method_is_active">
+        <observer name="merchant_warrior_payment_method_is_active"
+                  instance="MerchantWarrior\Payment\Observer\MWIsActiveObserver" />
+    </event>
 </config>
