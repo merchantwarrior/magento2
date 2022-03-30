@@ -26,9 +26,12 @@ class TransactionDataBuilder extends AbstractDataBuilder
         $order = $paymentDO->getOrder();
 
         return [
-            RequestApiInterface::TRANSACTION_AMOUNT   => $this->getTransactionAmount($order),
-            RequestApiInterface::TRANSACTION_CURRENCY => $order->getCurrencyCode(),
-            RequestApiInterface::TRANSACTION_PRODUCT  => $this->getProductData($order)
+            RequestApiInterface::TRANSACTION_AMOUNT
+                => $this->getTransactionAmount((float)$order->getGrandTotalAmount()),
+            RequestApiInterface::TRANSACTION_CURRENCY
+                => $order->getCurrencyCode(),
+            RequestApiInterface::TRANSACTION_PRODUCT
+                => $this->getProductData($order)
         ];
     }
 
@@ -46,19 +49,5 @@ class TransactionDataBuilder extends AbstractDataBuilder
             $items[] = $item->getSku();
         }
         return implode(',', $items);
-    }
-
-    /**
-     * Get formatted amount
-     *
-     * @param OrderAdapterInterface $order
-     *
-     * @return string
-     */
-    private function getTransactionAmount(OrderAdapterInterface $order): string
-    {
-        $price = (float)$order->getGrandTotalAmount();
-
-        return number_format($price, 2, '.', '');
     }
 }

@@ -4,12 +4,10 @@ declare(strict_types=1);
 
 namespace MerchantWarrior\Payment\Gateway\Request;
 
-use Magento\Payment\Gateway\Request\BuilderInterface;
-
 /**
  * Class RefundDataBuilder
  */
-class RefundDataBuilder implements BuilderInterface
+class RefundDataBuilder extends AbstractDataBuilder
 {
     /**
      * Builds ENV request
@@ -20,6 +18,16 @@ class RefundDataBuilder implements BuilderInterface
      */
     public function build(array $buildSubject): array
     {
-        return [];
+        $paymentDO = $this->readPayment($buildSubject);
+
+        $payment = $paymentDO->getPayment();
+        $creditMemo = $payment->getCreditMemo();
+
+        return [
+            'transactionAmount' => $this->getTransactionAmount($creditMemo->getGrandTotal()),
+            'transactionCurrency' => $creditMemo->getOrderCurrencyCode(),
+            'transactionID' => $this->clearTransactionId($payment->getTransactionId()),
+            'refundAmount' => $this->getTransactionAmount($creditMemo->getGrandTotal())
+        ];
     }
 }

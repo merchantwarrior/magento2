@@ -23,13 +23,16 @@ class RefundCard extends RequestApi implements RefundCardInterface
             return [];
         }
 
-        return $this->sendRequest([
-            self::METHOD => self::API_METHOD,
-            self::TRANSACTION_AMOUNT => $transactionAmount,
-            self::TRANSACTION_CURRENCY => $currency,
-            self::TRANSACTION_ID => $transactionId,
-            self::REFUND_AMOUNT => $refundAmount
-        ]);
+        return $this->sendRequest(
+            self::API_METHOD,
+            [
+                self::METHOD => self::API_METHOD,
+                self::TRANSACTION_AMOUNT => $transactionAmount,
+                self::TRANSACTION_CURRENCY => $currency,
+                self::TRANSACTION_ID => $transactionId,
+                self::REFUND_AMOUNT => $refundAmount
+            ]
+        );
     }
 
     /**
@@ -40,26 +43,6 @@ class RefundCard extends RequestApi implements RefundCardInterface
     protected function getApiUrl(): string
     {
         return $this->config->getApiUrl() . 'post/';
-    }
-
-    /**
-     * Set request
-     *
-     * @param array $data
-     *
-     * @return array
-     * @throws LocalizedException
-     */
-    private function sendRequest(array $data): array
-    {
-        $data = $this->formData($data);
-
-        $this->sendPostRequest(self::API_METHOD, $data);
-
-        if ($this->getResponseCode(self::API_METHOD) !== '0') {
-            throw new LocalizedException(__($this->getResponseMessage(self::API_METHOD)));
-        }
-        return $this->getResponse(self::API_METHOD)->toArray();
     }
 
     /**

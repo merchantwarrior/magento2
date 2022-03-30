@@ -7,22 +7,22 @@ namespace MerchantWarrior\Payment\Gateway\Http\Client\PayFrame;
 use Magento\Framework\Exception\LocalizedException;
 use Magento\Payment\Gateway\Http\ClientInterface;
 use Magento\Payment\Gateway\Http\TransferInterface;
-use MerchantWarrior\Payment\Api\Payframe\ProcessAuthInterface;
+use MerchantWarrior\Payment\Api\Payframe\ProcessInterface;
 
 class TransactionAuthorize implements ClientInterface
 {
     /**
-     * @var ProcessAuthInterface
+     * @var ProcessInterface
      */
-    private ProcessAuthInterface $processCard;
+    private ProcessInterface $process;
 
     /**
-     * @param ProcessAuthInterface $processAuth
+     * @param ProcessInterface $process
      */
     public function __construct(
-        ProcessAuthInterface $processAuth
+        ProcessInterface $process
     ) {
-        $this->processAuth = $processAuth;
+        $this->process = $process;
     }
 
     /**
@@ -38,7 +38,7 @@ class TransactionAuthorize implements ClientInterface
 
         if (count($transactionData)) {
             try {
-                $result = $this->processAuth->execute($transactionData);
+                $result = $this->process->execute(ProcessInterface::API_METHOD_AUTH, $transactionData);
             } catch (LocalizedException $err) {
                 $result = [
                     'responseCode' => $err->getCode(),

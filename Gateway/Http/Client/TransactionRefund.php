@@ -2,25 +2,26 @@
 
 declare(strict_types=1);
 
-namespace MerchantWarrior\Payment\Gateway\Http\Client\PayFrame;
+namespace MerchantWarrior\Payment\Gateway\Http\Client;
 
 use Magento\Framework\Exception\LocalizedException;
 use Magento\Payment\Gateway\Http\ClientInterface;
 use Magento\Payment\Gateway\Http\TransferInterface;
-use MerchantWarrior\Payment\Api\Payframe\ProcessInterface;
+use MerchantWarrior\Payment\Api\Direct\RefundCardInterface;
+use MerchantWarrior\Payment\Model\Api\RequestApiInterface;
 
-class TransactionCapture implements ClientInterface
+class TransactionRefund implements ClientInterface
 {
     /**
-     * @var ProcessInterface
+     * @var RefundCardInterface
      */
-    private ProcessInterface $process;
+    private RefundCardInterface $process;
 
     /**
-     * @param ProcessInterface $process
+     * @param RefundCardInterface $process
      */
     public function __construct(
-        ProcessInterface $process
+        RefundCardInterface $process
     ) {
         $this->process = $process;
     }
@@ -38,7 +39,12 @@ class TransactionCapture implements ClientInterface
 
         if (count($transactionData)) {
             try {
-                $result = $this->process->execute(ProcessInterface::API_METHOD_CARD, $transactionData);
+                $result = $this->process->execute(
+                    $transactionData[RequestApiInterface::TRANSACTION_AMOUNT],
+                    $transactionData[RequestApiInterface::TRANSACTION_CURRENCY],
+                    $transactionData[RequestApiInterface::TRANSACTION_ID],
+                    $transactionData[RequestApiInterface::REFUND_AMOUNT]
+                );
             } catch (LocalizedException $err) {
                 $result = [
                     'responseCode' => $err->getCode(),

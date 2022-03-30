@@ -2,5 +2,6 @@
 <mapping xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="urn:magento:module:Magento_Payment:etc/error_mapping.xsd">
     <message_list>
         <message code="MW - 006:Card has expired" translate="true">Card has expired.</message>
+        <message code="MW - 011:Invalid transactionID" translate="true">Invalid Transaction ID</message>
     </message_list>
 </mapping>

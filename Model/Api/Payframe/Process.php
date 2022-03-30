@@ -2,28 +2,28 @@
 
 declare(strict_types=1);
 
-namespace MerchantWarrior\Payment\Model\Api\Direct;
+namespace MerchantWarrior\Payment\Model\Api\Payframe;
 
 use Magento\Framework\Exception\LocalizedException;
-use MerchantWarrior\Payment\Api\Direct\ProcessCardInterface;
+use MerchantWarrior\Payment\Api\Payframe\ProcessInterface;
 use MerchantWarrior\Payment\Model\Api\RequestApi;
 
-class ProcessCard extends RequestApi implements ProcessCardInterface
+class Process extends RequestApi implements ProcessInterface
 {
     /**
      * @inheritdoc
      */
-    public function execute(array $transactionParams): array
+    public function execute(string $method, array $transactionParams): array
     {
-        if (!$this->config->isEnabled()) {
+        if (!$this->config->isPayFrameActive()) {
             return [];
         }
 
+        $transactionParams[self::METHOD] = $method;
+
         $this->validate($transactionParams);
 
-        $transactionParams[self::METHOD] = self::API_METHOD;
-
-        return $this->sendRequest(self::API_METHOD, $transactionParams);
+        return $this->sendRequest($method, $transactionParams);
     }
 
     /**
@@ -33,7 +33,7 @@ class ProcessCard extends RequestApi implements ProcessCardInterface
      */
     protected function getApiUrl(): string
     {
-        return $this->config->getApiUrl() . 'post/';
+        return $this->config->getApiUrl() . 'payframe/';
     }
 
     /**
