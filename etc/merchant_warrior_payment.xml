@@ -31,9 +31,5 @@
             <label>UnionPay</label>
             <code_alt>unionpay</code_alt>
         </type>
-        <type id="LA" order="80">
-            <label>Laser</label>
-            <code_alt>laser</code_alt>
-        </type>
     </credit_cards>
 </payment>

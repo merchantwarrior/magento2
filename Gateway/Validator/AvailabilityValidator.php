@@ -6,7 +6,6 @@ namespace MerchantWarrior\Payment\Gateway\Validator;
 
 use Magento\Payment\Gateway\Validator\AbstractValidator;
 use Magento\Payment\Gateway\Validator\ResultInterface;
-use Magento\Payment\Gateway\Validator\ResultInterfaceFactory;
 use MerchantWarrior\Payment\Model\Ui\ConfigProvider as MWConfigProvider;
 use MerchantWarrior\Payment\Model\Ui\PayFrame\ConfigProvider as MWPayFrameConfigProvider;
 
