@@ -23,7 +23,7 @@ class ProcessAuth extends RequestApi implements ProcessAuthInterface
 
         $transactionParams[self::METHOD] = self::API_METHOD;
 
-        return $this->sendRequest($transactionParams);
+        return $this->sendRequest(self::API_METHOD, $transactionParams);
     }
 
     /**
@@ -34,26 +34,6 @@ class ProcessAuth extends RequestApi implements ProcessAuthInterface
     protected function getApiUrl(): string
     {
         return $this->config->getApiUrl() . 'post/';
-    }
-
-    /**
-     * Set request
-     *
-     * @param array $data
-     *
-     * @return array
-     * @throws LocalizedException
-     */
-    private function sendRequest(array $data): array
-    {
-        $data = $this->formData($data);
-
-        $this->sendPostRequest(self::API_METHOD,  $data);
-
-        if ($this->getResponseCode(self::API_METHOD) !== '0') {
-            throw new LocalizedException(__($this->getResponseMessage(self::API_METHOD)));
-        }
-        return $this->getResponse(self::API_METHOD)->toArray();
     }
 
     /**

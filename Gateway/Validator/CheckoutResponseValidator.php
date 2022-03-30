@@ -39,16 +39,10 @@ class CheckoutResponseValidator extends AbstractValidator
     public function validate(array $validationSubject): ResultInterface
     {
         $response = SubjectReader::readResponse($validationSubject);
-        $paymentDataObjectInterface = SubjectReader::readPayment($validationSubject);
-        $payment = $paymentDataObjectInterface->getPayment();
 
         $errorMessages = [];
 
-        if (isset($response['responseCode']) && $response['responseCode'] === '0') {
-            $payment->setAdditionalInformation('responseMessage', $response['responseMessage']);
-            $payment->setAdditionalInformation('transactionID', $response['transactionID']);
-            $payment->setAdditionalInformation('paymentCardNumber', $response['paymentCardNumber']);
-        } else {
+        if (!isset($response['responseCode']) || $response['responseCode'] !== '0') {
             if (!empty($response['error'])) {
                 $this->logger->error($response['error']);
             }

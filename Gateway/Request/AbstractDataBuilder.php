@@ -24,4 +24,31 @@ abstract class AbstractDataBuilder implements BuilderInterface
     {
         return Helper\SubjectReader::readPayment($subject);
     }
+
+    /**
+     * Get formatted amount
+     *
+     * @param float $price
+     *
+     * @return string
+     */
+    protected function getTransactionAmount(float $price): string
+    {
+        return number_format($price, 2, '.', '');
+    }
+
+    /**
+     * Clear transaction ID
+     *
+     * @param string $transactionId
+     *
+     * @return string
+     */
+    protected function clearTransactionId(string $transactionId): string
+    {
+        if (strpos($transactionId, '-refund') !== false) {
+            $transactionId = str_replace('-refund', '', $transactionId);
+        }
+        return $transactionId;
+    }
 }

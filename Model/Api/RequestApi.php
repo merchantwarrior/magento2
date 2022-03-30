@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace MerchantWarrior\Payment\Model\Api;
 
 use Magento\Framework\DataObject;
+use Magento\Framework\Exception\LocalizedException;
 use Magento\Framework\HTTP\ClientInterface;
 use Magento\Framework\Event\ManagerInterface;
 use Magento\Framework\Xml\Parser;
@@ -18,13 +19,13 @@ abstract class RequestApi implements RequestApiInterface
     /**#@+
      * Request Mode
      */
-    const REQUEST_MODE_JSON = true;
+    public const REQUEST_MODE_JSON = true;
     /**#@-*/
 
     /**#@+
      * Success response code
      */
-    const SUCCESS_CODE = 0;
+    public const SUCCESS_CODE = 0;
     /**#@-*/
 
     /**
@@ -114,6 +115,31 @@ abstract class RequestApi implements RequestApiInterface
         $this->timezone = $timezone;
         $this->serializer = $serializer;
         $this->xmlParser = $xmlParser;
+    }
+
+    /**
+     * Set request
+     *
+     * @param string $method
+     * @param array $data
+     *
+     * @return array
+     * @throws LocalizedException
+     */
+    protected function sendRequest(string $method, array $data): array
+    {
+        $data = $this->formData($data);
+
+        $this->sendPostRequest($method, $data);
+
+        if ($this->getResponseCode($method) !== '0') {
+            throw new LocalizedException(
+                __($this->getResponseMessage($method)),
+                null,
+                $this->getResponseCode($method)
+            );
+        }
+        return $this->getResponse($method)->toArray();
     }
 
     /**

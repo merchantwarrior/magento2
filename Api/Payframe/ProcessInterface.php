@@ -7,18 +7,19 @@ namespace MerchantWarrior\Payment\Api\Payframe;
 use Magento\Framework\Exception\LocalizedException;
 
 /**
- * Interface ProcessAuthInterface
+ * Interface ProcessInterface
  */
-interface ProcessAuthInterface
+interface ProcessInterface
 {
     /**#@+
      * Api Method constants
      */
-    const API_METHOD = 'processAuth';
+    const API_METHOD_AUTH = 'processAuth';
+    const API_METHOD_CARD = 'processCard';
     /**#@-*/
 
     /**
-     * Execute processAuth for Payframe
+     * Execute process for Payframe
      *
      * Expected params:
      * [
@@ -42,10 +43,11 @@ interface ProcessAuthInterface
      *  'hash' => ''
      * ]
      *
+     * @param string $method
      * @param array $transactionParams
      *
      * @return array
      * @throws LocalizedException
      */
-    public function execute(array $transactionParams): array;
+    public function execute(string $method, array $transactionParams): array;
 }
