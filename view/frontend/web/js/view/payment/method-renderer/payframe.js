@@ -7,9 +7,9 @@ define([
     'Magento_Checkout/js/model/quote',
     'Magento_Catalog/js/price-utils',
     'MerchantWarrior_Payment/js/action/place-order',
-    'MerchantWarrior_Payment/js/action/process-card',
+    'Magento_Checkout/js/model/full-screen-loader',
     'payframeLib'
-], function ($, ko, _, Component, customerData, quote, priceUtils, placeOrderAction, processCardAction) {
+], function ($, ko, _, Component, customerData, quote, priceUtils, placeOrderAction, fullScreenLoader) {
     'use strict';
 
     return Component.extend({
@@ -71,6 +71,7 @@ define([
          * @private
          */
         _initMwPayFrame: function () {
+            fullScreenLoader.startLoader();
             $('#' + this.mwCardDivId).html('');
 
             this.mwPayframe = this._initPayFrame(
@@ -87,7 +88,6 @@ define([
             ) => this._payFrameCallback(
                 tokenStatus, payframeToken, payframeKey
             );
-            this.mwPayframe.loading = () => this._payFrameLoading();
             this.mwPayframe.loaded = () => this._payFrameLoaded();
 
             this.tdsCheck = this._initTdsCheck(
@@ -170,17 +170,13 @@ define([
                 );
             } else {
                 if (this.mwPayframe.responseCode == -2 || this.mwPayframe.responseCode == -3) {
-                    console.log('Validation failed - ' + this.mwPayframe.responseMessage);
+                    fullScreenLoader.stopLoader(true);
                 }
             }
         },
 
-        _payFrameLoading: function () {
-
-        },
-
         _payFrameLoaded: function () {
-
+            fullScreenLoader.stopLoader(true);
         },
 
         /**
@@ -338,6 +334,8 @@ define([
             }
 
             if (this.validate()) {
+                fullScreenLoader.startLoader();
+
                 this.mwPayframe.submitPayframe();
             }
             return false;
