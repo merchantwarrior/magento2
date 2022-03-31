@@ -43,6 +43,7 @@ interface RequestApiInterface
     const PAYMENT_CARD_CSC = 'paymentCardCSC';
     const TRANSACTION_ID = 'transactionID';
     const REFUND_AMOUNT = 'refundAmount';
+    const CAPTURE_AMOUNT = 'captureAmount';
     /**#@-*/
 
     /**#@+

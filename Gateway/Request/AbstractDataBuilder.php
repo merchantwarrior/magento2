@@ -49,6 +49,9 @@ abstract class AbstractDataBuilder implements BuilderInterface
         if (strpos($transactionId, '-refund') !== false) {
             $transactionId = str_replace('-refund', '', $transactionId);
         }
+        if (strpos($transactionId, '-capture') !== false) {
+            $transactionId = str_replace('-capture', '', $transactionId);
+        }
         return $transactionId;
     }
 }

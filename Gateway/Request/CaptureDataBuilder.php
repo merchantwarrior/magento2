@@ -4,15 +4,13 @@ declare(strict_types=1);
 
 namespace MerchantWarrior\Payment\Gateway\Request;
 
-use Magento\Payment\Gateway\Request\BuilderInterface;
-
 /**
- * Class CustomerDataBuilder
+ * Class CaptureDataBuilder
  */
-class CaptureDataBuilder implements BuilderInterface
+class CaptureDataBuilder extends AbstractDataBuilder
 {
     /**
-     * Create capture request
+     * Builds ENV request
      *
      * @param array $buildSubject
      *
@@ -20,6 +18,16 @@ class CaptureDataBuilder implements BuilderInterface
      */
     public function build(array $buildSubject): array
     {
-        return [];
+        $paymentDO = $this->readPayment($buildSubject);
+
+        $payment = $paymentDO->getPayment();
+        $order = $paymentDO->getOrder();
+
+        return [
+            'transactionAmount' => $this->getTransactionAmount((float)$order->getGrandTotalAmount()),
+            'transactionCurrency' => $order->getCurrencyCode(),
+            'transactionID' => $this->clearTransactionId($payment->getTransactionId()),
+            'captureAmount' => $this->getTransactionAmount((float)$order->getGrandTotalAmount())
+        ];
     }
 }

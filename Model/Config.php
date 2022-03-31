@@ -25,7 +25,6 @@ class Config
      * Configuration constants
      */
     public const XML_PATH_ACTIVE = 'payment/merchant_warrior/active';
-    const XML_PATH_ALLOWED_CC = 'payment/merchant_warrior_payframe/cctypes';
     public const XML_PATH_IS_SANDBOX_MODE_ENABLED = 'payment/merchant_warrior/sandbox_mode';
     /**#@-*/
 
@@ -40,8 +39,10 @@ class Config
     /**#@+
      * Configuration for PayFrame constants
      */
-    public const XML_PATH_PAYFRAME_ACTIVE = 'payment/merchant_warrior/active';
+    public const XML_PATH_PAYFRAME_ACTIVE = 'payment/merchant_warrior_payframe/active';
     public const XML_PATH_PAYFRAME_ALLOWED_CC = 'payment/merchant_warrior_payframe/cctypes';
+    public const XML_PATH_PAYFRAME_ALLOWED_SPECIFIC = 'payment/merchant_warrior_payframe/allowspecific';
+    public const XML_PATH_PAYFRAME_ALLOWED_SPECIFICCOUNTRY = 'payment/merchant_warrior_payframe/specificcountry';
     /**#@-*/
 
     /**#@+
