@@ -18,10 +18,6 @@ define([
             mwIframeID: 'mwIframe',
             mwCardDivId: 'payframe-card-data',
             frameStyle: {
-                backgroundColor: '#ffbfec',
-                textColor: '#f963cd',
-                border: '3px solid #f963cd',
-                fontFamily: 'Arial',
                 errorTextColor: 'red',
                 errorBorderColor: 'red',
                 fontSize: '18px',

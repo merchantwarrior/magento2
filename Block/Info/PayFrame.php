@@ -88,12 +88,14 @@ class PayFrame extends Info
     private function formCardType(string $cardType): string
     {
         $cardsTypes = $this->config->getCcTypes();
-        foreach ($cardsTypes as $card) {
+
+        $result = $cardType;
+        array_walk($cardsTypes, static function(&$card) use (&$result, $cardType) {
             if ($card['code_alt'] === $cardType) {
-                return $card['label'];
+                $result = $card['name'];
             }
-        }
-        return $cardType;
+        });
+        return $result;
     }
 
     /**

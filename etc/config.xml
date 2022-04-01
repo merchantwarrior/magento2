@@ -38,7 +38,7 @@
                 <active>1</active>
                 <model>MerchantWarriorPayFrameFacade</model>
                 <title>Merchant Warrior PayFrame</title>
-                <payment_action>authorize</payment_action>
+                <payment_action>authorize_capture</payment_action>
                 <is_gateway>1</is_gateway>
                 <can_use_checkout>1</can_use_checkout>
                 <can_authorize>1</can_authorize>
