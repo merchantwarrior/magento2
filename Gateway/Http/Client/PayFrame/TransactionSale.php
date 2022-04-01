@@ -9,7 +9,7 @@ use Magento\Payment\Gateway\Http\ClientInterface;
 use Magento\Payment\Gateway\Http\TransferInterface;
 use MerchantWarrior\Payment\Api\Payframe\ProcessInterface;
 
-class TransactionCapture implements ClientInterface
+class TransactionSale implements ClientInterface
 {
     /**
      * @var ProcessInterface

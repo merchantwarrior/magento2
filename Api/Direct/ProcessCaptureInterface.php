@@ -7,18 +7,18 @@ namespace MerchantWarrior\Payment\Api\Direct;
 use Magento\Framework\Exception\LocalizedException;
 
 /**
- * Interface RefundCardInterface
+ * Interface ProcessCaptureInterface
  */
-interface RefundCardInterface
+interface ProcessCaptureInterface
 {
     /**#@+
      * Api Method constants
      */
-    const API_METHOD = 'refundCard';
+    const API_METHOD = 'processCapture';
     /**#@-*/
 
     /**
-     * Execute refund card
+     * Execute process capture
      *
      * @param array $transactionParams
      *

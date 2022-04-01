@@ -7,21 +7,20 @@ namespace MerchantWarrior\Payment\Gateway\Http\Client;
 use Magento\Framework\Exception\LocalizedException;
 use Magento\Payment\Gateway\Http\ClientInterface;
 use Magento\Payment\Gateway\Http\TransferInterface;
-use MerchantWarrior\Payment\Api\Direct\RefundCardInterface;
-use MerchantWarrior\Payment\Model\Api\RequestApiInterface;
+use MerchantWarrior\Payment\Api\Direct\ProcessCaptureInterface;
 
-class TransactionRefund implements ClientInterface
+class TransactionCapture implements ClientInterface
 {
     /**
-     * @var RefundCardInterface
+     * @var ProcessCaptureInterface
      */
-    private RefundCardInterface $process;
+    private ProcessCaptureInterface $process;
 
     /**
-     * @param RefundCardInterface $process
+     * @param ProcessCaptureInterface $process
      */
     public function __construct(
-        RefundCardInterface $process
+        ProcessCaptureInterface $process
     ) {
         $this->process = $process;
     }
