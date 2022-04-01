@@ -13,26 +13,17 @@ class RefundCard extends RequestApi implements RefundCardInterface
     /**
      * @inheritdoc
      */
-    public function execute(
-        string $transactionAmount,
-        string $currency,
-        string $transactionId,
-        string $refundAmount
-    ): array {
+    public function execute(array $transactionParams): array
+    {
         if (!$this->config->isEnabled()) {
             return [];
         }
 
-        return $this->sendRequest(
-            self::API_METHOD,
-            [
-                self::METHOD => self::API_METHOD,
-                self::TRANSACTION_AMOUNT => $transactionAmount,
-                self::TRANSACTION_CURRENCY => $currency,
-                self::TRANSACTION_ID => $transactionId,
-                self::REFUND_AMOUNT => $refundAmount
-            ]
-        );
+        $this->validate($transactionParams);
+
+        $transactionParams[self::METHOD] = self::API_METHOD;
+
+        return $this->sendRequest(self::API_METHOD, $transactionParams);
     }
 
     /**
@@ -48,13 +39,27 @@ class RefundCard extends RequestApi implements RefundCardInterface
     /**
      * Validate
      *
-     * @param string $date
+     * @param array $data
      *
      * @return void
      * @throws LocalizedException
      */
-    private function validate(string $date): void
+    private function validate(array $data): void
     {
-        // TODO: Add additonal validation for data
+        if (!isset($data[self::TRANSACTION_AMOUNT])) {
+            throw new LocalizedException(__('Transaction Amount is missed!'));
+        }
+
+        if (!isset($data[self::TRANSACTION_CURRENCY])) {
+            throw new LocalizedException(__('Transaction Currency is missed!'));
+        }
+
+        if (!isset($data[self::TRANSACTION_ID])) {
+            throw new LocalizedException(__('Transaction ID is missed!'));
+        }
+
+        if (!isset($data[self::REFUND_AMOUNT])) {
+            throw new LocalizedException(__('Refund Amount is missed!'));
+        }
     }
 }

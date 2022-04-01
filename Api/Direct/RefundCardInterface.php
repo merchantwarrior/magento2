@@ -20,18 +20,10 @@ interface RefundCardInterface
     /**
      * Execute refund card
      *
-     * @param string $transactionAmount
-     * @param string $currency
-     * @param string $transactionId
-     * @param string $refundAmount
+     * @param array $transactionParams
      *
      * @return array
      * @throws LocalizedException
      */
-    public function execute(
-        string $transactionAmount,
-        string $currency,
-        string $transactionId,
-        string $refundAmount
-    ): array;
+    public function execute(array $transactionParams): array;
 }

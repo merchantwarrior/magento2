@@ -12,45 +12,45 @@ interface RequestApiInterface
     /**#@+
      * Authorization keys
      */
-    const MERCHANT_USER_ID = 'merchantUUID';
-    const API_KEY = 'apiKey';
+    public const MERCHANT_USER_ID = 'merchantUUID';
+    public const API_KEY = 'apiKey';
     /**#@-*/
 
     /**#@+
      * Post params
      */
-    const METHOD = 'method';
+    public const METHOD = 'method';
     /**#@-*/
 
     /**#@+
      * Api Direct Method constants
      */
-    const TRANSACTION_AMOUNT = 'transactionAmount';
-    const TRANSACTION_CURRENCY = 'transactionCurrency';
-    const TRANSACTION_PRODUCT = 'transactionProduct';
-    const CUSTOMER_NAME = 'customerName';
-    const CUSTOMER_COUNTRY = 'customerCountry';
-    const CUSTOMER_STATE = 'customerState';
-    const CUSTOMER_CITY = 'customerCity';
-    const CUSTOMER_ADDRESS = 'customerAddress';
-    const CUSTOMER_POST_CODE = 'customerPostCode';
-    const CUSTOMER_PHONE = 'customerPhone';
-    const CUSTOMER_EMAIL = 'customerEmail';
-    const CUSTOMER_IP = 'customerIP';
-    const PAYMENT_CARD_NAME = 'paymentCardName';
-    const PAYMENT_CARD_NUMBER = 'paymentCardNumber';
-    const PAYMENT_CARD_EXPIRY = 'paymentCardExpiry';
-    const PAYMENT_CARD_CSC = 'paymentCardCSC';
-    const TRANSACTION_ID = 'transactionID';
-    const REFUND_AMOUNT = 'refundAmount';
-    const CAPTURE_AMOUNT = 'captureAmount';
+    public const TRANSACTION_AMOUNT = 'transactionAmount';
+    public const TRANSACTION_CURRENCY = 'transactionCurrency';
+    public const TRANSACTION_PRODUCT = 'transactionProduct';
+    public const CUSTOMER_NAME = 'customerName';
+    public const CUSTOMER_COUNTRY = 'customerCountry';
+    public const CUSTOMER_STATE = 'customerState';
+    public const CUSTOMER_CITY = 'customerCity';
+    public const CUSTOMER_ADDRESS = 'customerAddress';
+    public const CUSTOMER_POST_CODE = 'customerPostCode';
+    public const CUSTOMER_PHONE = 'customerPhone';
+    public const CUSTOMER_EMAIL = 'customerEmail';
+    public const CUSTOMER_IP = 'customerIP';
+    public const PAYMENT_CARD_NAME = 'paymentCardName';
+    public const PAYMENT_CARD_NUMBER = 'paymentCardNumber';
+    public const PAYMENT_CARD_EXPIRY = 'paymentCardExpiry';
+    public const PAYMENT_CARD_CSC = 'paymentCardCSC';
+    public const TRANSACTION_ID = 'transactionID';
+    public const REFUND_AMOUNT = 'refundAmount';
+    public const CAPTURE_AMOUNT = 'captureAmount';
     /**#@-*/
 
     /**#@+
      * Api Payframe Method constants
      */
-    const PAYFRAME_KEY = 'payframeKey';
-    const PAYFRAME_TOKEN = 'payframeToken';
-    const PAYFRAME_THREE_DS_TOKEN = 'threeDSToken';
+    public const PAYFRAME_KEY = 'payframeKey';
+    public const PAYFRAME_TOKEN = 'payframeToken';
+    public const PAYFRAME_THREE_DS_TOKEN = 'threeDSToken';
     /**#@-*/
 }

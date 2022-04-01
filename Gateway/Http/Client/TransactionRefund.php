@@ -39,12 +39,7 @@ class TransactionRefund implements ClientInterface
 
         if (count($transactionData)) {
             try {
-                $result = $this->process->execute(
-                    $transactionData[RequestApiInterface::TRANSACTION_AMOUNT],
-                    $transactionData[RequestApiInterface::TRANSACTION_CURRENCY],
-                    $transactionData[RequestApiInterface::TRANSACTION_ID],
-                    $transactionData[RequestApiInterface::REFUND_AMOUNT]
-                );
+                $result = $this->process->execute($transactionData);
             } catch (LocalizedException $err) {
                 $result = [
                     'responseCode' => $err->getCode(),
