@@ -2,7 +2,7 @@
     "name": "merchantwarrior/module-payment",
     "description": "Official Magento2 Plugin to connect to Payment Service Provider Merchant Warrior.",
     "type": "magento2-module",
-    "version": "0.1.0",
+    "version": "0.1.1",
     "license": "MIT",
     "repositories": [
         {
@@ -11,11 +11,11 @@
         }
     ],
     "require": {
-        "magento/framework": ">=101.0.8 <102 || >=102.0.1",
-        "magento/module-vault": "101.*",
-        "magento/module-payment": "100.1.*",
-        "magento/module-checkout": "100.1.*",
-        "magento/module-sales": "100.1.*",
+        "magento/framework": "*",
+        "magento/module-vault": "*",
+        "magento/module-payment": "*",
+        "magento/module-checkout": "*",
+        "magento/module-sales": "*",
         "ext-json": "*"
     },
     "require-dev": {
@@ -30,22 +30,5 @@
         "psr-4": {
             "Merchantwarrior\\Payment\\": ""
         }
-    },
-    "autoload-dev": {
-        "psr-4": {
-            "Merchantwarrior\\Payment\\Tests\\": "tests/"
-        }
-    },
-    "scripts": {
-        "test": [
-            "Composer\\Config::disableProcessTimeout",
-            "vendor/bin/phpunit -c Test/phpunit.xml"
-        ],
-        "post-install-cmd": [
-            "([ $COMPOSER_DEV_MODE -eq 0 ] || vendor/bin/phpcs --config-set installed_paths ../../magento/magento-coding-standard/)"
-        ],
-        "post-update-cmd": [
-            "([ $COMPOSER_DEV_MODE -eq 0 ] || vendor/bin/phpcs --config-set installed_paths ../../magento/magento-coding-standard/)"
-        ]
     }
 }
