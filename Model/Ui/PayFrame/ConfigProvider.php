@@ -17,7 +17,6 @@ class ConfigProvider implements ConfigProviderInterface
      * Method code constant
      */
     public const METHOD_CODE = 'merchant_warrior_payframe';
-    public const CC_VAULT_CODE = self::METHOD_CODE . '_vault';
     /**#@-*/
 
     /**

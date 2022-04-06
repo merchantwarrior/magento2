@@ -56,6 +56,14 @@
         </arguments>
     </virtualType>
 
+    <!-- CC Vault Payment Method Facade configuration -->
+    <virtualType name="MerchantWarriorCreditCardVaultFacade" type="Magento\Vault\Model\Method\Vault">
+        <arguments>
+            <argument name="code" xsi:type="const">MerchantWarrior\Payment\Model\Ui\ConfigProvider::CC_VAULT_CODE</argument>
+            <argument name="logger" xsi:type="object">MerchantWarrior\Payment\Logger\MerchantWarriorLogger</argument>
+        </arguments>
+    </virtualType>
+
     <!-- MW validators infrastructure -->
     <virtualType name="MerchantWarriorValidatorPool" type="Magento\Payment\Gateway\Validator\ValidatorPool">
         <arguments>
