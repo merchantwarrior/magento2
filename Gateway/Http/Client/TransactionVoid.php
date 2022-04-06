@@ -8,6 +8,7 @@ use Magento\Framework\Exception\LocalizedException;
 use Magento\Payment\Gateway\Http\ClientInterface;
 use Magento\Payment\Gateway\Http\TransferInterface;
 use MerchantWarrior\Payment\Api\Direct\ProcessVoidInterface;
+use MerchantWarrior\Payment\Model\Api\RequestApiInterface;
 
 class TransactionVoid implements ClientInterface
 {
@@ -36,9 +37,9 @@ class TransactionVoid implements ClientInterface
     {
         $transactionData = $transferObject->getBody();
 
-        if (count($transactionData)) {
+        if (count($transactionData) && isset($transactionData[RequestApiInterface::TRANSACTION_ID])) {
             try {
-                //$result = $this->process->execute(ProcessInterface::API_METHOD_AUTH, $transactionData);
+                $result = $this->process->execute($transactionData[RequestApiInterface::TRANSACTION_ID]);
             } catch (LocalizedException $err) {
                 $result = [
                     'responseCode' => $err->getCode(),

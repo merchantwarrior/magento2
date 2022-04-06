@@ -99,6 +99,7 @@
                 <item name="void" xsi:type="string">MerchantWarriorPaymentCancelCommand</item>
                 <item name="refund" xsi:type="string">MerchantWarriorPaymentRefundCommand</item>
                 <item name="cancel" xsi:type="string">MerchantWarriorPaymentCancelCommand</item>
+                <item name="deny_payment" xsi:type="string">MerchantWarriorPaymentCancelCommand</item>
             </argument>
         </arguments>
     </virtualType>
@@ -230,6 +231,7 @@
             <argument name="transferFactory" xsi:type="object">MerchantWarrior\Payment\Gateway\Http\TransferFactory</argument>
             <argument name="client" xsi:type="object">MerchantWarrior\Payment\Gateway\Http\Client\TransactionVoid</argument>
             <argument name="errorMessageMapper" xsi:type="object">MerchantWarrior\Payment\Gateway\ErrorMapper\VirtualErrorMessageMapper</argument>
+            <argument name="handler" xsi:type="object">MerchantWarriorCancelResponseHandler</argument>
             <argument name="validator" xsi:type="object">CheckoutResponseValidator</argument>
         </arguments>
     </virtualType>
@@ -238,6 +240,14 @@
         <arguments>
             <argument name="builders" xsi:type="array">
                 <item name="transaction_data" xsi:type="string">MerchantWarrior\Payment\Gateway\Request\CancelDataBuilder</item>
+            </argument>
+        </arguments>
+    </virtualType>
+
+    <virtualType name="MerchantWarriorCancelResponseHandler" type="Magento\Payment\Gateway\Response\HandlerChain">
+        <arguments>
+            <argument name="handlers" xsi:type="array">
+                <item name="payment_details" xsi:type="string">MerchantWarrior\Payment\Gateway\Response\CancelAuthHandler</item>
             </argument>
         </arguments>
     </virtualType>

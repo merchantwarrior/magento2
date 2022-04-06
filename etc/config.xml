@@ -30,7 +30,7 @@
                 <sort_order>2</sort_order>
                 <cctypes>VI,MC</cctypes>
                 <useccv>1</useccv>
-                <order_status>processing</order_status>
+                <order_status>pending</order_status>
                 <debug>1</debug>
                 <group>merchant_warrior</group>
             </merchant_warrior>
@@ -59,7 +59,7 @@
                 <sort_order>2</sort_order>
                 <cctypes>VI,MC</cctypes>
                 <useccv>1</useccv>
-                <order_status>processing</order_status>
+                <order_status>pending</order_status>
                 <group>merchant_warrior</group>
             </merchant_warrior_payframe>
         </payment>

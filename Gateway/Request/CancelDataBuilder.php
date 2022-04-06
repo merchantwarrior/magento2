@@ -4,12 +4,12 @@ declare(strict_types=1);
 
 namespace MerchantWarrior\Payment\Gateway\Request;
 
-use Magento\Payment\Gateway\Request\BuilderInterface;
+use MerchantWarrior\Payment\Model\Api\RequestApiInterface;
 
 /**
  * Class CancelDataBuilder
  */
-class CancelDataBuilder implements BuilderInterface
+class CancelDataBuilder extends AbstractDataBuilder
 {
     /**
      * Create cancel request
@@ -20,6 +20,12 @@ class CancelDataBuilder implements BuilderInterface
      */
     public function build(array $buildSubject): array
     {
-        return [];
+        $paymentDO = $this->readPayment($buildSubject);
+
+        $payment = $paymentDO->getPayment();
+        return [
+            RequestApiInterface::TRANSACTION_ID
+                => $payment->getAdditionalInformation(RequestApiInterface::TRANSACTION_ID)
+        ];
     }
 }

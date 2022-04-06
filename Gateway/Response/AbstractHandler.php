@@ -70,6 +70,19 @@ abstract class AbstractHandler implements HandlerInterface
     }
 
     /**
+     * Clear additional data
+     *
+     * @param Payment $payment
+     * @param array $response
+     *
+     * @return void
+     */
+    protected function clearAdditionalData(Payment $payment, array $response): void
+    {
+        $payment->setTransactionId('');
+    }
+
+    /**
      * Reads payment from subject
      *
      * @param array $subject
