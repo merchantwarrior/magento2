@@ -14,7 +14,7 @@ interface ProcessVoidInterface
     /**#@+
      * Api Method constants
      */
-    const API_METHOD = 'processVoid';
+    public const API_METHOD = 'processVoid';
     /**#@-*/
 
     /**

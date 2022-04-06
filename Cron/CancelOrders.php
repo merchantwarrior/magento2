@@ -4,43 +4,31 @@ declare(strict_types=1);
 
 namespace MerchantWarrior\Payment\Cron;
 
-use Magento\Sales\Api\OrderManagementInterface;
+use MerchantWarrior\Payment\Model\Service\CancelStuckOrders;
 
 class CancelOrders
 {
     /**
-     * @var OrdersProviderInterface[]
+     * @var CancelStuckOrders
      */
-    private $providers;
+    private CancelStuckOrders $cancelStuckOrders;
 
     /**
-     * @var OrderManagementInterface
-     */
-    private $orderManagement;
-
-    /**
-     * @param OrderManagementInterface $orderManagement
-     * @param array $providers
+     * @param CancelStuckOrders $cancelStuckOrders
      */
     public function __construct(
-        OrderManagementInterface $orderManagement,
-        array $providers
+        CancelStuckOrders $cancelStuckOrders
     ) {
-        $this->providers = $providers;
-        $this->orderManagement = $orderManagement;
+        $this->cancelStuckOrders = $cancelStuckOrders;
     }
 
-    public function execute()
+    /**
+     * Cancel stuck orders
+     *
+     * @return void
+     */
+    public function execute(): void
     {
-        foreach ($this->providers as $provider) {
-            $this->cancelOrders($provider);
-        }
-    }
-
-    private function cancelOrders($provider)
-    {
-        foreach ($provider->provide() as $order) {
-            $this->orderManagement->cancel($order->getEntityId());
-        }
+        $this->cancelStuckOrders->execute();
     }
 }
