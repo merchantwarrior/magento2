@@ -8,8 +8,9 @@ define([
     'Magento_Catalog/js/price-utils',
     'MerchantWarrior_Payment/js/action/place-order',
     'Magento_Checkout/js/model/full-screen-loader',
+    'Magento_Vault/js/view/payment/vault-enabler',
     'payframeLib'
-], function ($, ko, _, Component, customerData, quote, priceUtils, placeOrderAction, fullScreenLoader) {
+], function ($, ko, _, Component, customerData, quote, priceUtils, placeOrderAction, fullScreenLoader, VaultEnabler) {
     'use strict';
 
     return Component.extend({
@@ -44,6 +45,9 @@ define([
             if (!this.isActive()) {
                 return;
             }
+
+            this.vaultEnabler = new VaultEnabler();
+            this.vaultEnabler.setPaymentCode(this.getVaultCode());
 
             this.isChecked.subscribe(function(methodCode) {
                 if (methodCode === this.item.method) {
@@ -307,6 +311,24 @@ define([
                 return true;
             }
             return false;
+        },
+
+        /**
+         * Returns vault code.
+         *
+         * @returns {String}
+         */
+        getVaultCode: function () {
+            return window.checkoutConfig.payment.merchant_warrior_payframe.ccVaultCode;
+        },
+
+        /**
+         * Check is vault enabled
+         *
+         * @returns {Boolean}
+         */
+        isVaultEnabled: function () {
+            return this.vaultEnabler.isVaultEnabled();
         },
 
         /**

@@ -62,6 +62,15 @@
                 <order_status>pending</order_status>
                 <group>merchant_warrior</group>
             </merchant_warrior_payframe>
+            <merchant_warrior_cc_vault>
+                <active>1</active>
+                <model>MerchantWarriorCreditCardVaultFacade</model>
+                <title>Stored Cards ( Merchant Warrior )</title>
+                <instant_purchase>
+                    <tokenFormat>MerchantWarrior\Payment\Model\InstantPurchase\CreditCard</tokenFormat>
+                </instant_purchase>
+                <can_authorize_vault>1</can_authorize_vault>
+            </merchant_warrior_cc_vault>
         </payment>
     </default>
 </config>
