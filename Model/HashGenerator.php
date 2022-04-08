@@ -9,7 +9,6 @@ use MerchantWarrior\Payment\Api\Direct\ProcessCaptureInterface;
 use MerchantWarrior\Payment\Api\Direct\ProcessVoidInterface;
 use MerchantWarrior\Payment\Api\Direct\RefundCardInterface;
 use MerchantWarrior\Payment\Api\Payframe\ProcessInterface;
-use MerchantWarrior\Payment\Model\Api\Direct\ProcessCapture;
 use MerchantWarrior\Payment\Model\Api\RequestApiInterface;
 
 class HashGenerator

@@ -69,7 +69,7 @@
             <argument name="config" xsi:type="object">MerchantWarriorVaultPaymentConfig</argument>
             <argument name="valueHandlerPool" xsi:type="object">MerchantWarriorVaultPaymentValueHandlerPool</argument>
             <argument name="code" xsi:type="const">MerchantWarrior\Payment\Model\Ui\ConfigProvider::CC_VAULT_CODE</argument>
-            <argument name="vaultProvider" xsi:type="object">MerchantWarriorFacade</argument>
+            <argument name="vaultProvider" xsi:type="object">MerchantWarriorPayFrameFacade</argument>
             <argument name="logger" xsi:type="object">MerchantWarrior\Payment\Logger\MerchantWarriorLogger</argument>
         </arguments>
     </virtualType>
@@ -179,6 +179,7 @@
         <arguments>
             <argument name="handlers" xsi:type="array">
                 <item name="payment_details" xsi:type="string">MerchantWarrior\Payment\Gateway\Response\CompleteAuthHandler</item>
+                <item name="vault_details" xsi:type="string">MerchantWarrior\Payment\Gateway\Response\VaultDetailsHandler</item>
             </argument>
         </arguments>
     </virtualType>
@@ -212,6 +213,7 @@
         <arguments>
             <argument name="handlers" xsi:type="array">
                 <item name="payment_details" xsi:type="string">MerchantWarrior\Payment\Gateway\Response\PaymentDetailsHandler</item>
+                <item name="vault_details" xsi:type="string">MerchantWarrior\Payment\Gateway\Response\VaultDetailsHandler</item>
             </argument>
         </arguments>
     </virtualType>

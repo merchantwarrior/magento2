@@ -20,6 +20,7 @@ class Process extends RequestApi implements ProcessInterface
         }
 
         $transactionParams[self::METHOD] = $method;
+        $transactionParams['addCard'] = '1';
 
         $this->validate($transactionParams);
 

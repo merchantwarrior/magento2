@@ -306,11 +306,9 @@ define([
          * @return {boolean} - is enabled
          */
         isActive: function () {
-            if (window.checkoutConfig.payment.merchant_warrior_payframe
-                && window.checkoutConfig.payment.merchant_warrior_payframe.active) {
-                return true;
-            }
-            return false;
+            return !!(window.checkoutConfig.payment.merchant_warrior_payframe
+                && window.checkoutConfig.payment.merchant_warrior_payframe.active);
+
         },
 
         /**
