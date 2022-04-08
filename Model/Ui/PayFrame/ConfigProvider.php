@@ -10,7 +10,7 @@ use Magento\Payment\Helper\Data as PaymentHelper;
 use Magento\Payment\Model\MethodInterface;
 use MerchantWarrior\Payment\Model\Config;
 use Magento\Checkout\Model\ConfigProviderInterface;
-use MerchantWarrior\Payment\Model\Ui\Vault\ConfigProvider as VaultConfigProvider;
+use MerchantWarrior\Payment\Model\Ui\ConfigProvider as MWConfigProvider;
 
 class ConfigProvider implements ConfigProviderInterface
 {
@@ -81,7 +81,7 @@ class ConfigProvider implements ConfigProviderInterface
                     'payframeSrc' => $this->getPayFrameSrc(),
                     'submitURL'   => $this->getSubmitUrl(),
                     'allowedTypeCards' => $this->getAllowedCCList(),
-                    'ccVaultCode' => VaultConfigProvider::CODE,
+                    'ccVaultCode' => MWConfigProvider::CC_VAULT_CODE,
                     'successPage' => $this->urlBuilder->getUrl(
                         'checkout/onepage/success',
                         [
