@@ -6,6 +6,7 @@ namespace MerchantWarrior\Payment\Model\Ui\Vault;
 
 use MerchantWarrior\Payment\Gateway\Config\Vault\Config;
 use Magento\Checkout\Model\ConfigProviderInterface;
+use MerchantWarrior\Payment\Model\Service\GetPaymentIconsList;
 
 class ConfigProvider implements ConfigProviderInterface
 {
@@ -21,13 +22,22 @@ class ConfigProvider implements ConfigProviderInterface
     private Config $config;
 
     /**
+     * @var GetPaymentIconsList
+     */
+    private GetPaymentIconsList $getPaymentIconsList;
+
+    /**
      * ConfigProvider constructor.
      *
      * @param Config $config
+     * @param GetPaymentIconsList $getPaymentIconsList
      */
-    public function __construct(Config $config)
-    {
+    public function __construct(
+        Config $config,
+        GetPaymentIconsList $getPaymentIconsList
+    ) {
         $this->config = $config;
+        $this->getPaymentIconsList = $getPaymentIconsList;
     }
 
     /**
@@ -40,7 +50,8 @@ class ConfigProvider implements ConfigProviderInterface
         return [
             'payment' => [
                 self::METHOD_CODE => [
-                    'cvvVerify' => $this->config->isCvvVerifyEnabled()
+                    'cvvVerify' => $this->config->isCvvVerifyEnabled(),
+                    'icons' => $this->getPaymentIconsList->execute()
                 ]
             ]
         ];

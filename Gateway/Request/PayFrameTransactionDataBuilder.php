@@ -34,6 +34,14 @@ class PayFrameTransactionDataBuilder extends AbstractDataBuilder
         if ($tdsToken = $payment->getAdditionalInformation(RequestApiInterface::PAYFRAME_THREE_DS_TOKEN)) {
             $result[RequestApiInterface::PAYFRAME_THREE_DS_TOKEN] = $tdsToken;
         }
+
+        if (
+            ($addToCard = $payment->getAdditionalInformation(RequestApiInterface::PAYFRAME_ADD_TO_CARD_KEY))
+            && $addToCard === '1'
+        ) {
+            $result[RequestApiInterface::PAYFRAME_ADD_TO_CARD_KEY] = '1';
+        }
+
         return $result;
     }
 }

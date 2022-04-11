@@ -18,6 +18,8 @@
                 type="MerchantWarrior\Payment\Model\Api\Token\AddCard" />
     <preference for="MerchantWarrior\Payment\Api\Token\RemoveCardInterface"
                 type="MerchantWarrior\Payment\Model\Api\Token\RemoveCard" />
+    <preference for="MerchantWarrior\Payment\Api\Token\ProcessInterface"
+                type="MerchantWarrior\Payment\Model\Api\Token\Process" />
 
     <type name="MerchantWarrior\Payment\Model\Config\Reader">
         <arguments>
@@ -139,6 +141,34 @@
                 <item name="vault_sale" xsi:type="string">MerchantWarriorVaultSaleCommand</item>
                 <item name="vault_capture" xsi:type="string">MerchantWarriorPaymentCaptureCommand</item>
                 <item name="deny_payment" xsi:type="string">MerchantWarriorPaymentCancelCommand</item>
+            </argument>
+        </arguments>
+    </virtualType>
+
+    <!-- Command managers section for Vault -->
+    <virtualType name="MerchantWarriorPaymentCcCommandManager" type="Magento\Payment\Gateway\Command\CommandManager">
+        <arguments>
+            <argument name="commandPool" xsi:type="object">MerchantWarriorPaymentVaultCommandPool</argument>
+        </arguments>
+    </virtualType>
+    <type name="Magento\Payment\Gateway\Command\CommandManagerPool">
+        <arguments>
+            <argument name="executors" xsi:type="array">
+                <item name="merchant_warrior_payframe" xsi:type="string">MerchantWarriorPaymentCcCommandManager</item>
+            </argument>
+        </arguments>
+    </type>
+
+    <!-- Vault Commands infrastructure -->
+    <virtualType name="MerchantWarriorPaymentVaultCommandPool" type="Magento\Payment\Gateway\Command\CommandPool">
+        <arguments>
+            <argument name="commands" xsi:type="array">
+                <item name="authorize" xsi:type="string">MerchantWarriorVaultAuthorizeCommand</item>
+                <item name="capture" xsi:type="string">MerchantWarriorPaymentCaptureCommand</item>
+                <item name="sale" xsi:type="string">MerchantWarriorVaultSaleCommand</item>
+                <item name="vault_authorize" xsi:type="string">MerchantWarriorVaultAuthorizeCommand</item>
+                <item name="vault_sale" xsi:type="string">MerchantWarriorVaultSaleCommand</item>
+                <item name="vault_capture" xsi:type="string">MerchantWarriorPaymentCaptureCommand</item>
             </argument>
         </arguments>
     </virtualType>

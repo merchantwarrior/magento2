@@ -5,7 +5,7 @@ declare(strict_types=1);
 namespace MerchantWarrior\Payment\Model\Api\Token;
 
 use Magento\Framework\Exception\LocalizedException;
-use MerchantWarrior\Payment\Api\Payframe\ProcessInterface;
+use MerchantWarrior\Payment\Api\Token\ProcessInterface;
 use MerchantWarrior\Payment\Model\Api\RequestApi;
 
 class Process extends RequestApi implements ProcessInterface

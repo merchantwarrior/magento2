@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace MerchantWarrior\Payment\Gateway\Request\Vault;
 
+use Magento\Vault\Api\PaymentTokenManagementInterface;
 use MerchantWarrior\Payment\Model\Api\RequestApiInterface;
 use MerchantWarrior\Payment\Gateway\Request\AbstractDataBuilder;
 
@@ -12,6 +13,20 @@ use MerchantWarrior\Payment\Gateway\Request\AbstractDataBuilder;
  */
 class TransactionDataBuilder extends AbstractDataBuilder
 {
+    /**
+     * @var PaymentTokenManagementInterface
+     */
+    private PaymentTokenManagementInterface $paymentTokenManagement;
+
+    /**
+     * @param PaymentTokenManagementInterface $paymentTokenManagement
+     */
+    public function __construct(
+        PaymentTokenManagementInterface $paymentTokenManagement
+    ) {
+        $this->paymentTokenManagement = $paymentTokenManagement;
+    }
+
     /**
      * Add delivery\billing details into request
      *
@@ -25,11 +40,13 @@ class TransactionDataBuilder extends AbstractDataBuilder
 
         $payment = $paymentDO->getPayment();
 
+        $data = $this->paymentTokenManagement->getByPublicHash(
+            $payment->getAdditionalInformation('public_hash'),
+            $payment->getAdditionalInformation('customer_id'),
+        );
+
         $result = [
-            RequestApiInterface::PAYFRAME_TOKEN
-                => $payment->getAdditionalInformation(RequestApiInterface::PAYFRAME_TOKEN),
-            RequestApiInterface::PAYFRAME_KEY
-                => $payment->getAdditionalInformation(RequestApiInterface::PAYFRAME_KEY)
+            'cardID' => $data->getGatewayToken()
         ];
 
         if ($tdsToken = $payment->getAdditionalInformation(RequestApiInterface::PAYFRAME_THREE_DS_TOKEN)) {

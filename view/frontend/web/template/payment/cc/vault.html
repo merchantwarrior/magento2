@@ -10,6 +10,12 @@
                     checked: isChecked,
                     visible: isRadioButtonVisible()"/>
         <label class="label" data-bind="attr: {'for': getId()}">
+            <!-- ko if: getIcon(getCardType()) -->
+                <img data-bind="attr: {
+                    'src': getIcon(getCardType()),
+                    'alt': getCardType() + ' logo'
+                    }" class="payment-icon">
+            <!--/ko-->
             <span text="getMaskedCard()"></span>
             (
             <span translate="'expires'"></span>:

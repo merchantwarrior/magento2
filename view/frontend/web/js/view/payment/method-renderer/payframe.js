@@ -3,14 +3,25 @@ define([
     'ko',
     'underscore',
     'Magento_Checkout/js/view/payment/default',
-    'Magento_Customer/js/customer-data',
     'Magento_Checkout/js/model/quote',
     'Magento_Catalog/js/price-utils',
     'MerchantWarrior_Payment/js/action/place-order',
     'Magento_Checkout/js/model/full-screen-loader',
     'Magento_Vault/js/view/payment/vault-enabler',
+    'Magento_Ui/js/model/messageList',
     'payframeLib'
-], function ($, ko, _, Component, customerData, quote, priceUtils, placeOrderAction, fullScreenLoader, VaultEnabler) {
+], function (
+    $,
+    ko,
+    _,
+    Component,
+    quote,
+    priceUtils,
+    placeOrderAction,
+    fullScreenLoader,
+    VaultEnabler,
+    globalMessageList
+) {
     'use strict';
 
     return Component.extend({
@@ -26,15 +37,15 @@ define([
                 cardTypeDisplay: 'right',
                 padding: '5px',
                 fieldHeight: '60px'
-            },
-            transactionResult: ''
+            }
         },
         mwPayframe: '',
         tdsCheck: '',
         payframeToken: '',
         payframeKey: '',
-        method: 'getPayframeToken', // change this to getPayframeToken for payment payframe
-        threeDS: false, // this will only work with the getPayframeToken method
+        tdsToken: '',
+        method: 'getPayframeToken', // change this to getPayframeToken for payment payframe,
+        isVaultShow: ko.observable(false),
 
         /**
          * Init component
@@ -63,6 +74,168 @@ define([
             if (this.isChecked() === 'merchant_warrior_payframe') {
                 this._initMwPayFrame();
             }
+        },
+
+        /**
+         * Process card action
+         *
+         * @return {void}
+         */
+        processCardAction: function () {
+            $.when(
+                placeOrderAction(this.getData())
+            ).fail(
+                () => {
+                    this.afterPlaceOrder.bind(this);
+                }
+            ).done(
+                () => {
+                    this.afterPlaceOrder.bind(this);
+                }
+            ).always(
+                () => {
+                    this._resetForm();
+                }
+            );
+        },
+
+        /**
+         * Format price
+         *
+         * @param {*} price - price, ex: 10.15
+         *
+         * @return {*|String} - return formatted price, 10 -> 10.00
+         */
+        getFormattedPrice: function (price) {
+            return priceUtils.formatPrice(
+                price,
+                {
+                    decimalSymbol: ".",
+                    groupLength: 3,
+                    groupSymbol: ",",
+                    integerRequired: false,
+                    pattern: "%s",
+                    precision: 2,
+                    requiredPrecision: 2
+                }
+            );
+        },
+
+        /**
+         * Form items skus list
+         *
+         * @return {string}
+         */
+        getItemsSku: function () {
+            let skus = '';
+            _.each(quote.getItems(), (item) => {
+                skus += item.sku + ', ';
+            });
+            return skus;
+        },
+
+        /**
+         * Returns payment method instructions.
+         *
+         * @return {boolean} - is enabled
+         */
+        isActive: function () {
+            return !!(window.checkoutConfig.payment.merchant_warrior_payframe && this._getPaymentConfig('active'));
+        },
+
+        /**
+         * Returns vault code.
+         *
+         * @returns {String}
+         */
+        getVaultCode: function () {
+            return this._getPaymentConfig('ccVaultCode');
+        },
+
+        /**
+         * Check is vault enabled
+         *
+         * @returns {Boolean}
+         */
+        isVaultEnabled: function () {
+            return this.vaultEnabler.isVaultEnabled();
+        },
+
+        /**
+         * Get payment data
+         *
+         * @return {{additional_data: {transaction_result: *}, method}}
+         */
+        getData: function() {
+            return {
+                'method': this.item.method,
+                'additional_data': this._formTransactionResultData()
+            };
+        },
+
+        /**
+         * Save order
+         */
+        placeOrder: function (data, event) {
+            if (event) {
+                event.preventDefault();
+            }
+
+            if (this.validate()) {
+                fullScreenLoader.startLoader();
+
+                this.mwPayframe.submitPayframe();
+            }
+            return false;
+        },
+
+        /**
+         * Form ID which response of saving CC to vault
+         *
+         * @return {string}
+         */
+        getSaveToVaultId: function () {
+            return this.getCode() + '_enable_vault';
+        },
+
+        /**
+         * Form and return transaction data
+         *
+         * @return {{payframeKey: *, cartId: *, payframeToken: *, tdsToken: *, email}}
+         *
+         * @private
+         */
+        _formTransactionResultData: function () {
+            let transactionResult = {
+                payframeToken: this.payframeToken,
+                payframeKey: this.payframeKey,
+                tdsToken: this.tdsToken,
+                cartId: quote.getQuoteId(),
+                email: quote.guestEmail
+            };
+
+            if (this._isSaveToVaultEnabled()) {
+                transactionResult.addCard = '1';
+            }
+            return transactionResult;
+        },
+
+        /**
+         * Check is save to vault checkbox is checked
+         *
+         * @return {boolean}
+         * @private
+         */
+        _isSaveToVaultEnabled: function () {
+            if (!this.isVaultEnabled()) {
+                return false;
+            }
+
+            let isSaveToVault = document.getElementById(this.getSaveToVaultId());
+            if (typeof isSaveToVault !== "undefined") {
+                return isSaveToVault.checked;
+            }
+            return false;
         },
 
         /**
@@ -176,6 +349,8 @@ define([
         },
 
         _payFrameLoaded: function () {
+            this.isVaultShow(true);
+
             fullScreenLoader.stopLoader(true);
         },
 
@@ -188,20 +363,24 @@ define([
          * @private
          */
         _tdsCallBack: function (liabilityShifted, tdsToken) {
+            this.tdsToken = tdsToken;
+
             if (liabilityShifted) {
                 // If the bank has taken liability for the transaction,
                 // submit the tdsToken with a processCard or processAuth transaction
-                this.processCardAction(tdsToken);
+                this.processCardAction();
             } else {
                 if (
                     this.tdsCheck.mwTDSMessage === 'Cardholder not enrolled in 3DS'
                     && this.tdsCheck.mwTDSResult === ''
                 ) {
-                    this.processCardAction('');
+                    this.processCardAction();
                 }
 
                 if (this.tdsCheck.mwTDSResult === 'error') {
-                    alert(this.tdsCheck.mwTDSMessage);
+                    globalMessageList.addErrorMessage({
+                        message: this.tdsCheck.mwTDSMessage
+                    });
                 }
                 this.tdsCheck.destroy();
             }
@@ -228,133 +407,9 @@ define([
         _resetForm: function () {
             this.payframeToken = '';
             this.payframeKey = '';
+            this.tdsToken = '';
 
             this._initMwPayFrame();
         },
-
-        /**
-         * Process card action
-         *
-         * @param {string} tdsToken - 3DS token
-         *
-         * @return {void}
-         */
-        processCardAction: function (tdsToken) {
-            this.transactionResult = {
-                payframeToken: this.payframeToken,
-                payframeKey: this.payframeKey,
-                tdsToken: tdsToken,
-                cartId: quote.getQuoteId(),
-                email: quote.guestEmail
-            };
-
-            $.when(
-                placeOrderAction(this.getData())
-            ).fail(
-                () => {
-                    this.afterPlaceOrder.bind(this);
-                }
-            ).done(
-                () => {
-                    this.afterPlaceOrder.bind(this);
-                }
-            ).always(
-                () => {
-                    this._resetForm();
-                }
-            );
-        },
-
-        /**
-         * Format price
-         *
-         * @param {*} price - price, ex: 10.15
-         *
-         * @return {*|String} - return formatted price, 10 -> 10.00
-         */
-        getFormattedPrice: function (price) {
-            return priceUtils.formatPrice(
-                price,
-                {
-                    decimalSymbol: ".",
-                    groupLength: 3,
-                    groupSymbol: ",",
-                    integerRequired: false,
-                    pattern: "%s",
-                    precision: 2,
-                    requiredPrecision: 2
-                }
-            );
-        },
-
-        /**
-         * Form items skus list
-         *
-         * @return {string}
-         */
-        getItemsSku: function () {
-            let skus = '';
-            _.each(quote.getItems(), (item) => {
-                skus += item.sku + ', ';
-            });
-            return skus;
-        },
-
-        /**
-         * Returns payment method instructions.
-         *
-         * @return {boolean} - is enabled
-         */
-        isActive: function () {
-            return !!(window.checkoutConfig.payment.merchant_warrior_payframe
-                && window.checkoutConfig.payment.merchant_warrior_payframe.active);
-
-        },
-
-        /**
-         * Returns vault code.
-         *
-         * @returns {String}
-         */
-        getVaultCode: function () {
-            return window.checkoutConfig.payment.merchant_warrior_payframe.ccVaultCode;
-        },
-
-        /**
-         * Check is vault enabled
-         *
-         * @returns {Boolean}
-         */
-        isVaultEnabled: function () {
-            return this.vaultEnabler.isVaultEnabled();
-        },
-
-        /**
-         * Get payment data
-         *
-         * @return {{additional_data: {transaction_result: *}, method}}
-         */
-        getData: function() {
-            return {
-                'method': this.item.method,
-                'additional_data': this.transactionResult
-            };
-        },
-
-        /**
-         * Save order
-         */
-        placeOrder: function (data, event) {
-            if (event) {
-                event.preventDefault();
-            }
-
-            if (this.validate()) {
-                fullScreenLoader.startLoader();
-
-                this.mwPayframe.submitPayframe();
-            }
-            return false;
-        }
     });
 });

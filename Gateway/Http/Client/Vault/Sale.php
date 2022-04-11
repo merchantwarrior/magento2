@@ -7,7 +7,7 @@ namespace MerchantWarrior\Payment\Gateway\Http\Client\Vault;
 use Magento\Framework\Exception\LocalizedException;
 use Magento\Payment\Gateway\Http\ClientInterface;
 use Magento\Payment\Gateway\Http\TransferInterface;
-use MerchantWarrior\Payment\Api\Payframe\ProcessInterface;
+use MerchantWarrior\Payment\Api\Token\ProcessInterface;
 
 class Sale implements ClientInterface
 {
@@ -38,7 +38,7 @@ class Sale implements ClientInterface
 
         if (count($transactionData)) {
             try {
-                $result = $this->process->execute(ProcessInterface::API_METHOD_CARD, $transactionData);
+                $result = $this->process->execute(ProcessInterface::API_METHOD_PROCESS_CARD, $transactionData);
             } catch (LocalizedException $err) {
                 $result = [
                     'responseCode' => $err->getCode(),

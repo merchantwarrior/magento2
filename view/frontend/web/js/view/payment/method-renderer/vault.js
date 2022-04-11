@@ -1,28 +1,22 @@
-/*browser:true*/
-/*global define*/
 define([
     'ko',
     'jquery',
     'Magento_Vault/js/view/payment/method-renderer/vault',
-    'PayPal_Braintree/js/view/payment/adapter',
+    'Magento_Checkout/js/model/quote',
     'Magento_Ui/js/model/messageList',
-    'PayPal_Braintree/js/view/payment/validator-handler',
     'Magento_Checkout/js/model/payment/additional-validators',
     'Magento_Checkout/js/model/full-screen-loader',
-    'braintree',
-    'braintreeHostedFields',
+    'MerchantWarrior_Payment/js/action/place-order',
     'mage/url'
 ], function (
     ko,
     $,
     VaultComponent,
-    Braintree,
+    quote,
     globalMessageList,
-    validatorManager,
     additionalValidators,
     fullScreenLoader,
-    client,
-    hostedFields,
+    placeOrderAction,
     url
 ) {
     'use strict';
@@ -31,17 +25,10 @@ define([
         defaults: {
             active: false,
             hostedFieldsInstance: null,
-            imports: {
-                onActiveChange: 'active'
-            },
-            modules: {
-                hostedFields: '${ $.parentName }.mw'
-            },
             template: 'MerchantWarrior_Payment/payment/cc/vault',
-            updatePaymentUrl: url.build('mw/payment/updatepaymentmethod'),
             vaultedCVV: ko.observable(""),
-            validatorManager: validatorManager,
             isValidCvv: false,
+            icon: '',
             onInstanceReady: function (instance) {
                 instance.on('validityChange', this.onValidityChange.bind(this));
             }
@@ -63,7 +50,6 @@ define([
          */
         initObservable: function () {
             this._super().observe(['active']);
-            this.validatorManager.initialize();
             return this;
         },
 
@@ -73,7 +59,7 @@ define([
          * @returns {boolean}
          */
         isActive: function () {
-            var active = this.getId() === this.isChecked();
+            let active = this.getId() === this.isChecked();
             this.active(active);
             return active;
         },
@@ -90,55 +76,15 @@ define([
             }
 
             if (self.showCvvVerify()) {
-                if (self.hostedFieldsInstance) {
-                    self.hostedFieldsInstance.teardown(function (teardownError) {
-                        if (teardownError) {
-                            globalMessageList.addErrorMessage({
-                                message: teardownError.message
-                            });
-                        }
-                        self.hostedFieldsInstance = null;
-                        self.initHostedCvvField();
-                    });
-                    return;
-                }
-                self.initHostedCvvField();
+
             }
         },
 
         /**
-         * Initialize the CVV input field with the Braintree Hosted Fields SDK.
+         * Initialize the CVV input field with the Hosted Fields SDK.
          */
         initHostedCvvField: function () {
-            var self = this;
-            client.create({
-                authorization: Braintree.getClientToken()
-            }, function (clientError, clientInstance) {
-                if (clientError) {
-                    globalMessageList.addErrorMessage({
-                        message: clientError.message
-                    });
-                }
-                hostedFields.create({
-                    client: clientInstance,
-                    fields: {
-                        cvv: {
-                            selector: '#' + self.getId() + '_cid',
-                            placeholder: '123'
-                        }
-                    }
-                }, function (hostedError, hostedFieldsInstance) {
-                    if (hostedError) {
-                        globalMessageList.addErrorMessage({
-                            message: hostedError.message
-                        });
-                        return;
-                    }
 
-                    self.hostedFieldsInstance = hostedFieldsInstance;
-                    self.onInstanceReady(self.hostedFieldsInstance);
-                });
-            });
         },
 
         /**
@@ -179,17 +125,37 @@ define([
          * @returns {Boolean}
          */
         showCvvVerify: function () {
+            return false;
             return window.checkoutConfig.payment[this.code].cvvVerify;
         },
 
         /**
+         * Get link to CC Logo
+         *
+         * @param cctype
+         *
+         * @return {*}
+         */
+        getIcon: function (cctype) {
+            let type = cctype.toLocaleLowerCase(),
+                icons = window.checkoutConfig.payment[this.code].icons;
+
+            if (icons[type]) {
+                return icons[type];
+            }
+            return null;
+        },
+
+        /**
          * Show or hide the error message.
+         *
          * @param selector
          * @param state
+         *
          * @returns {boolean}
          */
         validateCvv: function (selector, state) {
-            var $selector = $(selector),
+            let $selector = $(selector),
                 invalidClass = 'mw-hosted-fields-invalid';
 
             if (state === true) {
@@ -202,13 +168,27 @@ define([
         },
 
         /**
+         * Get payment data
+         *
+         * @return {{additional_data: {transaction_result: *}, method}}
+         */
+        getData: function() {
+            return {
+                'method': this.item.method,
+                'additional_data': this._formTransactionResultData()
+            };
+        },
+
+        /**
          * Place order
          */
         placeOrder: function () {
-            var self = this;
+            let self = this;
 
             if (self.showCvvVerify()) {
-                if (!self.validateCvv('#' + self.getId() + '_cid', self.isValidCvv) || !additionalValidators.validate()) {
+                if (!self.validateCvv('#' + self.getId() + '_cid', self.isValidCvv)
+                    || !additionalValidators.validate()
+                ) {
                     return;
                 }
             } else {
@@ -219,75 +199,39 @@ define([
 
             fullScreenLoader.startLoader();
 
-            if (self.showCvvVerify() && typeof self.hostedFieldsInstance !== 'undefined') {
-                self.hostedFieldsInstance.tokenize({}, function (error, payload) {
-                    if (error) {
-                        fullScreenLoader.stopLoader();
-                        globalMessageList.addErrorMessage({
-                            message: error.message
-                        });
-                        return;
-                    }
-                    $.getJSON(
-                        self.updatePaymentUrl,
-                        {
-                            'nonce': payload.nonce,
-                            'public_hash': self.publicHash
-                        }
-                    ).done(function (response) {
-                        if (response.success === false) {
-                            fullScreenLoader.stopLoader();
-                            globalMessageList.addErrorMessage({
-                                message: 'CVV verification failed.'
-                            });
-                            return;
-                        }
-                        self.getPaymentMethodNonce();
-                    })
+            if (self.showCvvVerify()) {
+                fullScreenLoader.stopLoader();
+                globalMessageList.addErrorMessage({
+                    message: 'CVV verification failed.'
                 });
             } else {
-                self.getPaymentMethodNonce();
+                $.when(
+                    placeOrderAction(this.getData())
+                ).fail(
+                    () => {
+                        this.afterPlaceOrder.bind(this);
+                    }
+                ).done(
+                    () => {
+                        this.afterPlaceOrder.bind(this);
+                    }
+                );
             }
         },
 
         /**
-         * Send request to get payment method nonce
+         * Form and return transaction data
+         *
+         * @return {{payframeKey: *, cartId: *, payframeToken: *, tdsToken: *, email}}
+         *
+         * @private
          */
-        getPaymentMethodNonce: function () {
-            var self = this;
-
-            fullScreenLoader.startLoader();
-            $.getJSON(self.nonceUrl, {
-                'public_hash': self.publicHash,
-                'cvv': self.vaultedCVV()
-            }).done(function (response) {
-                fullScreenLoader.stopLoader();
-                self.hostedFields(function (formComponent) {
-                    formComponent.setPaymentMethodNonce(response.paymentMethodNonce);
-                    formComponent.additionalData['public_hash'] = self.publicHash;
-                    formComponent.code = self.code;
-                    if (self.vaultedCVV()) {
-                        formComponent.additionalData['cvv'] = self.vaultedCVV();
-                    }
-
-                    self.validatorManager.validate(formComponent, function () {
-                        fullScreenLoader.stopLoader();
-                        return formComponent.placeOrder('parent');
-                    }, function() {
-                        // No teardown actions required.
-                        fullScreenLoader.stopLoader();
-                        formComponent.setPaymentMethodNonce(null);
-                    });
-
-                });
-            }).fail(function (response) {
-                var error = JSON.parse(response.responseText);
-
-                fullScreenLoader.stopLoader();
-                globalMessageList.addErrorMessage({
-                    message: error.message
-                });
-            });
-        }
+        _formTransactionResultData: function () {
+            return {
+                cartId: quote.getQuoteId(),
+                email: quote.guestEmail,
+                public_hash: this.publicHash
+            };
+        },
     });
 });
