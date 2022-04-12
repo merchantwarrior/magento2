@@ -125,7 +125,6 @@ define([
          * @returns {Boolean}
          */
         showCvvVerify: function () {
-            return false;
             return window.checkoutConfig.payment[this.code].cvvVerify;
         },
 
@@ -140,8 +139,8 @@ define([
             let type = cctype.toLocaleLowerCase(),
                 icons = window.checkoutConfig.payment[this.code].icons;
 
-            if (icons[type]) {
-                return icons[type];
+            if (icons[type].url) {
+                return icons[type].url;
             }
             return null;
         },

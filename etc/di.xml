@@ -137,9 +137,9 @@
                 <item name="void" xsi:type="string">MerchantWarriorPaymentCancelCommand</item>
                 <item name="refund" xsi:type="string">MerchantWarriorPaymentRefundCommand</item>
                 <item name="cancel" xsi:type="string">MerchantWarriorPaymentCancelCommand</item>
-                <item name="vault_authorize" xsi:type="string">MerchantWarriorVaultAuthorizeCommand</item>
-                <item name="vault_sale" xsi:type="string">MerchantWarriorVaultSaleCommand</item>
-                <item name="vault_capture" xsi:type="string">MerchantWarriorPaymentCaptureCommand</item>
+<!--                <item name="vault_authorize" xsi:type="string">MerchantWarriorVaultAuthorizeCommand</item>-->
+<!--                <item name="vault_sale" xsi:type="string">MerchantWarriorVaultSaleCommand</item>-->
+<!--                <item name="vault_capture" xsi:type="string">MerchantWarriorPaymentCaptureCommand</item>-->
                 <item name="deny_payment" xsi:type="string">MerchantWarriorPaymentCancelCommand</item>
             </argument>
         </arguments>

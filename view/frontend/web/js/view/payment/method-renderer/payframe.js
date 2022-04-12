@@ -232,7 +232,7 @@ define([
             }
 
             let isSaveToVault = document.getElementById(this.getSaveToVaultId());
-            if (typeof isSaveToVault !== "undefined") {
+            if (typeof isSaveToVault !== "undefined" && isSaveToVault !== null) {
                 return isSaveToVault.checked;
             }
             return false;
@@ -410,6 +410,8 @@ define([
             this.tdsToken = '';
 
             this._initMwPayFrame();
+
+            fullScreenLoader.stopLoader(true);
         },
     });
 });

@@ -68,7 +68,7 @@ class GetPaymentIconsList
     {
         $icons = [];
         foreach ($this->config->getCcTypes() as $ccType) {
-            $icons[$ccType['code_alt']] = $this->getIconUrl($ccType['code_alt']);
+            $icons[$ccType['code_alt']] = $this->getIcon($ccType['code_alt'], $ccType['name']);
         }
         return $icons;
     }
@@ -77,19 +77,26 @@ class GetPaymentIconsList
      * Get icon by CC Type
      *
      * @param string $ccType
+     * @param string $label
      *
-     * @return string|null
+     * @return array
      */
-    private function getIconUrl(string $ccType): ?string
+    private function getIcon(string $ccType, string $label): array
     {
         try {
-            $asset = $this->assetRepo->createAsset(self::MODULE_CODE . '::images/' . $ccType . '.png');
+            $asset = $this->assetRepo->createAsset(self::MODULE_CODE . '::images/cc/' . $ccType . '.png');
             if ($this->assetSource->findSource($asset)) {
-                return $asset->getUrl();
+                [$width, $height] = getimagesize($asset->getSourceFile());
+                return [
+                    'url' => $asset->getUrl(),
+                    'width' => $width,
+                    'height' => $height,
+                    'title' => __($label),
+                ];
             }
-            return null;
+            return [];
         } catch (LocalizedException $e) {
-            return null;
+            return [];
         }
     }
 }

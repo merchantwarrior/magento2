@@ -114,11 +114,12 @@ class VaultDetailsHandler extends AbstractHandler
         $paymentToken->setTokenDetails(
             $this->convertDetailsToJSON(
                 [
-                    'type' => $this->getCreditCardType($response['cardType']),
+                    'type' => $this->getCreditCardType($response['cardType'], 'name'),
                     'maskedCC' => $this->formCardNumber($response['paymentCardNumber']),
                     'expirationDate' => $response['cardExpiryMonth'] .'/'. $response['cardExpiryYear'],
                     'cardKey' => $response['cardKey'],
-                    'ivrCardID' => $response['ivrCardID']
+                    'ivrCardID' => $response['ivrCardID'],
+                    'alt_code' => $this->getCreditCardType($response['cardType'], 'alt_code')
                 ]
             )
         );
@@ -130,17 +131,18 @@ class VaultDetailsHandler extends AbstractHandler
      * Form Card Type
      *
      * @param string $cardType
+     * @param string $key
      *
      * @return string
      */
-    private function getCreditCardType(string $cardType): string
+    private function getCreditCardType(string $cardType, string $key): string
     {
         $cardsTypes = $this->config->getCcTypes();
 
         $result = $cardType;
-        array_walk($cardsTypes, static function(&$card) use (&$result, $cardType) {
+        array_walk($cardsTypes, static function(&$card) use (&$result, $cardType, $key) {
             if ($card['code_alt'] === $cardType) {
-                $result = $card['name'];
+                $result = $card[$key];
             }
         });
         return $result;
@@ -171,10 +173,12 @@ class VaultDetailsHandler extends AbstractHandler
 
     /**
      * Convert payment token details to JSON
+     *
      * @param array $details
+     *
      * @return string
      */
-    private function convertDetailsToJSON($details): string
+    private function convertDetailsToJSON(array $details): string
     {
         $json = $this->serializer->serialize($details);
         return $json ?: '{}';

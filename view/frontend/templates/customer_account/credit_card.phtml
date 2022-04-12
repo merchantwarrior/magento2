@@ -20,7 +20,15 @@ $ccNumberView = $escaper->escapeHtml($block->getNumberLast4Digits());
         <?= $escaper->escapeHtml($block->getExpDate()) ?>
     </td>
     <td data-th="<?= $escaper->escapeHtml(__('Type')) ?>" class="col card-type">
-        <?= $escaper->escapeHtml($block->getType()) ?>
+        <?php if ($url = $block->getIconUrl()): ?>
+            <img src="<?= /* @noEscape */ $block->getIconUrl() ?>"
+                 width="<?= /* @noEscape */ $block->getIconWidth() ?>"
+                 height="<?= /* @noEscape */ $block->getIconHeight() ?>"
+                 alt="<?= $escaper->escapeHtml($block->getType()) ?>"
+            >
+        <?php else: ?>
+            <?= $escaper->escapeHtml($block->getType()) ?>
+        <?php endif ?>
     </td>
     <td data-th="<?= $escaper->escapeHtml(__('Actions')) ?>" class="col actions">
         <form

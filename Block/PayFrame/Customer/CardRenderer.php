@@ -4,12 +4,38 @@ declare(strict_types=1);
 
 namespace MerchantWarrior\Payment\Block\PayFrame\Customer;
 
+use Magento\Framework\View\Element\Template;
 use Magento\Vault\Api\Data\PaymentTokenInterface;
-use Magento\Vault\Block\AbstractCardRenderer;
+use Magento\Vault\Block\AbstractTokenRenderer;
+use MerchantWarrior\Payment\Model\Service\GetPaymentIconsList;
 use MerchantWarrior\Payment\Model\Ui\PayFrame\ConfigProvider;
 
-class CardRenderer extends AbstractCardRenderer
+class CardRenderer extends AbstractTokenRenderer
 {
+    /**
+     * @var GetPaymentIconsList
+     */
+    private GetPaymentIconsList $getPaymentIconsList;
+
+    /**
+     * @var array
+     */
+    private array $icon;
+
+    /**
+     * @param Template\Context $context
+     * @param GetPaymentIconsList $getPaymentIconsList
+     * @param array $data
+     */
+    public function __construct(
+        Template\Context $context,
+        GetPaymentIconsList $getPaymentIconsList,
+        array $data = []
+    ) {
+        $this->getPaymentIconsList = $getPaymentIconsList;
+        parent::__construct($context, $data);
+    }
+
     /**
      * Can render specified token
      *
@@ -46,18 +72,62 @@ class CardRenderer extends AbstractCardRenderer
         return $this->getTokenDetails()['expirationDate'];
     }
 
-    public function getIconUrl()
+    /**
+     * Get icon URL
+     *
+     * @return mixed|null
+     */
+    public function getIconUrl(): ?string
     {
-        return '';
+        if ($icon = $this->getCardIcon()) {
+            return $icon['url'];
+        }
+        return null;
     }
 
-    public function getIconHeight()
+    /**
+     * Get icon height
+     *
+     * @return mixed|null
+     */
+    public function getIconHeight(): ?int
     {
-        return 0;
+        if ($icon = $this->getCardIcon()) {
+            return $icon['height'];
+        }
+        return null;
     }
 
-    public function getIconWidth()
+    /**
+     * Get icon width
+     *
+     * @return mixed|null
+     */
+    public function getIconWidth(): ?int
     {
-        return 0;
+        if ($icon = $this->getCardIcon()) {
+            return $icon['width'];
+        }
+        return null;
+    }
+
+    /**
+     * Get card icon
+     *
+     * @return array|null
+     */
+    protected function getCardIcon(): ?array
+    {
+        $type = $this->getTokenDetails()['alt_code'];
+
+        if (isset($this->icon[$type])) {
+            return $this->icon[$type];
+        }
+
+        $icons = $this->getPaymentIconsList->execute();
+        if (isset($icons[$type])) {
+            $this->icon[$type] = $icons[$type];
+        }
+        return ($this->icon[$type]) ?? null;
     }
 }
