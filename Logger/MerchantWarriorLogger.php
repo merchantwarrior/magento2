@@ -87,9 +87,10 @@ class MerchantWarriorLogger extends Logger
      * @param integer $level The logging level
      * @param string $message The log message
      * @param array $context The log context
+     *
      * @return Boolean Whether the record has been processed
      */
-    public function addRecord($level, $message, array $context = [])
+    public function addRecord(int $level, string $message, array $context = []): bool
     {
         $context['is_exception'] = $message instanceof Exception;
         return parent::addRecord($level, $message, $context);

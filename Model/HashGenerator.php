@@ -54,7 +54,7 @@ class HashGenerator
 
     /**
      * Prepare hash for query type
-     * Algorythm: md5(apiPassphrase) + merchantUUID + transactionID OR transactionReferenceID
+     * Algorithm: md5(apiPassphrase) + merchantUUID + transactionID OR transactionReferenceID
      *
      * @param array $data
      *

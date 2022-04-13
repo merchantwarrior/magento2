@@ -9,7 +9,7 @@ use Magento\Payment\Gateway\Http\ClientInterface;
 use Magento\Payment\Gateway\Http\TransferInterface;
 use MerchantWarrior\Payment\Api\Payframe\ProcessInterface;
 
-class TransactionAuthorize implements ClientInterface
+class Sale implements ClientInterface
 {
     /**
      * @var ProcessInterface
@@ -38,12 +38,9 @@ class TransactionAuthorize implements ClientInterface
 
         if (count($transactionData)) {
             try {
-                $result = $this->process->execute(ProcessInterface::API_METHOD_AUTH, $transactionData);
+                $result = $this->process->execute(ProcessInterface::API_METHOD_CARD, $transactionData);
             } catch (LocalizedException $err) {
-                $result = [
-                    'responseCode' => $err->getCode(),
-                    'error' => $err->getMessage()
-                ];
+                $result = $this->process->getError(ProcessInterface::API_METHOD_AUTH);
             }
             return $result;
         }

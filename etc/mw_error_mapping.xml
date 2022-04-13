@@ -3,5 +3,107 @@
     <message_list>
         <message code="MW - 006:Card has expired" translate="true">Card has expired.</message>
         <message code="MW - 011:Invalid transactionID" translate="true">Invalid Transaction ID</message>
+        <message code="00" translate="true">Approved</message>
+        <message code="01" translate="true">Refer to Card Issuer</message>
+        <message code="02" translate="true">Refer to Issuer's special conditions</message>
+        <message code="03" translate="true">Invalid Merchant</message>
+        <message code="04" translate="true">Pick Up Card</message>
+        <message code="05" translate="true">Do Not Honor</message>
+        <message code="06" translate="true">Error</message>
+        <message code="07" translate="true">Pick Up Card, Special Conditions</message>
+        <message code="08" translate="true">Honor with identification</message>
+        <message code="09" translate="true">Request in Progress</message>
+        <message code="10" translate="true">Partial Amount Approved</message>
+        <message code="11" translate="true">VIP Approval</message>
+        <message code="12" translate="true">Invalid Transaction</message>
+        <message code="13" translate="true">Invalid Amount</message>
+        <message code="14" translate="true">Invalid Card Number</message>
+        <message code="15" translate="true">No Such Issuer</message>
+        <message code="16" translate="true">Approved, update track 3</message>
+        <message code="17" translate="true">Customer Cancellation</message>
+        <message code="18" translate="true">Customer Dispute</message>
+        <message code="19" translate="true">Re-enter Transaction</message>
+        <message code="20" translate="true">Invalid Response</message>
+        <message code="21" translate="true">No Action Taken (no match)</message>
+        <message code="22" translate="true">Suspected Malfunction</message>
+        <message code="23" translate="true">Unacceptable Transaction Fee</message>
+        <message code="24" translate="true">File Update not Supported by Receiver</message>
+        <message code="25" translate="true">Unable to Locate Record on File</message>
+        <message code="26" translate="true">Duplicate File Update Record</message>
+        <message code="27" translate="true">File Update Field Edit Error</message>
+        <message code="28" translate="true">File Update File Locked Out</message>
+        <message code="29" translate="true">File Update not Successful</message>
+        <message code="30" translate="true">Format Error</message>
+        <message code="31" translate="true">Bank not Supported by Switch</message>
+        <message code="32" translate="true">Completed Partially</message>
+        <message code="33" translate="true">Expired Card - Pick Up</message>
+        <message code="34" translate="true">Suspected Fraud - Pick Up</message>
+        <message code="35" translate="true">Contact Acquirer - Pick Up</message>
+        <message code="36" translate="true">Restricted Card - Pick Up</message>
+        <message code="37" translate="true">Call Acquirer Security - Pick Up</message>
+        <message code="38" translate="true">Allowable PIN Tries Exceeded</message>
+        <message code="39" translate="true">No CREDIT Account</message>
+        <message code="40" translate="true">Requested Function not Supported</message>
+        <message code="41" translate="true">Lost Card - Pick Up</message>
+        <message code="42" translate="true">No Universal Amount</message>
+        <message code="43" translate="true">Stolen Card - Pick Up</message>
+        <message code="44" translate="true">No Investment Account</message>
+        <message code="45" translate="true">Account Closed</message>
+        <message code="46" translate="true">Identification Required</message>
+        <message code="47" translate="true">Identification Cross-Check Required</message>
+        <message code="48" translate="true">No Customer Record</message>
+        <message code="49" translate="true">Reserved For Future Realtime Use</message>
+        <message code="50" translate="true">Reserved For Future Realtime Use</message>
+        <message code="51" translate="true">Insufficient Funds</message>
+        <message code="52" translate="true">No Cheque Account</message>
+        <message code="53" translate="true">No Savings Account</message>
+        <message code="54" translate="true">Expired Card</message>
+        <message code="55" translate="true">Incorrect PIN</message>
+        <message code="56" translate="true">No Card Record</message>
+        <message code="57" translate="true">Trans. not Permitted to Cardholder</message>
+        <message code="58" translate="true">Transaction not Permitted to Terminal</message>
+        <message code="59" translate="true">Suspected Fraud</message>
+        <message code="60" translate="true">Card Acceptor Contact Acquirer</message>
+        <message code="61" translate="true">Exceeds Withdrawal Amount Limits</message>
+        <message code="62" translate="true">Restricted Card</message>
+        <message code="63" translate="true">Security Violation</message>
+        <message code="64" translate="true">Original Amount Incorrect</message>
+        <message code="65" translate="true">Exceeds Withdrawal Frequency Limit</message>
+        <message code="66" translate="true">Card Acceptor Call Acquirer Security</message>
+        <message code="67" translate="true">Hard Capture - Pick Up Card at ATM</message>
+        <message code="68" translate="true">Response Received Too Late</message>
+        <message code="75" translate="true">Allowable PIN Tries Exceeded</message>
+        <message code="76" translate="true">Previous message not found</message>
+        <message code="77" translate="true">Data does not match original message</message>
+        <message code="80" translate="true">Invalid Date</message>
+        <message code="81" translate="true">Cryptographic failure</message>
+        <message code="82" translate="true">Incorrect CVV</message>
+        <message code="83" translate="true">Unable to verify PIN</message>
+        <message code="84" translate="true">Invalid authorization life cycle</message>
+        <message code="85" translate="true">No reason to decline</message>
+        <message code="86" translate="true">ATM Malfunction</message>
+        <message code="87" translate="true">No Envelope Inserted</message>
+        <message code="88" translate="true">Unable to Dispense</message>
+        <message code="89" translate="true">Administration Error</message>
+        <message code="90" translate="true">Cut-off in Progress</message>
+        <message code="91" translate="true">Issuer or Switch is Inoperative</message>
+        <message code="92" translate="true">Financial Institution Not Found</message>
+        <message code="93" translate="true">Trans Cannot be Completed</message>
+        <message code="94" translate="true">Duplicate Transmission</message>
+        <message code="95" translate="true">Reconcile Error</message>
+        <message code="96" translate="true">System Malfunction</message>
+        <message code="97" translate="true">Reconciliation Totals Reset</message>
+        <message code="98" translate="true">MAC Error</message>
+        <message code="99" translate="true">Reserved for National Use</message>
+        <message code="N0" translate="true">Force STIP (VISA)</message>
+        <message code="N3" translate="true">Cash Service Not Available (VISA)</message>
+        <message code="N4" translate="true">Cash request exceeds issuer limit (VISA)</message>
+        <message code="N7" translate="true">Decline for CVV2 failure (VISA)</message>
+        <message code="P2" translate="true">Invalid biller information (VISA)</message>
+        <message code="P5" translate="true">PIN Change Unblock Declined (VISA)</message>
+        <message code="P6" translate="true">Unsafe PIN (VISA)</message>
+        <message code="XA" translate="true">Forward to issuer</message>
+        <message code="XD" translate="true">Forward to issuer</message>
+        <message code="XX" translate="true">Unknown Code</message>
     </message_list>
 </mapping>

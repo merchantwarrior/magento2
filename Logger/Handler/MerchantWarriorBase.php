@@ -9,10 +9,10 @@ class MerchantWarriorBase extends Base
     /**
      * Overwrite core it needs to be the exact level otherwise use different handler
      *
-     * {@inheritdoc}
+     * @inheritdoc
      */
-    public function isHandling(array $record)
+    public function isHandling(array $record): bool
     {
-        return $record['level'] == $this->level;
+        return $record['level'] === $this->level;
     }
 }
