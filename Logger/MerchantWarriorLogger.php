@@ -44,56 +44,53 @@ class MerchantWarriorLogger extends Logger
      *
      * @param string $message The log message
      * @param array $context The log context
+     *
      * @return Boolean Whether the record has been processed
      */
-    public function addMerchantWarriorNotification($message, array $context = [])
+    public function addMerchantWarriorNotification($message, array $context = []): bool
     {
+        $context['is_exception'] = $message instanceof Exception;
+
         return $this->addRecord(static::MERCHANT_WARRIOR_NOTIFICATION, $message, $context);
     }
 
     /**
      * @param $message
      * @param array $context
+     *
      * @return bool
      */
-    public function addMerchantWarriorDebug($message, array $context = [])
+    public function addMerchantWarriorDebug($message, array $context = []): bool
     {
+        $context['is_exception'] = $message instanceof Exception;
+
         return $this->addRecord(static::MERCHANT_WARRIOR_DEBUG, $message, $context);
     }
 
     /**
      * @param $message
      * @param array $context
+     *
      * @return bool
      */
-    public function addMerchantWarriorResult($message, array $context = [])
+    public function addMerchantWarriorResult($message, array $context = []): bool
     {
+        $context['is_exception'] = $message instanceof Exception;
+
         return $this->addRecord(static::MERCHANT_WARRIOR_RESULT, $message, $context);
     }
 
     /**
      * @param $message
      * @param array $context
+     *
      * @return bool
      */
-    public function addMerchantWarriorNotificationCronjob($message, array $context = [])
-    {
-        return $this->addRecord(static::MERCHANT_WARRIOR_NOTIFICATION_CRONJOB, $message, $context);
-    }
-
-    /**
-     * Adds a log record.
-     *
-     * @param integer $level The logging level
-     * @param string $message The log message
-     * @param array $context The log context
-     *
-     * @return Boolean Whether the record has been processed
-     */
-    public function addRecord(int $level, string $message, array $context = []): bool
+    public function addMerchantWarriorNotificationCronjob($message, array $context = []): bool
     {
         $context['is_exception'] = $message instanceof Exception;
-        return parent::addRecord($level, $message, $context);
+
+        return $this->addRecord(static::MERCHANT_WARRIOR_NOTIFICATION_CRONJOB, $message, $context);
     }
 
     /**
@@ -103,10 +100,13 @@ class MerchantWarriorLogger extends Logger
      *
      * @param string $message The log message
      * @param array $context The log context
+     *
      * @return Boolean Whether the record has been processed
      */
-    public function addNotificationLog($message, array $context = [])
+    public function addNotificationLog($message, array $context = []): bool
     {
+        $context['is_exception'] = $message instanceof Exception;
+
         return $this->addRecord(static::INFO, $message, $context);
     }
 }
