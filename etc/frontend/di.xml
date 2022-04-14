@@ -21,4 +21,9 @@
             </argument>
         </arguments>
     </type>
+
+    <type name="Magento\Vault\Api\PaymentTokenRepositoryInterface">
+        <plugin name="merchant_warrior_delete_stored_payment"
+                type="MerchantWarrior\Payment\Plugin\DeleteStoredPaymentPlugin" />
+    </type>
 </config>

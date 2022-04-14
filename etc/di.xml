@@ -260,6 +260,7 @@
                 <item name="address" xsi:type="string">MerchantWarrior\Payment\Gateway\Request\AddressDataBuilder</item>
                 <item name="transaction" xsi:type="string">MerchantWarrior\Payment\Gateway\Request\TransactionDataBuilder</item>
                 <item name="mw_transaction_data" xsi:type="string">MerchantWarrior\Payment\Gateway\Request\PayFrameTransactionDataBuilder</item>
+                <item name="vault" xsi:type="string">MerchantWarrior\Payment\Gateway\Request\VaultDataBuilder</item>
             </argument>
         </arguments>
     </virtualType>
