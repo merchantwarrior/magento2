@@ -2,7 +2,7 @@
     "name": "merchantwarrior/module-payment",
     "description": "Official Magento2 Plugin to connect to Payment Service Provider Merchant Warrior.",
     "type": "magento2-module",
-    "version": "0.1.4",
+    "version": "0.1.5",
     "license": "MIT",
     "repositories": [
         {
@@ -11,7 +11,7 @@
         }
     ],
     "require": {
-        "php": "~7.4.0||~8.1.0",
+        "php": "~7.3.0||~7.4.0||~8.0.0||~8.1.0",
         "magento/framework": "*",
         "magento/module-vault": "*",
         "magento/module-payment": "*",
