@@ -56,12 +56,13 @@ define(
                             window.checkoutConfig.payment.merchant_warrior_payframe.successPage
                         ));
                     }
-
-                    fullScreenLoader.stopLoader(true);
                 }
             ).fail(
                 (response) => {
                     errorProcessor.process(response);
+                }
+            ).always(
+                () => {
                     fullScreenLoader.stopLoader(true);
                 }
             );

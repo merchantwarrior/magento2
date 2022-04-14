@@ -5,17 +5,18 @@ declare(strict_types=1);
 namespace MerchantWarrior\Payment\Api\Payframe;
 
 use Magento\Framework\Exception\LocalizedException;
+use MerchantWarrior\Payment\Api\ApiProcessInterface;
 
 /**
  * Interface ProcessInterface
  */
-interface ProcessInterface
+interface ProcessInterface extends ApiProcessInterface
 {
     /**#@+
      * Api Method constants
      */
-    const API_METHOD_AUTH = 'processAuth';
-    const API_METHOD_CARD = 'processCard';
+    public const API_METHOD_AUTH = 'processAuth';
+    public const API_METHOD_CARD = 'processCard';
     /**#@-*/
 
     /**

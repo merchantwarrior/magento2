@@ -46,7 +46,7 @@ class CheckoutResponseValidator extends AbstractValidator
             if (!empty($response['error'])) {
                 $this->logger->error($response['error']);
             }
-            return $this->createResult(false, [$response['error']]);
+            return $this->createResult(false, [$response['error']], [$response['responseAuthCode']]);
         }
         return $this->createResult(true, $errorMessages);
     }

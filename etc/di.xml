@@ -20,6 +20,8 @@
                 type="MerchantWarrior\Payment\Model\Api\Token\AddCard" />
     <preference for="MerchantWarrior\Payment\Api\Token\RemoveCardInterface"
                 type="MerchantWarrior\Payment\Model\Api\Token\RemoveCard" />
+    <preference for="MerchantWarrior\Payment\Api\Token\ProcessInterface"
+                type="MerchantWarrior\Payment\Model\Api\Token\Process" />
 
     <virtualType name="MerchantWarrior\Payment\Block\Form\DirectApi" type="Magento\Payment\Block\Form\Cc">
         <arguments>
@@ -80,7 +82,7 @@
             <argument name="config" xsi:type="object">MerchantWarriorVaultPaymentConfig</argument>
             <argument name="valueHandlerPool" xsi:type="object">MerchantWarriorVaultPaymentValueHandlerPool</argument>
             <argument name="code" xsi:type="const">MerchantWarrior\Payment\Model\Ui\ConfigProvider::CC_VAULT_CODE</argument>
-            <argument name="vaultProvider" xsi:type="object">MerchantWarriorFacade</argument>
+            <argument name="vaultProvider" xsi:type="object">MerchantWarriorPayFrameFacade</argument>
             <argument name="logger" xsi:type="object">MerchantWarrior\Payment\Logger\MerchantWarriorLogger</argument>
         </arguments>
     </virtualType>
@@ -163,10 +165,35 @@
                 <item name="void" xsi:type="string">MerchantWarriorPaymentCancelCommand</item>
                 <item name="refund" xsi:type="string">MerchantWarriorPaymentRefundCommand</item>
                 <item name="cancel" xsi:type="string">MerchantWarriorPaymentCancelCommand</item>
+                <item name="deny_payment" xsi:type="string">MerchantWarriorPaymentCancelCommand</item>
+            </argument>
+        </arguments>
+    </virtualType>
+
+    <!-- Command managers section for Vault -->
+    <virtualType name="MerchantWarriorPaymentCcCommandManager" type="Magento\Payment\Gateway\Command\CommandManager">
+        <arguments>
+            <argument name="commandPool" xsi:type="object">MerchantWarriorPaymentVaultCommandPool</argument>
+        </arguments>
+    </virtualType>
+    <type name="Magento\Payment\Gateway\Command\CommandManagerPool">
+        <arguments>
+            <argument name="executors" xsi:type="array">
+                <item name="merchant_warrior_payframe" xsi:type="string">MerchantWarriorPaymentCcCommandManager</item>
+            </argument>
+        </arguments>
+    </type>
+
+    <!-- Vault Commands infrastructure -->
+    <virtualType name="MerchantWarriorPaymentVaultCommandPool" type="Magento\Payment\Gateway\Command\CommandPool">
+        <arguments>
+            <argument name="commands" xsi:type="array">
+                <item name="authorize" xsi:type="string">MerchantWarriorVaultAuthorizeCommand</item>
+                <item name="capture" xsi:type="string">MerchantWarriorPaymentCaptureCommand</item>
+                <item name="sale" xsi:type="string">MerchantWarriorVaultSaleCommand</item>
                 <item name="vault_authorize" xsi:type="string">MerchantWarriorVaultAuthorizeCommand</item>
                 <item name="vault_sale" xsi:type="string">MerchantWarriorVaultSaleCommand</item>
                 <item name="vault_capture" xsi:type="string">MerchantWarriorPaymentCaptureCommand</item>
-                <item name="deny_payment" xsi:type="string">MerchantWarriorPaymentCancelCommand</item>
             </argument>
         </arguments>
     </virtualType>
@@ -196,7 +223,7 @@
         <arguments>
             <argument name="requestBuilder" xsi:type="object">MerchantWarriorPaymentPayFrameAuthorizeRequest</argument>
             <argument name="transferFactory" xsi:type="object">MerchantWarrior\Payment\Gateway\Http\TransferFactory</argument>
-            <argument name="client" xsi:type="object">MerchantWarrior\Payment\Gateway\Http\Client\PayFrame\TransactionAuthorize</argument>
+            <argument name="client" xsi:type="object">MerchantWarrior\Payment\Gateway\Http\Client\PayFrame\Authorize</argument>
             <argument name="validator" xsi:type="object">CheckoutResponseValidator</argument>
             <argument name="handler" xsi:type="object">MerchantWarriorPayFrameAuthorizeResponseHandler</argument>
             <argument name="errorMessageMapper" xsi:type="object">MerchantWarrior\Payment\Gateway\ErrorMapper\VirtualErrorMessageMapper</argument>
@@ -241,6 +268,7 @@
         <arguments>
             <argument name="handlers" xsi:type="array">
                 <item name="payment_details" xsi:type="string">MerchantWarrior\Payment\Gateway\Response\CompleteAuthHandler</item>
+                <item name="vault_details" xsi:type="string">MerchantWarrior\Payment\Gateway\Response\VaultDetailsHandler</item>
             </argument>
         </arguments>
     </virtualType>
@@ -258,7 +286,7 @@
         <arguments>
             <argument name="requestBuilder" xsi:type="object">MerchantWarriorPaymentPayFrameSaleRequest</argument>
             <argument name="transferFactory" xsi:type="object">MerchantWarrior\Payment\Gateway\Http\TransferFactory</argument>
-            <argument name="client" xsi:type="object">MerchantWarrior\Payment\Gateway\Http\Client\PayFrame\TransactionSale</argument>
+            <argument name="client" xsi:type="object">MerchantWarrior\Payment\Gateway\Http\Client\PayFrame\Sale</argument>
             <argument name="validator" xsi:type="object">CheckoutResponseValidator</argument>
             <argument name="handler" xsi:type="object">MerchantWarriorSaleResponseHandler</argument>
             <argument name="errorMessageMapper" xsi:type="object">MerchantWarrior\Payment\Gateway\ErrorMapper\VirtualErrorMessageMapper</argument>
@@ -303,6 +331,7 @@
         <arguments>
             <argument name="handlers" xsi:type="array">
                 <item name="payment_details" xsi:type="string">MerchantWarrior\Payment\Gateway\Response\PaymentDetailsHandler</item>
+                <item name="vault_details" xsi:type="string">MerchantWarrior\Payment\Gateway\Response\VaultDetailsHandler</item>
             </argument>
         </arguments>
     </virtualType>

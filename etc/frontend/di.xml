@@ -5,6 +5,19 @@
             <argument name="configProviders" xsi:type="array">
                 <item name="mw_payframe_config_provider"
                       xsi:type="object">MerchantWarrior\Payment\Model\Ui\PayFrame\ConfigProvider</item>
+                <item name="mw_cc_vault_payframe_config_provider"
+                      xsi:type="object">MerchantWarrior\Payment\Model\Ui\Vault\ConfigProvider</item>
+            </argument>
+        </arguments>
+    </type>
+
+    <type name="Magento\Vault\Model\Ui\TokensConfigProvider">
+        <arguments>
+            <argument name="tokenUiComponentProviders" xsi:type="array">
+                <item name="merchant_warrior_payframe"
+                      xsi:type="object">MerchantWarrior\Payment\Model\Ui\TokenUiComponentProvider</item>
+                <item name="merchant_warrior_cc_vault"
+                      xsi:type="object">MerchantWarrior\Payment\Model\Ui\TokenUiComponentProvider</item>
             </argument>
         </arguments>
     </type>

@@ -118,6 +118,22 @@ abstract class RequestApi implements RequestApiInterface
     }
 
     /**
+     * Get error data
+     *
+     * @param string $method
+     *
+     * @return array
+     */
+    public function getError(string $method): array
+    {
+        return [
+            'responseCode' => $this->getResponseCode($method),
+            'responseAuthCode' => $this->getAuthResponseCode($method),
+            'error' => __($this->getAuthResponseMessage($method))->render()
+        ];
+    }
+
+    /**
      * Set request
      *
      * @param string $method
@@ -295,6 +311,36 @@ abstract class RequestApi implements RequestApiInterface
             return null;
         }
         return $this->getResponse($key)->getData('responseCode');
+    }
+
+    /**
+     * Get auth error message
+     *
+     * @param string $key
+     *
+     * @return string|null
+     */
+    protected function getAuthResponseMessage(string $key): ?string
+    {
+        if ($this->getResponse($key)->isEmpty()) {
+            return null;
+        }
+        return $this->getResponse($key)->getData('authMessage');
+    }
+
+    /**
+     * Get auth response message
+     *
+     * @param string $key
+     *
+     * @return string|null
+     */
+    protected function getAuthResponseCode(string $key): ?string
+    {
+        if ($this->getResponse($key)->isEmpty()) {
+            return null;
+        }
+        return $this->getResponse($key)->getData('authResponseCode');
     }
 
     /**

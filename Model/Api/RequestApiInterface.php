@@ -53,4 +53,10 @@ interface RequestApiInterface
     public const PAYFRAME_TOKEN = 'payframeToken';
     public const PAYFRAME_THREE_DS_TOKEN = 'threeDSToken';
     /**#@-*/
+
+    /**#@+
+     * Additional Api Payframe Method constants
+     */
+    public const PAYFRAME_ADD_TO_CARD_KEY = 'addCard';
+    /**#@-*/
 }
