@@ -46,12 +46,20 @@ class ProcessCard extends RequestApi implements ProcessCardInterface
      */
     private function validate(array $data): void
     {
-        if (!isset($data[self::PAYFRAME_KEY])) {
-            throw new LocalizedException(__('Your card is incorrect!'));
+        if (!isset($data[self::PAYMENT_CARD_NUMBER])) {
+            throw new LocalizedException(__('You must enter card number!'));
         }
 
-        if (!isset($data[self::PAYFRAME_TOKEN])) {
-            throw new LocalizedException(__('Your card is incorrect!'));
+        if (!isset($data[self::PAYMENT_CARD_CSC])) {
+            throw new LocalizedException(__('You must enter card CSC code!'));
+        }
+
+        if (!isset($data[self::PAYMENT_CARD_EXPIRY])) {
+            throw new LocalizedException(__('You must enter card expiry date!'));
+        }
+
+        if (!isset($data[self::PAYMENT_CARD_NAME])) {
+            throw new LocalizedException(__('You must enter card name!'));
         }
     }
 }
