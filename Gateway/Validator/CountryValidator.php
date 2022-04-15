@@ -21,6 +21,9 @@ class CountryValidator extends AbstractValidator
      */
     private ScopeConfigInterface $scopeConfig;
 
+    protected string $allowedSpecificConfigPath = Config::XML_PATH_PAYFRAME_ALLOWED_SPECIFIC;
+    protected string $allowedCountryConfigPath = Config::XML_PATH_PAYFRAME_ALLOWED_SPECIFICCOUNTRY;
+
     /**
      * @param ResultInterfaceFactory $resultFactory
      * @param ScopeConfigInterface $scopeConfig
@@ -46,13 +49,13 @@ class CountryValidator extends AbstractValidator
         $storeId = $validationSubject['storeId'];
 
         $allowedSpecific = $this->scopeConfig->getValue(
-            Config::XML_PATH_PAYFRAME_ALLOWED_SPECIFIC,
+            $this->allowedSpecificConfigPath,
             ScopeInterface::SCOPE_STORE,
             $storeId
         );
         if ((int)$allowedSpecific === 1) {
             $availableCountries = $this->scopeConfig->getValue(
-                Config::XML_PATH_PAYFRAME_ALLOWED_SPECIFICCOUNTRY,
+                $this->allowedCountryConfigPath,
                 ScopeInterface::SCOPE_STORE,
                 $storeId
             );
