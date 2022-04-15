@@ -44,7 +44,10 @@ class Config
     public const XML_PATH_PAYFRAME_ALLOWED_SPECIFIC = 'payment/merchant_warrior_payframe/allowspecific';
     public const XML_PATH_PAYFRAME_ALLOWED_SPECIFICCOUNTRY = 'payment/merchant_warrior_payframe/specificcountry';
     /**#@-*/
-
+    public const XML_PATH_DIRECTAPI_ACTIVE = 'payment/merchant_warrior/active';
+    public const XML_PATH_DIRECTAPI_ALLOWED_CC = 'payment/merchant_warrior/cctypes';
+    public const XML_PATH_DIRECTAPI_ALLOWED_SPECIFIC = 'payment/merchant_warrior/allowspecific';
+    public const XML_PATH_DIRECTAPI_ALLOWED_SPECIFICCOUNTRY = 'payment/merchant_warrior/specificcountry';
     /**#@+
      * Configuration debugger constants
      */
@@ -195,8 +198,27 @@ class Config
      */
     public function getPayFrameAllowedTypeCards(): array
     {
+        return $this->getTypeCardsByConfigPath(self::XML_PATH_PAYFRAME_ALLOWED_CC);
+    }
+
+    /**
+     * Get list of allowed Credit Cards for Admin DirectAPI method
+     *
+     * @return array
+     */
+    public function getAdminAllowedTypeCards(): array
+    {
+        return $this->getTypeCardsByConfigPath(self::XML_PATH_DIRECTAPI_ALLOWED_CC);
+    }
+
+    /**
+     * @param string $configPath
+     * @return array
+     */
+    protected function getTypeCardsByConfigPath(string $configPath): array
+    {
         $cards = $this->scopeConfig->getValue(
-            self::XML_PATH_PAYFRAME_ALLOWED_CC,
+            $configPath,
             ScopeInterface::SCOPE_STORE,
             $this->getStoreId()
         );

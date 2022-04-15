@@ -46,6 +46,14 @@ class ProcessCard extends RequestApi implements ProcessCardInterface
      */
     private function validate(array $data): void
     {
+        if (!isset($data[self::PAYMENT_CARD_TYPE])) {
+            throw new LocalizedException(__('You must select card type!'));
+        }
+
+        if (!in_array($data[self::PAYMENT_CARD_TYPE], $this->config->getAdminAllowedTypeCards())) {
+            throw new LocalizedException(__('This card type is not allowed!'));
+        }
+
         if (!isset($data[self::PAYMENT_CARD_NUMBER])) {
             throw new LocalizedException(__('You must enter card number!'));
         }
