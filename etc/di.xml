@@ -28,6 +28,12 @@
             <argument name="data" xsi:type="array">
                 <item name="template" xsi:type="string">MerchantWarrior_Payment::form/cc.phtml</item>
             </argument>
+            <argument name="paymentConfig" xsi:type="object">MerchantWarrior\Payment\Model\Configuration</argument>
+        </arguments>
+    </virtualType>
+    <virtualType name="MerchantWarrior\Payment\Model\Configuration" type="Magento\Payment\Model\Config">
+        <arguments>
+            <argument name="dataStorage" xsi:type="object">MerchantWarrior\Payment\Model\Config\Data</argument>
         </arguments>
     </virtualType>
 
@@ -57,7 +63,7 @@
             <argument name="formBlockType" xsi:type="string">MerchantWarrior\Payment\Block\Form\DirectApi</argument>
             <argument name="infoBlockType" xsi:type="string">Magento\Payment\Block\Info</argument>
             <argument name="valueHandlerPool" xsi:type="object">MerchantWarriorPaymentValueHandlerPool</argument>
-            <argument name="validatorPool" xsi:type="object">MerchantWarriorValidatorPool</argument>
+            <argument name="validatorPool" xsi:type="object">MerchantWarriorDirectAPIValidatorPool</argument>
             <argument name="commandPool" xsi:type="object">MerchantWarriorPaymentCommandPool</argument>
             <argument name="logger" xsi:type="object">MerchantWarrior\Payment\Logger\MerchantWarriorLogger</argument>
         </arguments>
@@ -112,6 +118,13 @@
                 <item name="global" xsi:type="string">MerchantWarrior\Payment\Gateway\Validator\GlobalValidator</item>
                 <item name="country" xsi:type="string">MerchantWarrior\Payment\Gateway\Validator\CountryValidator</item>
                 <item name="availability" xsi:type="string">MerchantWarrior\Payment\Gateway\Validator\AvailabilityValidator</item>
+            </argument>
+        </arguments>
+    </virtualType>
+    <virtualType name="MerchantWarriorDirectAPIValidatorPool" type="MerchantWarriorValidatorPool">
+        <arguments>
+            <argument name="validators" xsi:type="array">
+                <item name="country" xsi:type="string">MerchantWarrior\Payment\Gateway\Validator\DirectAPI\CountryValidator</item>
             </argument>
         </arguments>
     </virtualType>

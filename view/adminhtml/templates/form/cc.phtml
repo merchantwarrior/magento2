@@ -21,7 +21,11 @@ $ccExpYear = $block->getInfoData('cc_exp_year');
                 <?php foreach ($block->getCcAvailableTypes() as $typeCode => $typeName): ?>
                     <option value="<?= $block->escapeHtml($typeCode) ?>"
                             <?php if ($typeCode == $ccType): ?>selected="selected"<?php endif ?>>
-                        <?= $block->escapeHtml($typeName) ?>
+                        <?php if (is_array($typeName) && array_key_exists('name', $typeName)) : ?>
+                            <?= $block->escapeHtml($typeName['name']) ?>
+                        <?php elseif (is_string($typeName)) : ?>
+                            <?= $block->escapeHtml($typeName) ?>
+                        <?php endif; ?>
                     </option>
                 <?php endforeach ?>
             </select>
@@ -35,6 +39,7 @@ $ccExpYear = $block->getInfoData('cc_exp_year');
             <input type="text" id="<?= /* @noEscape */ $code ?>_cc_owner" name="payment[cc_owner]"
                    title="<?= $block->escapeHtml(__('Name')) ?>"
                    class="admin__control-text"
+                   data-validate="{'stripped-min-length':'3'}"
                    value="<?= /* @noEscape */ $block->getInfoData('cc_owner') ?>"/>
         </div>
     </div>
@@ -46,7 +51,13 @@ $ccExpYear = $block->getInfoData('cc_exp_year');
             <input type="text" id="<?= /* @noEscape */ $code ?>_cc_number" name="payment[cc_number]"
                    title="<?= $block->escapeHtml(__('Credit Card Number')) ?>"
                    class="admin__control-text validate-cc-number"
-                   value="<?= /* @noEscape */ $block->getInfoData('cc_number') ?>"/>
+                   value="<?= /* @noEscape */ $block->getInfoData('cc_number') ?>"
+                   data-validate='{
+                       "required-number":true,
+                       "validate-cc-number":"#<?= /* @noEscape */ $code ?>_cc_type",
+                       "validate-cc-type":"#<?= /* @noEscape */ $code ?>_cc_type"
+                   }'
+            />
             <?= /* @noEscape */ $secureRenderer->renderEventListenerAsTag(
                 'oncopy',
                 "event.preventDefault();",

@@ -37,6 +37,8 @@ class DirectApiTransactionDataBuilder extends AbstractDataBuilder
                 => $payment->getCcOwner(),
             RequestApiInterface::PAYMENT_CARD_EXPIRY
                 => $expiry,
+            RequestApiInterface::PAYMENT_CARD_TYPE
+                => $payment->getCcType()
         ];
 
         if ($tdsToken = $payment->getAdditionalInformation(RequestApiInterface::PAYFRAME_THREE_DS_TOKEN)) {

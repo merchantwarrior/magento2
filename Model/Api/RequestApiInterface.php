@@ -41,6 +41,7 @@ interface RequestApiInterface
     public const PAYMENT_CARD_NUMBER = 'paymentCardNumber';
     public const PAYMENT_CARD_EXPIRY = 'paymentCardExpiry';
     public const PAYMENT_CARD_CSC = 'paymentCardCSC';
+    public const PAYMENT_CARD_TYPE = 'paymentCardType';
     public const TRANSACTION_ID = 'transactionID';
     public const REFUND_AMOUNT = 'refundAmount';
     public const CAPTURE_AMOUNT = 'captureAmount';
