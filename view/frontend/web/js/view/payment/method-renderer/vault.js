@@ -214,6 +214,10 @@ define([
                     () => {
                         this.afterPlaceOrder.bind(this);
                     }
+                ).always(
+                    () => {
+                        fullScreenLoader.stopLoader(true);
+                    }
                 );
             }
         },

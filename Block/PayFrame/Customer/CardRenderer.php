@@ -118,7 +118,7 @@ class CardRenderer extends AbstractTokenRenderer
      */
     protected function getCardIcon(): ?array
     {
-        $type = $this->getTokenDetails()['alt_code'];
+        $type = $this->getTokenDetails()['code_alt'];
 
         if (isset($this->icon[$type])) {
             return $this->icon[$type];

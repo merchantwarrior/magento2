@@ -16,8 +16,10 @@ use Magento\Payment\Model\InfoInterface;
 use Magento\Sales\Api\Data\OrderPaymentExtensionInterfaceFactory;
 use Magento\Sales\Api\Data\OrderPaymentExtensionInterface;
 use Magento\Vault\Api\Data\PaymentTokenInterface;
+use Magento\Vault\Api\PaymentTokenManagementInterface;
 use MerchantWarrior\Payment\Logger\MerchantWarriorLogger;
 use MerchantWarrior\Payment\Model\Config;
+use MerchantWarrior\Payment\Model\Ui\PayFrame\ConfigProvider;
 use Magento\Vault\Api\Data\PaymentTokenFactoryInterface;
 
 class VaultDetailsHandler extends AbstractHandler
@@ -26,6 +28,11 @@ class VaultDetailsHandler extends AbstractHandler
      * @var PaymentTokenFactoryInterface
      */
     private PaymentTokenFactoryInterface $paymentTokenFactory;
+
+    /**
+     * @var PaymentTokenManagementInterface
+     */
+    private PaymentTokenManagementInterface $paymentTokenManagement;
 
     /**
      * @var OrderPaymentExtensionInterfaceFactory
@@ -46,6 +53,7 @@ class VaultDetailsHandler extends AbstractHandler
      * VaultDetailsHandler constructor.
      *
      * @param PaymentTokenFactoryInterface $paymentTokenFactory
+     * @param PaymentTokenManagementInterface $paymentTokenManagement
      * @param OrderPaymentExtensionInterfaceFactory $paymentExtensionFactory
      * @param Config $config
      * @param SerializerInterface $serializer
@@ -54,6 +62,7 @@ class VaultDetailsHandler extends AbstractHandler
      */
     public function __construct(
         PaymentTokenFactoryInterface $paymentTokenFactory,
+        PaymentTokenManagementInterface $paymentTokenManagement,
         OrderPaymentExtensionInterfaceFactory $paymentExtensionFactory,
         Config $config,
         SerializerInterface $serializer,
@@ -61,6 +70,7 @@ class VaultDetailsHandler extends AbstractHandler
         MerchantWarriorLogger $logger
     ) {
         $this->paymentTokenFactory = $paymentTokenFactory;
+        $this->paymentTokenManagement = $paymentTokenManagement;
         $this->paymentExtensionFactory = $paymentExtensionFactory;
         $this->config = $config;
         $this->serializer = $serializer;
@@ -78,6 +88,12 @@ class VaultDetailsHandler extends AbstractHandler
 
         $paymentDO = $this->readPayment($handlingSubject);
         $payment = $paymentDO->getPayment();
+
+        if (isset($response['cardID'])
+            && $this->isTokenExists($response['cardID'], (int)$paymentDO->getOrder()->getCustomerId())
+        ) {
+            return;
+        }
 
         try {
             $paymentToken = $this->getVaultPaymentToken($response);
@@ -109,7 +125,6 @@ class VaultDetailsHandler extends AbstractHandler
         $paymentToken = $this->paymentTokenFactory->create(PaymentTokenFactoryInterface::TOKEN_TYPE_CREDIT_CARD);
         $paymentToken->setGatewayToken($response['cardID']);
         $paymentToken->setExpiresAt($this->getExpirationDate($response));
-        $paymentToken->setIsVisible(true);
 
         $paymentToken->setTokenDetails(
             $this->convertDetailsToJSON(
@@ -119,12 +134,29 @@ class VaultDetailsHandler extends AbstractHandler
                     'expirationDate' => $response['cardExpiryMonth'] .'/'. $response['cardExpiryYear'],
                     'cardKey' => $response['cardKey'],
                     'ivrCardID' => $response['ivrCardID'],
-                    'alt_code' => $this->getCreditCardType($response['cardType'], 'alt_code')
+                    'code_alt' => $this->getCreditCardType($response['cardType'], 'code_alt')
                 ]
             )
         );
 
         return $paymentToken;
+    }
+
+    /**
+     * CHeck is token exists
+     *
+     * @param string $hash
+     * @param int $customerId
+     *
+     * @return PaymentTokenInterface|null
+     */
+    private function isTokenExists(string $hash, int $customerId): ?PaymentTokenInterface
+    {
+        return $this->paymentTokenManagement->getByGatewayToken(
+            $hash,
+            ConfigProvider::METHOD_CODE,
+            $customerId
+        );
     }
 
     /**

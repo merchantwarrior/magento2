@@ -8,7 +8,6 @@ use Magento\Framework\Exception\LocalizedException;
 use Magento\Payment\Gateway\Http\ClientInterface;
 use Magento\Payment\Gateway\Http\TransferInterface;
 use MerchantWarrior\Payment\Api\Direct\RefundCardInterface;
-use MerchantWarrior\Payment\Model\Api\RequestApiInterface;
 
 class TransactionRefund implements ClientInterface
 {
@@ -41,10 +40,7 @@ class TransactionRefund implements ClientInterface
             try {
                 $result = $this->process->execute($transactionData);
             } catch (LocalizedException $err) {
-                $result = [
-                    'responseCode' => $err->getCode(),
-                    'error' => $err->getMessage()
-                ];
+                $result = $this->process->getError(RefundCardInterface::API_METHOD);
             }
             return $result;
         }

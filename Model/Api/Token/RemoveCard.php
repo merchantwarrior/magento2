@@ -19,8 +19,10 @@ class RemoveCard extends RequestApi implements RemoveCardInterface
             return [];
         }
 
-        $transactionParams[self::METHOD] = RemoveCardInterface::API_METHOD;
-        $transactionParams['cardID'] = $cardID;
+        $transactionParams = [
+            self::METHOD => RemoveCardInterface::API_METHOD,
+            'cardID' => $cardID
+        ];
 
         $this->validate($transactionParams);
 
@@ -47,16 +49,7 @@ class RemoveCard extends RequestApi implements RemoveCardInterface
      */
     private function validate(array $data): void
     {
-        if (!isset($data['cardName'])) {
-            throw new LocalizedException(__('Your card data is incorrect!'));
-        }
-        if (!isset($data['cardNumber'])) {
-            throw new LocalizedException(__('Your card data is incorrect!'));
-        }
-        if (!isset($data['cardExpiryMonth'])) {
-            throw new LocalizedException(__('Your card data is incorrect!'));
-        }
-        if (!isset($data['cardExpiryYear'])) {
+        if (!isset($data['cardID'])) {
             throw new LocalizedException(__('Your card data is incorrect!'));
         }
     }

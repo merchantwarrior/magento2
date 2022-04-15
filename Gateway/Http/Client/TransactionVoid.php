@@ -41,10 +41,7 @@ class TransactionVoid implements ClientInterface
             try {
                 $result = $this->process->execute($transactionData[RequestApiInterface::TRANSACTION_ID]);
             } catch (LocalizedException $err) {
-                $result = [
-                    'responseCode' => $err->getCode(),
-                    'error' => $err->getMessage()
-                ];
+                $result = $this->process->getError(ProcessVoidInterface::API_METHOD);
             }
             return $result;
         }

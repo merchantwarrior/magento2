@@ -40,10 +40,7 @@ class Sale implements ClientInterface
             try {
                 $result = $this->process->execute(ProcessInterface::API_METHOD_PROCESS_CARD, $transactionData);
             } catch (LocalizedException $err) {
-                $result = [
-                    'responseCode' => $err->getCode(),
-                    'error' => $err->getMessage()
-                ];
+                $result = $this->process->getError(ProcessInterface::API_METHOD_PROCESS_CARD);
             }
             return $result;
         }

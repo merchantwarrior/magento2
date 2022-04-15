@@ -216,6 +216,7 @@ define([
 
             if (this._isSaveToVaultEnabled()) {
                 transactionResult.addCard = '1';
+                transactionResult.is_active_payment_token_enabler = true;
             }
             return transactionResult;
         },
