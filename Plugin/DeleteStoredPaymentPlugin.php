@@ -38,15 +38,15 @@ class DeleteStoredPaymentPlugin
      * @param PaymentTokenRepositoryInterface $subject
      * @param PaymentTokenInterface $paymentToken
      *
-     * @return PaymentTokenInterface $paymentToken
+     * @return null
      */
     public function beforeDelete(
         PaymentTokenRepositoryInterface $subject,
         PaymentTokenInterface $paymentToken
-    ): PaymentTokenInterface {
+    ) {
         $this->token = $paymentToken->getGatewayToken();
 
-        return $paymentToken;
+        return null;
     }
 
     /**

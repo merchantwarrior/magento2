@@ -40,10 +40,7 @@ class TransactionAuthorize implements ClientInterface
             try {
                 $result = $this->process->execute($transactionData);
             } catch (LocalizedException $err) {
-                $result = [
-                    'responseCode' => $err->getCode(),
-                    'error' => $err->getMessage()
-                ];
+                $result = $this->process->getError(ProcessAuthInterface::API_METHOD);
             }
             return $result;
         }

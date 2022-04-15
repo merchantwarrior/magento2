@@ -2,6 +2,8 @@
 <config xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
         xsi:noNamespaceSchemaLocation="urn:magento:framework:ObjectManager/etc/config.xsd">
     <!-- Direct API -->
+    <preference for="MerchantWarrior\Payment\Api\Direct\ProcessInterface"
+                type="MerchantWarrior\Payment\Model\Api\Direct\Process" />
     <preference for="MerchantWarrior\Payment\Api\Direct\RefundCardInterface"
                 type="MerchantWarrior\Payment\Model\Api\Direct\RefundCard" />
     <preference for="MerchantWarrior\Payment\Api\Direct\ProcessVoidInterface"

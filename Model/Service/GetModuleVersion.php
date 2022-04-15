@@ -9,6 +9,7 @@ use Magento\Framework\Component\ComponentRegistrarInterface;
 use Magento\Framework\Exception\FileSystemException;
 use Magento\Framework\Serialize\SerializerInterface;
 use Magento\Framework\Filesystem\DriverInterface;
+use Magento\Framework\Filesystem\Driver\File;
 
 /**
  * Class GetModuleVersion
@@ -34,12 +35,12 @@ class GetModuleVersion
     /**
      * GetModuleVersion constructor.
      *
-     * @param DriverInterface $driver
+     * @param File $driver
      * @param SerializerInterface $serializer
      * @param ComponentRegistrarInterface $componentRegistrar
      */
     public function __construct(
-        DriverInterface $driver,
+        File $driver,
         SerializerInterface $serializer,
         ComponentRegistrarInterface $componentRegistrar
     ) {

@@ -89,7 +89,9 @@ class VaultDetailsHandler extends AbstractHandler
         $paymentDO = $this->readPayment($handlingSubject);
         $payment = $paymentDO->getPayment();
 
-        if ($this->isTokenExists($response['cardID'], (int)$paymentDO->getOrder()->getCustomerId())) {
+        if (isset($response['cardID'])
+            && $this->isTokenExists($response['cardID'], (int)$paymentDO->getOrder()->getCustomerId())
+        ) {
             return;
         }
 

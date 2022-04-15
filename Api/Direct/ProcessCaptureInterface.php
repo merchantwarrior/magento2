@@ -5,11 +5,12 @@ declare(strict_types=1);
 namespace MerchantWarrior\Payment\Api\Direct;
 
 use Magento\Framework\Exception\LocalizedException;
+use MerchantWarrior\Payment\Api\ApiProcessInterface;
 
 /**
  * Interface ProcessCaptureInterface
  */
-interface ProcessCaptureInterface
+interface ProcessCaptureInterface extends ApiProcessInterface
 {
     /**#@+
      * Api Method constants
