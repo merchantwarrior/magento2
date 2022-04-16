@@ -26,7 +26,7 @@ class Config extends PaymentConfig
      *
      * @param MWConfig $config
      * @param ScopeConfigInterface $scopeConfig
-     * @param $methodCode
+     * @param string|null $methodCode
      * @param string $pathPattern
      */
     public function __construct(
