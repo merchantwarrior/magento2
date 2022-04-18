@@ -21,4 +21,8 @@
         <observer name="merchant_warrior_payment_method_is_active"
                   instance="MerchantWarrior\Payment\Observer\MWIsActiveObserver" />
     </event>
+    <event name="sales_order_save_after">
+        <observer name="braintree_sales_order_save_after"
+                  instance="MerchantWarrior\Payment\Observer\SalesOrderSaveObserver" />
+    </event>
 </config>
