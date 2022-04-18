@@ -95,15 +95,10 @@ class VaultDetailsHandler extends AbstractHandler
             return;
         }
 
-        try {
-            $paymentToken = $this->getVaultPaymentToken($response);
-            if (null !== $paymentToken) {
-                $extensionAttributes = $this->getExtensionAttributes($payment);
-                $extensionAttributes->setVaultPaymentToken($paymentToken);
-            }
-        } catch (InputException | NoSuchEntityException $e) {
-            $this->logger->error($e->getMessage());
-            return;
+        $paymentToken = $this->getVaultPaymentToken($response);
+        if (null !== $paymentToken) {
+            $extensionAttributes = $this->getExtensionAttributes($payment);
+            $extensionAttributes->setVaultPaymentToken($paymentToken);
         }
     }
 
@@ -113,8 +108,6 @@ class VaultDetailsHandler extends AbstractHandler
      * @param array $response
      *
      * @return PaymentTokenInterface|null
-     * @throws InputException
-     * @throws NoSuchEntityException|Exception
      */
     protected function getVaultPaymentToken(array $response): ?PaymentTokenInterface
     {
@@ -122,24 +115,29 @@ class VaultDetailsHandler extends AbstractHandler
             return null;
         }
 
-        $paymentToken = $this->paymentTokenFactory->create(PaymentTokenFactoryInterface::TOKEN_TYPE_CREDIT_CARD);
-        $paymentToken->setGatewayToken($response['cardID']);
-        $paymentToken->setExpiresAt($this->getExpirationDate($response));
+        try {
+            $paymentToken = $this->paymentTokenFactory->create(PaymentTokenFactoryInterface::TOKEN_TYPE_CREDIT_CARD);
+            $paymentToken->setGatewayToken($response['cardID']);
+            $paymentToken->setExpiresAt($this->getExpirationDate($response));
 
-        $paymentToken->setTokenDetails(
-            $this->convertDetailsToJSON(
-                [
-                    'type' => $this->getCreditCardType($response['cardType'], 'name'),
-                    'maskedCC' => $this->formCardNumber($response['paymentCardNumber']),
-                    'expirationDate' => $response['cardExpiryMonth'] .'/'. $response['cardExpiryYear'],
-                    'cardKey' => $response['cardKey'],
-                    'ivrCardID' => $response['ivrCardID'],
-                    'code_alt' => $this->getCreditCardType($response['cardType'], 'code_alt')
-                ]
-            )
-        );
+            $paymentToken->setTokenDetails(
+                $this->convertDetailsToJSON(
+                    [
+                        'type' => $this->getCreditCardType($response['cardType'], 'name'),
+                        'maskedCC' => $this->formCardNumber($response['paymentCardNumber']),
+                        'expirationDate' => $response['cardExpiryMonth'] . '/' . $response['cardExpiryYear'],
+                        'cardKey' => $response['cardKey'],
+                        'ivrCardID' => $response['ivrCardID'],
+                        'code_alt' => $this->getCreditCardType($response['cardType'], 'code_alt')
+                    ]
+                )
+            );
+            return $paymentToken;
+        } catch (NoSuchEntityException | \Exception $err) {
+            $this->logger->error($err->getMessage());
 
-        return $paymentToken;
+            return null;
+        }
     }
 
     /**
