@@ -61,7 +61,7 @@
         <arguments>
             <argument name="code" xsi:type="const">MerchantWarrior\Payment\Model\Ui\ConfigProvider::METHOD_CODE</argument>
             <argument name="formBlockType" xsi:type="string">MerchantWarrior\Payment\Block\Form\DirectApi</argument>
-            <argument name="infoBlockType" xsi:type="string">Magento\Payment\Block\Info</argument>
+            <argument name="infoBlockType" xsi:type="string">MerchantWarrior\Payment\Block\Info\PayFrame</argument>
             <argument name="valueHandlerPool" xsi:type="object">MerchantWarriorPaymentValueHandlerPool</argument>
             <argument name="validatorPool" xsi:type="object">MerchantWarriorDirectAPIValidatorPool</argument>
             <argument name="commandPool" xsi:type="object">MerchantWarriorPaymentCommandPool</argument>
