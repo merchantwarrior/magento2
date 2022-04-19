@@ -12,6 +12,7 @@ use Magento\Payment\Gateway\Helper;
 use Magento\Sales\Api\Data\OrderInterface;
 use Magento\Sales\Model\Order;
 use Magento\Sales\Model\Order\Payment;
+use Magento\Framework\FlagManager;
 use MerchantWarrior\Payment\Logger\MerchantWarriorLogger;
 
 abstract class AbstractHandler implements HandlerInterface
@@ -27,14 +28,22 @@ abstract class AbstractHandler implements HandlerInterface
     protected MerchantWarriorLogger $logger;
 
     /**
+     * @var FlagManager
+     */
+    private FlagManager $flagManager;
+
+    /**
      * @param Session $checkoutSession
+     * @param FlagManager $flagManager
      * @param MerchantWarriorLogger $logger
      */
     public function __construct(
         Session $checkoutSession,
+        FlagManager $flagManager,
         MerchantWarriorLogger $logger
     ) {
         $this->logger = $logger;
+        $this->flagManager = $flagManager;
         $this->checkoutSession = $checkoutSession;
     }
 
@@ -67,6 +76,8 @@ abstract class AbstractHandler implements HandlerInterface
             $this->logger->error($exp->getMessage());
         }
         $payment->setTransactionId($response['transactionID']);
+
+        $this->saveTransactionId($payment->getOrder()->getIncrementId(), $response['transactionID']);
     }
 
     /**
@@ -100,5 +111,25 @@ abstract class AbstractHandler implements HandlerInterface
     protected function getOrder(): OrderInterface
     {
         return $this->checkoutSession->getLastRealOrder();
+    }
+
+    /**
+     * Save transaction ID
+     *
+     * @param string $orderId
+     * @param string $transactionId
+     *
+     * @return void
+     */
+    private function saveTransactionId(string $orderId, string $transactionId): void
+    {
+        if (($data = $this->flagManager->getFlagData('mw_transaction')) && count($data)) {
+            $data[$orderId] = $transactionId;
+        } else {
+            $data = [
+                $orderId => $transactionId
+            ];
+        }
+        $this->flagManager->saveFlag('mw_transaction', $data);
     }
 }

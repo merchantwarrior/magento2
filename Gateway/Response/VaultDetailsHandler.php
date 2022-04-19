@@ -95,11 +95,11 @@ class VaultDetailsHandler implements HandlerInterface
         $paymentDO = $this->readPayment($handlingSubject);
         $payment = $paymentDO->getPayment();
 
-//        if (isset($response['cardID'])
-//            && $this->isTokenExists($response['cardID'], (int)$paymentDO->getOrder()->getCustomerId())
-//        ) {
-//            return;
-//        }
+        if (isset($response['cardID'])
+            && $this->isTokenExists($response['cardID'], (int)$paymentDO->getOrder()->getCustomerId())
+        ) {
+            return;
+        }
 
         $paymentToken = $this->getVaultPaymentToken($response);
         if (null !== $paymentToken) {

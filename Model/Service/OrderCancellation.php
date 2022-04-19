@@ -4,12 +4,13 @@ declare(strict_types=1);
 
 namespace MerchantWarrior\Payment\Model\Service;
 
+use Magento\Framework\Exception\CouldNotSaveException;
+use Magento\Framework\Exception\InputException;
 use Magento\Framework\Exception\LocalizedException;
-use Magento\Framework\Exception\NoSuchEntityException;
+use Magento\Framework\Exception\StateException;
+use Magento\Framework\FlagManager;
 use MerchantWarrior\Payment\Api\Direct\ProcessVoidInterface;
 use MerchantWarrior\Payment\Api\Data\TransactionDetailDataInterface;
-use MerchantWarrior\Payment\Api\TransactionDetailDataRepositoryInterface;
-use MerchantWarrior\Payment\Logger\MerchantWarriorLogger;
 
 /**
  * The service to cancel an order and void authorization transaction.
@@ -17,33 +18,33 @@ use MerchantWarrior\Payment\Logger\MerchantWarriorLogger;
 class OrderCancellation
 {
     /**
+     * @var FlagManager
+     */
+    private FlagManager $flagManager;
+
+    /**
      * @var ProcessVoidInterface
      */
     private ProcessVoidInterface $processVoid;
 
     /**
-     * @var TransactionDetailDataRepositoryInterface
+     * @var CreateTransaction
      */
-    private TransactionDetailDataRepositoryInterface $transactionDetailDataRepository;
+    private CreateTransaction $createTransaction;
 
     /**
-     * @var MerchantWarriorLogger
-     */
-    private MerchantWarriorLogger $merchantWarriorLogger;
-
-    /**
+     * @param FlagManager $flagManager
      * @param ProcessVoidInterface $processVoid
-     * @param TransactionDetailDataRepositoryInterface $transactionDetailDataRepository
-     * @param MerchantWarriorLogger $merchantWarriorLogger
+     * @param CreateTransaction $createTransaction
      */
     public function __construct(
+        FlagManager $flagManager,
         ProcessVoidInterface $processVoid,
-        TransactionDetailDataRepositoryInterface $transactionDetailDataRepository,
-        MerchantWarriorLogger $merchantWarriorLogger
+        CreateTransaction $createTransaction
     ) {
+        $this->flagManager = $flagManager;
         $this->processVoid = $processVoid;
-        $this->transactionDetailDataRepository = $transactionDetailDataRepository;
-        $this->merchantWarriorLogger = $merchantWarriorLogger;
+        $this->createTransaction = $createTransaction;
     }
 
     /**
@@ -52,39 +53,57 @@ class OrderCancellation
      * @param string $incrementId
      *
      * @return bool
+     * @throws CouldNotSaveException
+     * @throws InputException
+     * @throws LocalizedException
+     * @throws StateException
      */
     public function execute(string $incrementId): bool
     {
-        if ($transaction = $this->getTransaction($incrementId)) {
-            try {
-                $this->processVoid->execute($transaction->getTransactionId());
+        if ($transaction = $this->getTransactionId($incrementId)) {
+            $this->processVoid->execute($transaction);
 
-                $transaction->setStatus(TransactionDetailDataInterface::STATUS_FAILED);
-                $this->transactionDetailDataRepository->save($transaction);
-            } catch (LocalizedException $e) {
-                $this->merchantWarriorLogger->error($e->getMessage());
-            }
+            $this->createTransaction->execute(
+                $incrementId,
+                $transaction,
+                TransactionDetailDataInterface::STATUS_FAILED
+            );
+
+            $this->unsetTransactionId($incrementId);
         }
         return true;
     }
 
     /**
-     * Get transaction
+     * Get transaction ID
      *
-     * @param string $incrementId
+     * @param string $orderId
      *
-     * @return null|TransactionDetailDataInterface
+     * @return string|null
      */
-    private function getTransaction(string $incrementId): ?TransactionDetailDataInterface
+    private function getTransactionId(string $orderId): ?string
     {
-        try {
-            $transaction = $this->transactionDetailDataRepository->getByOrderId($incrementId);
-            if ($transaction->getStatus() === TransactionDetailDataInterface::STATUS_NEW) {
-                return $transaction;
-            }
-            return null;
-        } catch (NoSuchEntityException $e) {
-            return null;
+        $data = $this->flagManager->getFlagData('mw_transaction');
+        if (count($data) && isset($data[$orderId])) {
+            return $data[$orderId];
+        }
+        return null;
+    }
+
+    /**
+     * Unset transaction ID
+     *
+     * @param string $orderId
+     *
+     * @return void
+     */
+    private function unsetTransactionId(string $orderId): void
+    {
+        $data = $this->flagManager->getFlagData('mw_transaction');
+        if (count($data) && isset($data[$orderId])) {
+            unset($data[$orderId]);
+
+            $this->flagManager->saveFlag('mw_transaction', $data);
         }
     }
 }
