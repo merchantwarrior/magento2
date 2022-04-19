@@ -8,10 +8,13 @@ use DateInterval;
 use DateTime;
 use DateTimeZone;
 use Exception;
+use Magento\Payment\Gateway\Helper;
 use Magento\Checkout\Model\Session;
 use Magento\Framework\Serialize\SerializerInterface;
 use Magento\Framework\Exception\InputException;
 use Magento\Framework\Exception\NoSuchEntityException;
+use Magento\Payment\Gateway\Data\PaymentDataObjectInterface;
+use Magento\Payment\Gateway\Response\HandlerInterface;
 use Magento\Payment\Model\InfoInterface;
 use Magento\Sales\Api\Data\OrderPaymentExtensionInterfaceFactory;
 use Magento\Sales\Api\Data\OrderPaymentExtensionInterface;
@@ -22,7 +25,7 @@ use MerchantWarrior\Payment\Model\Config;
 use MerchantWarrior\Payment\Model\Ui\PayFrame\ConfigProvider;
 use Magento\Vault\Api\Data\PaymentTokenFactoryInterface;
 
-class VaultDetailsHandler extends AbstractHandler
+class VaultDetailsHandler implements HandlerInterface
 {
     /**
      * @var PaymentTokenFactoryInterface
@@ -50,6 +53,11 @@ class VaultDetailsHandler extends AbstractHandler
     private SerializerInterface $serializer;
 
     /**
+     * @var MerchantWarriorLogger
+     */
+    private MerchantWarriorLogger $logger;
+
+    /**
      * VaultDetailsHandler constructor.
      *
      * @param PaymentTokenFactoryInterface $paymentTokenFactory
@@ -57,7 +65,6 @@ class VaultDetailsHandler extends AbstractHandler
      * @param OrderPaymentExtensionInterfaceFactory $paymentExtensionFactory
      * @param Config $config
      * @param SerializerInterface $serializer
-     * @param Session $checkoutSession
      * @param MerchantWarriorLogger $logger
      */
     public function __construct(
@@ -66,7 +73,6 @@ class VaultDetailsHandler extends AbstractHandler
         OrderPaymentExtensionInterfaceFactory $paymentExtensionFactory,
         Config $config,
         SerializerInterface $serializer,
-        Session $checkoutSession,
         MerchantWarriorLogger $logger
     ) {
         $this->paymentTokenFactory = $paymentTokenFactory;
@@ -74,7 +80,7 @@ class VaultDetailsHandler extends AbstractHandler
         $this->paymentExtensionFactory = $paymentExtensionFactory;
         $this->config = $config;
         $this->serializer = $serializer;
-        parent::__construct($checkoutSession, $logger);
+        $this->logger = $logger;
     }
 
     /**
@@ -89,11 +95,11 @@ class VaultDetailsHandler extends AbstractHandler
         $paymentDO = $this->readPayment($handlingSubject);
         $payment = $paymentDO->getPayment();
 
-        if (isset($response['cardID'])
-            && $this->isTokenExists($response['cardID'], (int)$paymentDO->getOrder()->getCustomerId())
-        ) {
-            return;
-        }
+//        if (isset($response['cardID'])
+//            && $this->isTokenExists($response['cardID'], (int)$paymentDO->getOrder()->getCustomerId())
+//        ) {
+//            return;
+//        }
 
         $paymentToken = $this->getVaultPaymentToken($response);
         if (null !== $paymentToken) {
@@ -138,6 +144,18 @@ class VaultDetailsHandler extends AbstractHandler
 
             return null;
         }
+    }
+
+    /**
+     * Reads payment from subject
+     *
+     * @param array $subject
+     *
+     * @return PaymentDataObjectInterface
+     */
+    protected function readPayment(array $subject): PaymentDataObjectInterface
+    {
+        return Helper\SubjectReader::readPayment($subject);
     }
 
     /**

@@ -45,6 +45,7 @@ class OrderCancelPlugin
      * @param \Closure $proceed
      * @param int $cartId
      * @param null|PaymentInterface $payment
+     *
      * @return int
      * @throws \Exception
      * @SuppressWarnings(PHPMD.UnusedFormalParameter)

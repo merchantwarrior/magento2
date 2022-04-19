@@ -9,24 +9,28 @@ namespace MerchantWarrior\Payment\Api\Data;
  **/
 interface TransactionDetailDataInterface
 {
-    const ENTITY_ID = 'entity_id';
-    const ORDER_ID = 'order_id';
-    const STATUS = 'status';
-    const TRANSACTION_ID = 'transaction_id';
+    public const ENTITY_ID = 'entity_id';
+    public const ORDER_ID = 'order_id';
+    public const STATUS = 'status';
+    public const TRANSACTION_ID = 'transaction_id';
 
-    const STATUS_NEW = 0;
-    const STATUS_SUCCESS = 1;
-    const STATUS_FAILED = 2;
+    public const STATUS_NEW = 1;
+    public const STATUS_SUCCESS = 2;
+    public const STATUS_FAILED = 3;
 
     /**
+     * Get entity ID
+     *
      * @return int|null
      */
     public function getId(): ?int;
 
     /**
-     * @return int
+     * Get oder ID
+     *
+     * @return string
      */
-    public function getOrderId(): int;
+    public function getOrderId(): string;
 
     /**
      * Get status
@@ -36,18 +40,11 @@ interface TransactionDetailDataInterface
     public function getStatus(): int;
 
     /**
+     * Return transaction ID
+     *
      * @return string
      */
     public function getTransactionId(): string;
-
-    /**
-     * Set ID
-     *
-     * @param int $id
-     *
-     * @return self
-     */
-    public function setId(int $id): TransactionDetailDataInterface;
 
     /**
      * Set Status
@@ -61,11 +58,11 @@ interface TransactionDetailDataInterface
     /**
      * Set Order ID
      *
-     * @param int $orderId
+     * @param string $orderId
      *
      * @return self
      */
-    public function setOrderId(int $orderId): TransactionDetailDataInterface;
+    public function setOrderId(string $orderId): TransactionDetailDataInterface;
 
     /**
      * Set transaction Source

@@ -12,6 +12,7 @@ class TransactionDetail extends AbstractModel implements TransactionDetailDataIn
 {
     /**
      * Initialize resource model
+     *
      * @return void
      */
     protected function _construct() // @codingStandardsIgnoreLine
@@ -24,9 +25,12 @@ class TransactionDetail extends AbstractModel implements TransactionDetailDataIn
      */
     public function getId(): ?int
     {
-        return $this->getData(self::ENTITY_ID);
+        return (int)$this->getData(self::ENTITY_ID);
     }
 
+    /**
+     * @inheritdoc
+     */
     public function getStatus(): int
     {
         return $this->getData(self::STATUS);
@@ -35,7 +39,7 @@ class TransactionDetail extends AbstractModel implements TransactionDetailDataIn
     /**
      * @inheritdoc
      */
-    public function getOrderId(): int
+    public function getOrderId(): string
     {
         return $this->getData(self::ORDER_ID);
     }
@@ -51,14 +55,6 @@ class TransactionDetail extends AbstractModel implements TransactionDetailDataIn
     /**
      * @inheritdoc
      */
-    public function setId(int $id): TransactionDetailDataInterface
-    {
-        return $this->setData(self::ENTITY_ID, $id);
-    }
-
-    /**
-     * @inheritdoc
-     */
     public function setStatus(int $status): TransactionDetailDataInterface
     {
         return $this->setData(self::STATUS, $status);
@@ -67,7 +63,7 @@ class TransactionDetail extends AbstractModel implements TransactionDetailDataIn
     /**
      * @inheritdoc
      */
-    public function setOrderId(int $orderId): TransactionDetailDataInterface
+    public function setOrderId(string $orderId): TransactionDetailDataInterface
     {
         return $this->setData(self::ORDER_ID, $orderId);
     }

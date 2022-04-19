@@ -25,6 +25,8 @@
     <preference for="MerchantWarrior\Payment\Api\Token\ProcessInterface"
                 type="MerchantWarrior\Payment\Model\Api\Token\Process" />
     <!-- Resource Models -->
+    <preference for="MerchantWarrior\Payment\Api\TransactionDetailDataRepositoryInterface"
+                type="MerchantWarrior\Payment\Model\TransactionDetailRepository" />
     <preference for="MerchantWarrior\Payment\Api\Data\TransactionDetailDataInterface"
                 type="MerchantWarrior\Payment\Model\TransactionDetail" />
 
