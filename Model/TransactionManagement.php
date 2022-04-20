@@ -2,20 +2,16 @@
 
 declare(strict_types=1);
 
-namespace MerchantWarrior\Payment\Model\Service;
+namespace MerchantWarrior\Payment\Model;
 
-use Magento\Framework\Exception\CouldNotSaveException;
-use Magento\Framework\Exception\InputException;
+use Magento\Framework\Exception\AlreadyExistsException;
 use Magento\Framework\Exception\NoSuchEntityException;
-use Magento\Framework\Exception\StateException;
 use MerchantWarrior\Payment\Api\Data\TransactionDetailDataInterface;
 use MerchantWarrior\Payment\Api\Data\TransactionDetailDataInterfaceFactory;
 use MerchantWarrior\Payment\Api\TransactionDetailDataRepositoryInterface;
+use MerchantWarrior\Payment\Model\ResourceModel\TransactionDetail;
 
-/**
- * The service creating a new transaction
- */
-class CreateTransaction
+class TransactionManagement
 {
     /**
      * @var TransactionDetailDataInterfaceFactory
@@ -28,15 +24,21 @@ class CreateTransaction
     private TransactionDetailDataRepositoryInterface $transactionDetailRepository;
 
     /**
-     * SalesOrderPlaceObserver constructor.
-     *
+     * @var TransactionDetail
+     */
+    private TransactionDetail $transactionDetail;
+
+    /**
+     * @param TransactionDetail $transactionDetail
      * @param TransactionDetailDataInterfaceFactory $transactionDetailFactory
      * @param TransactionDetailDataRepositoryInterface $transactionDetailRepository
      */
     public function __construct(
+        TransactionDetail $transactionDetail,
         TransactionDetailDataInterfaceFactory $transactionDetailFactory,
         TransactionDetailDataRepositoryInterface $transactionDetailRepository
     ) {
+        $this->transactionDetail = $transactionDetail;
         $this->transactionDetailFactory = $transactionDetailFactory;
         $this->transactionDetailRepository = $transactionDetailRepository;
     }
@@ -49,23 +51,50 @@ class CreateTransaction
      * @param int $status
      *
      * @return void
-     * @throws CouldNotSaveException
-     * @throws InputException
-     * @throws StateException
+     * @throws AlreadyExistsException
      */
-    public function execute(
+    public function create(
         string $orderIncrementId,
         string $transactionId,
         int $status = TransactionDetailDataInterface::STATUS_NEW
-    ) {
+    ): void {
         $transactionDetail = $this->getTransactionDetailInstance($orderIncrementId);
         if (!$transactionDetail->getId()) {
             $transactionDetail->setOrderId($orderIncrementId);
             $transactionDetail->setStatus($status);
             $transactionDetail->setTransactionId($transactionId);
 
-            $this->transactionDetailRepository->save($transactionDetail);
+            $this->transactionDetail->save($transactionDetail);
         }
+    }
+
+    /**
+     * Get transaction
+     *
+     * @param string $orderIncrementId
+     *
+     * @return TransactionDetailDataInterface|null
+     */
+    public function getTransaction(string $orderIncrementId): ?TransactionDetailDataInterface
+    {
+        try {
+            return $this->transactionDetailRepository->getByOrderId($orderIncrementId);
+        } catch (NoSuchEntityException $e) {
+            return null;
+        }
+    }
+
+    /**
+     * Change transaction status
+     *
+     * @param string $orderId
+     * @param int $status
+     *
+     * @return void
+     */
+    public function changeStatus(string $orderId, int $status): void
+    {
+        $this->transactionDetail->changeStatus([$orderId], $status);
     }
 
     /**

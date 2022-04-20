@@ -25,7 +25,8 @@ class TransactionDetail extends AbstractModel implements TransactionDetailDataIn
      */
     public function getId(): ?int
     {
-        return (int)$this->getData(self::ENTITY_ID);
+        return $this->hasData(self::ENTITY_ID)
+            ? (int)$this->getData(self::ENTITY_ID) : null;
     }
 
     /**

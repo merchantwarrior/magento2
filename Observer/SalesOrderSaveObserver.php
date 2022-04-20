@@ -4,31 +4,32 @@ declare(strict_types=1);
 
 namespace MerchantWarrior\Payment\Observer;
 
-use Magento\Framework\Exception\CouldNotSaveException;
-use Magento\Framework\Exception\InputException;
-use Magento\Framework\Exception\StateException;
+use Magento\Framework\Exception\AlreadyExistsException;
 use Magento\Framework\Event\Observer;
 use Magento\Framework\Event\ObserverInterface;
+use Magento\Sales\Api\Data\OrderInterface;
 use Magento\Sales\Model\Order;
-use MerchantWarrior\Payment\Model\Service\CreateTransaction;
+use Magento\Sales\Model\Order\Invoice;
+use MerchantWarrior\Payment\Api\Data\TransactionDetailDataInterface;
+use MerchantWarrior\Payment\Model\TransactionManagement;
 use MerchantWarrior\Payment\Model\Ui\ConfigProvider;
 
 class SalesOrderSaveObserver implements ObserverInterface
 {
     /**
-     * @var CreateTransaction
+     * @var TransactionManagement
      */
-    private CreateTransaction $createTransaction;
+    private TransactionManagement $transactionManagement;
 
     /**
      * SalesOrderPlaceObserver constructor.
      *
-     * @param CreateTransaction $createTransaction
+     * @param TransactionManagement $transactionManagement
      */
     public function __construct(
-        CreateTransaction $createTransaction
+        TransactionManagement $transactionManagement
     ) {
-        $this->createTransaction = $createTransaction;
+        $this->transactionManagement = $transactionManagement;
     }
 
     /**
@@ -37,9 +38,7 @@ class SalesOrderSaveObserver implements ObserverInterface
      * @param Observer $observer
      *
      * @return void
-     * @throws CouldNotSaveException
-     * @throws InputException
-     * @throws StateException
+     * @throws AlreadyExistsException
      */
     public function execute(Observer $observer)
     {
@@ -52,10 +51,57 @@ class SalesOrderSaveObserver implements ObserverInterface
 
         $paymentMethod = $order->getPayment()->getMethod();
         if (0 === strpos($paymentMethod, ConfigProvider::METHOD_CODE)) {
-            $additionalInformation = $order->getPayment()->getAdditionalInformation();
-            if (!empty($additionalInformation['transactionID'])) {
-                $this->createTransaction->execute($order->getIncrementId(), $additionalInformation['transactionID']);
+            $this->createTransactionRow($order);
+        }
+    }
+
+    /**
+     * Create transaction row
+     *
+     * @param OrderInterface $order
+     *
+     * @return void
+     * @throws AlreadyExistsException
+     */
+    private function createTransactionRow(OrderInterface $order): void
+    {
+        $additionalInformation = $order->getPayment()->getAdditionalInformation();
+        if (!empty($additionalInformation['transactionID'])) {
+            if ($this->transactionManagement->getTransaction($order->getIncrementId())) {
+                $this->transactionManagement->changeStatus(
+                    $order->getIncrementId(),
+                    $this->getTransactionStatus($order)
+                );
+            } else {
+                $this->transactionManagement->create(
+                    $order->getIncrementId(),
+                    $additionalInformation['transactionID'],
+                    $this->getTransactionStatus($order)
+                );
             }
         }
+    }
+
+    /**
+     * Get transaction status
+     *
+     * @param OrderInterface $order
+     *
+     * @return int
+     */
+    private function getTransactionStatus(OrderInterface $order): int
+    {
+        $invoices = $order->getInvoiceCollection();
+        if (!$invoices->count()) {
+            return TransactionDetailDataInterface::STATUS_NEW;
+        }
+
+        $status = TransactionDetailDataInterface::STATUS_SUCCESS;
+        foreach ($invoices as $invoice) {
+            if ($invoice->getState() !== Invoice::STATE_PAID) {
+                $status = TransactionDetailDataInterface::STATUS_NEW;
+            }
+        }
+        return $status;
     }
 }

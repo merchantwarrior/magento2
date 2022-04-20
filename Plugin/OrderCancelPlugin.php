@@ -7,9 +7,8 @@ namespace MerchantWarrior\Payment\Plugin;
 use Magento\Quote\Api\CartManagementInterface;
 use Magento\Quote\Api\CartRepositoryInterface;
 use Magento\Quote\Api\Data\PaymentInterface;
-use MerchantWarrior\Payment\Model\Service\OrderCancellation;
+use MerchantWarrior\Payment\Model\Service\RollbackTransaction;
 use MerchantWarrior\Payment\Model\Ui\ConfigProvider;
-use MerchantWarrior\Payment\Model\Ui\PayFrame\ConfigProvider as PFConfigProvider;
 
 /**
  * Cancels an order and an authorization transaction.
@@ -17,9 +16,9 @@ use MerchantWarrior\Payment\Model\Ui\PayFrame\ConfigProvider as PFConfigProvider
 class OrderCancelPlugin
 {
     /**
-     * @var OrderCancellation
+     * @var RollbackTransaction
      */
-    private OrderCancellation $orderCancellation;
+    private RollbackTransaction $rollbackTransaction;
 
     /**
      * @var CartRepositoryInterface
@@ -27,14 +26,14 @@ class OrderCancelPlugin
     private CartRepositoryInterface $quoteRepository;
 
     /**
-     * @param OrderCancellation $orderCancellation
+     * @param RollbackTransaction $rollbackTransaction
      * @param CartRepositoryInterface $quoteRepository
      */
     public function __construct(
-        OrderCancellation $orderCancellation,
+        RollbackTransaction $rollbackTransaction,
         CartRepositoryInterface $quoteRepository
     ) {
-        $this->orderCancellation = $orderCancellation;
+        $this->rollbackTransaction = $rollbackTransaction;
         $this->quoteRepository = $quoteRepository;
     }
 
@@ -61,16 +60,11 @@ class OrderCancelPlugin
         } catch (\Exception $e) {
             $quote = $this->quoteRepository->get((int) $cartId);
             $payment = $quote->getPayment();
-            $paymentCodes = [
-                ConfigProvider::METHOD_CODE,
-                ConfigProvider::CC_VAULT_CODE,
-                PFConfigProvider::METHOD_CODE
-            ];
-            if (in_array($payment->getMethod(), $paymentCodes, true)) {
-                $incrementId = $quote->getReservedOrderId();
-                $this->orderCancellation->execute($incrementId);
-            }
 
+            if (0 === strpos($payment->getMethod(), ConfigProvider::METHOD_CODE)) {
+                $incrementId = $quote->getReservedOrderId();
+                $this->rollbackTransaction->execute($incrementId);
+            }
             throw $e;
         }
     }

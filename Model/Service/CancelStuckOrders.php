@@ -13,7 +13,6 @@ use MerchantWarrior\Payment\Model\Ui\PayFrame\ConfigProvider;
 
 /**
  * Class CancelStuckOrders
- * Return current module version
  */
 class CancelStuckOrders
 {

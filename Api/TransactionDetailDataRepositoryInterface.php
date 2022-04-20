@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace MerchantWarrior\Payment\Api;
 
+use Magento\Framework\Exception\CouldNotDeleteException;
 use Magento\Framework\Exception\InputException;
 use Magento\Framework\Exception\StateException;
 use Magento\Framework\Exception\CouldNotSaveException;
@@ -65,6 +66,7 @@ interface TransactionDetailDataRepositoryInterface
      *
      * @return bool Will returned True if deleted
      * @throws StateException
+     * @throws CouldNotDeleteException
      */
     public function delete(TransactionDetailDataInterface $data): bool;
 
@@ -75,6 +77,7 @@ interface TransactionDetailDataRepositoryInterface
      *
      * @return bool Will returned True if deleted
      * @throws NoSuchEntityException
+     * @throws CouldNotDeleteException
      * @throws StateException
      */
     public function deleteById(int $entityId): bool;
