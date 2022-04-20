@@ -24,6 +24,11 @@
                 type="MerchantWarrior\Payment\Model\Api\Token\RemoveCard" />
     <preference for="MerchantWarrior\Payment\Api\Token\ProcessInterface"
                 type="MerchantWarrior\Payment\Model\Api\Token\Process" />
+    <!-- Resource Models -->
+    <preference for="MerchantWarrior\Payment\Api\TransactionDetailDataRepositoryInterface"
+                type="MerchantWarrior\Payment\Model\TransactionDetailRepository" />
+    <preference for="MerchantWarrior\Payment\Api\Data\TransactionDetailDataInterface"
+                type="MerchantWarrior\Payment\Model\TransactionDetail" />
 
     <virtualType name="MerchantWarrior\Payment\Block\Form\DirectApi" type="Magento\Payment\Block\Form\Cc">
         <arguments>
@@ -528,5 +533,9 @@
                 <item name="debug" xsi:type="object">Magento\Framework\Logger\Handler\Debug</item>
             </argument>
         </arguments>
+    </type>
+
+    <type name="Magento\Quote\Api\CartManagementInterface">
+        <plugin name="merchant_warrior_order_cancellation" type="MerchantWarrior\Payment\Plugin\OrderCancelPlugin"/>
     </type>
 </config>

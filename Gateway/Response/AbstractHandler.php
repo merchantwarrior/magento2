@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace MerchantWarrior\Payment\Gateway\Response;
 
 use Magento\Checkout\Model\Session;
+use Magento\Framework\Exception\AlreadyExistsException;
 use Magento\Framework\Exception\LocalizedException;
 use Magento\Payment\Gateway\Data\PaymentDataObjectInterface;
 use Magento\Payment\Gateway\Response\HandlerInterface;
@@ -13,6 +14,7 @@ use Magento\Sales\Api\Data\OrderInterface;
 use Magento\Sales\Model\Order;
 use Magento\Sales\Model\Order\Payment;
 use MerchantWarrior\Payment\Logger\MerchantWarriorLogger;
+use MerchantWarrior\Payment\Model\TransactionManagement;
 
 abstract class AbstractHandler implements HandlerInterface
 {
@@ -27,14 +29,22 @@ abstract class AbstractHandler implements HandlerInterface
     protected MerchantWarriorLogger $logger;
 
     /**
+     * @var TransactionManagement
+     */
+    private TransactionManagement $transactionManagement;
+
+    /**
      * @param Session $checkoutSession
+     * @param TransactionManagement $transactionManagement
      * @param MerchantWarriorLogger $logger
      */
     public function __construct(
         Session $checkoutSession,
+        TransactionManagement $transactionManagement,
         MerchantWarriorLogger $logger
     ) {
         $this->logger = $logger;
+        $this->transactionManagement = $transactionManagement;
         $this->checkoutSession = $checkoutSession;
     }
 
@@ -45,6 +55,7 @@ abstract class AbstractHandler implements HandlerInterface
      * @param array $response
      *
      * @return void
+     * @throws AlreadyExistsException
      */
     protected function fillAdditionalData(Payment $payment, array $response): void
     {
@@ -67,6 +78,8 @@ abstract class AbstractHandler implements HandlerInterface
             $this->logger->error($exp->getMessage());
         }
         $payment->setTransactionId($response['transactionID']);
+
+        $this->transactionManagement->create($payment->getOrder()->getIncrementId(), $response['transactionID']);
     }
 
     /**

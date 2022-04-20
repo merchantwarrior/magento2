@@ -1,0 +1,9 @@
+<?xml version="1.0"?>
+<config xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="urn:magento:module:Magento_Cron:etc/crontab.xsd">
+    <group id="merchant_warrior_payment">
+        <job name="merchant_warrior_cancel_expired_orders"
+             instance="MerchantWarrior\Payment\Cron\CancelOrders" method="execute">
+            <schedule>0 0 * * *</schedule>
+        </job>
+    </group>
+</config>

@@ -1,0 +1,16 @@
+{
+    "merchant_warrior_transaction_details": {
+        "column": {
+            "entity_id": true,
+            "order_id": true,
+            "status": true,
+            "transaction_id": true
+        },
+        "index": {
+            "MERCHANT_WARRIOR_TRANSACTION_DETAILS_ORDER_ID": true
+        },
+        "constraint": {
+            "PRIMARY": true
+        }
+    }
+}
