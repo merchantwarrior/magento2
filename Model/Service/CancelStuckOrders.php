@@ -5,12 +5,13 @@ declare(strict_types=1);
 namespace MerchantWarrior\Payment\Model\Service;
 
 use Magento\Sales\Api\Data\OrderInterface;
-use Magento\Sales\Api\OrderManagementInterface;
+use Magento\Sales\Api\OrderRepositoryInterface;
 use Magento\Sales\Model\Order;
 use Magento\Sales\Model\ResourceModel\Order\Collection;
 use Magento\Framework\Stdlib\DateTime\TimezoneInterface;
 use MerchantWarrior\Payment\Model\Ui\ConfigProvider;
 use MerchantWarrior\Payment\Model\Ui\PayFrame\ConfigProvider as PFConfigProvider;
+use MerchantWarrior\Payment\Logger\MerchantWarriorLogger;
 
 /**
  * Class CancelStuckOrders
@@ -28,43 +29,75 @@ class CancelStuckOrders
     private TimezoneInterface $timezone;
 
     /**
-     * @var OrderManagementInterface
+     * @var MerchantWarriorLogger
      */
-    private OrderManagementInterface $orderManagement;
+    private MerchantWarriorLogger $warriorLogger;
+
+    /**
+     * @var OrderRepositoryInterface
+     */
+    private OrderRepositoryInterface $orderRepository;
 
     /**
      * CancelStuckOrders constructor.
      *
      * @param Collection $collection
      * @param TimezoneInterface $timezone
-     * @param OrderManagementInterface $orderManagement
+     * @param OrderRepositoryInterface $orderRepository
+     * @param MerchantWarriorLogger $warriorLogger
      */
     public function __construct(
         Collection $collection,
         TimezoneInterface $timezone,
-        OrderManagementInterface $orderManagement
+        OrderRepositoryInterface $orderRepository,
+        MerchantWarriorLogger $warriorLogger
     ) {
         $this->collection = $collection;
         $this->timezone = $timezone;
-        $this->orderManagement = $orderManagement;
+        $this->orderRepository = $orderRepository;
+        $this->warriorLogger = $warriorLogger;
     }
 
     /**
      * Get module version
      *
      * @return void
+     * @throws \Exception
      */
     public function execute(): void
     {
-        $now = $this->timezone->date();
         foreach ($this->getOrders() as $order) {
-            $purchasedDate = $this->timezone->date($order->getCreatedAt())->add(new \DateInterval('P1D'));
-            if ($now > $purchasedDate) {
-                $order->getPayment()->deny();
+            if ((int)$order->getId() !== 94) {
+                continue;
+            }
 
-                $this->orderManagement->cancel($order->getEntityId());
+            $diffMinutes = $this->getDiffInHours($order);
+            if ($diffMinutes >= 480) {
+                try {
+                    $order->getPayment()->deny();
+                    $this->orderRepository->save($order);
+                } catch (\Exception $err) {
+                    $this->warriorLogger->error($err->getMessage());
+                }
             }
         }
+    }
+
+    /**
+     * Get diff in hours
+     *
+     * @param OrderInterface $order
+     *
+     * @return float
+     */
+    private function getDiffInHours(OrderInterface $order): float
+    {
+        $timeZone = new \DateTimeZone($this->timezone->getConfigTimezone('store', $order->getStore()));
+
+        $now = $this->timezone->date()->setTimezone($timeZone)->getTimestamp();
+        $orderCreatedAt = $this->timezone->date($order->getCreatedAt())->setTimezone($timeZone)->getTimestamp();
+
+        return round (($now - $orderCreatedAt) / 60);
     }
 
     /**

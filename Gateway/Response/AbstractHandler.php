@@ -74,6 +74,9 @@ abstract class AbstractHandler implements HandlerInterface
             if (isset($response['cardExpiryYear'])) {
                 $payment->setAdditionalInformation('cardExpiryYear', $response['cardExpiryYear']);
             }
+            if (isset($response['authSettledDate'])) {
+                $payment->setAdditionalInformation('authSettledDate', $response['authSettledDate']);
+            }
         } catch (LocalizedException $exp) {
             $this->logger->error($exp->getMessage());
         }
