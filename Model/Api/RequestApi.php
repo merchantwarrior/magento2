@@ -22,12 +22,6 @@ abstract class RequestApi implements RequestApiInterface
     public const REQUEST_MODE_JSON = true;
     /**#@-*/
 
-    /**#@+
-     * Success response code
-     */
-    public const SUCCESS_CODE = 0;
-    /**#@-*/
-
     /**
      * @var Config
      */
@@ -62,11 +56,6 @@ abstract class RequestApi implements RequestApiInterface
      * @var Parser
      */
     protected Parser $xmlParser;
-
-    /**
-     * @var bool
-     */
-    protected bool $authoriseCall = false;
 
     /**
      * @var int|null
@@ -352,6 +341,8 @@ abstract class RequestApi implements RequestApiInterface
      */
     protected function beforeCall(array $data = []): void
     {
+        $this->clearData();
+
         $this->eventManager->dispatch(
             'merchant_warrior_post_before',
             [
@@ -381,5 +372,17 @@ abstract class RequestApi implements RequestApiInterface
                 'call_time'     => $this->getCallTime(),
             ]
         );
+    }
+
+    /**
+     * Clear stored data
+     *
+     * @return void
+     */
+    private function clearData(): void
+    {
+        $this->data = [];
+        $this->response = [];
+        $this->status = 200;
     }
 }

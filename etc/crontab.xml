@@ -3,7 +3,7 @@
     <group id="merchant_warrior_payment">
         <job name="merchant_warrior_cancel_expired_orders"
              instance="MerchantWarrior\Payment\Cron\CancelOrders" method="execute">
-            <schedule>0 0 * * *</schedule>
+            <schedule>0 */8 * * *</schedule>
         </job>
     </group>
 </config>
