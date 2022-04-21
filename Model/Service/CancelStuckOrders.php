@@ -9,7 +9,8 @@ use Magento\Sales\Api\OrderManagementInterface;
 use Magento\Sales\Model\Order;
 use Magento\Sales\Model\ResourceModel\Order\Collection;
 use Magento\Framework\Stdlib\DateTime\TimezoneInterface;
-use MerchantWarrior\Payment\Model\Ui\PayFrame\ConfigProvider;
+use MerchantWarrior\Payment\Model\Ui\ConfigProvider;
+use MerchantWarrior\Payment\Model\Ui\PayFrame\ConfigProvider as PFConfigProvider;
 
 /**
  * Class CancelStuckOrders
@@ -57,8 +58,10 @@ class CancelStuckOrders
     {
         $now = $this->timezone->date();
         foreach ($this->getOrders() as $order) {
-            $purchasedDate = $this->timezone->date($order->getPurchasedAt())->add(new \DateInterval('P1D'));
+            $purchasedDate = $this->timezone->date($order->getCreatedAt())->add(new \DateInterval('P1D'));
             if ($now > $purchasedDate) {
+                $order->getPayment()->deny();
+
                 $this->orderManagement->cancel($order->getEntityId());
             }
         }
@@ -86,7 +89,7 @@ class CancelStuckOrders
             'payment.method',
             [
                 [
-                    'eq' => ConfigProvider::METHOD_CODE
+                    'in' => [PFConfigProvider::METHOD_CODE, ConfigProvider::METHOD_CODE, ConfigProvider::CC_VAULT_CODE]
                 ]
             ]
         )->addFieldToFilter(
