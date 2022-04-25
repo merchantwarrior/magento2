@@ -34,6 +34,27 @@
             <!--/ko-->
         </div>
 
+        <!-- ko if: showCvvVerify() -->
+        <div class="field cvv required" data-bind="attr: {id: getId() + '_cvv_div'}">
+            <label data-bind="attr: {for: getId() + '_cid'}" class="label">
+                <span><!-- ko i18n: 'Card Verification Number'--><!-- /ko --></span>
+            </label>
+            <div class="control">
+                <div data-bind="attr: {id: getId() + '_cid'}" class="hosted-control hosted-cid">
+                    <input type="number"
+                           class="input-text cvv"
+                           data-bind="attr: { id: getId() + '_cc_cid' }"
+                           name="payment[cc_cid]"
+                           value=""
+                           placeholder="123"
+                           data-validate='{"required":true, "minlength": 3, "maxLength": 4}'
+                    />
+                </div>
+                <div class="hosted-error"><!-- ko i18n: 'Please, enter valid Card Verification Number'--><!-- /ko --></div>
+            </div>
+        </div>
+        <!-- /ko -->
+
         <div class="checkout-agreements-block">
             <!-- ko foreach: $parent.getRegion('before-place-order') -->
                 <!-- ko template: getTemplate() --><!-- /ko -->

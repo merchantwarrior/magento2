@@ -12,10 +12,10 @@
             <label>Title</label>
             <config_path>payment/merchant_warrior_cc_vault/title</config_path>
         </field>
-        <field id="cc_vault_cvv" translate="label" type="select" sortOrder="25" showInDefault="1" showInWebsite="1" showInStore="0">
+        <field id="cc_vault_cvv" translate="label" type="select" sortOrder="25" showInDefault="1" showInWebsite="1" showInStore="1">
             <label>Enable Vault CVV Re-verification</label>
             <source_model>Magento\Config\Model\Config\Source\Yesno</source_model>
-            <config_path>payment/merchant_warrior_cc_vault/cvv</config_path>
+            <config_path>payment/merchant_warrior_cc_vault/cc_vault_cvv</config_path>
             <depends>
                 <field id="active">1</field>
             </depends>

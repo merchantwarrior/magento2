@@ -1,0 +1,54 @@
+//
+//  Vault Container
+//  _____________________________________________
+
+& when (@media-common = true) {
+    #payment-method-mw-cc-vault {
+        .field {
+            &.required {
+                .label {
+                    font-weight: @font-weight__semibold;
+
+                    &:after {
+                        content: '*';
+                        color: @color-red10;
+                        .lib-font-size(18px);
+                        margin: 0 0 0 5px;
+                    }
+                }
+            }
+
+            .input-text {
+                .lib-input-placeholder();
+                &::placeholder {
+                    opacity: .5;
+                }
+            }
+
+            .hosted-control {
+                background: @color-white;
+                font-family: @font-family__base;
+                .lib-font-size(14px);
+                height: 32px;
+                vertical-align: baseline;
+                box-sizing: border-box;
+                position: relative;
+                width: 5rem;
+
+                &.mw-hosted-fields-invalid:not(.mw-hosted-fields-focused) ~ .hosted-error {
+                    height: auto;
+                    opacity: 1;
+                }
+            }
+
+            .hosted-error {
+                clear: both;
+                color: @color-red10;
+                .lib-font-size(12px);
+                height: 0;
+                margin-top: 7px;
+                opacity: 0;
+            }
+        }
+    }
+}

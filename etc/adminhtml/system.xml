@@ -4,13 +4,11 @@
         <section id="payment" translate="label" type="text" sortOrder="400" showInDefault="1" showInWebsite="1" showInStore="1">
             <group id="merchant_warrior_group_all_in_one" translate="label comment" type="text" sortOrder="5" showInDefault="1" showInWebsite="1" showInStore="1">
                 <label>Merchant Warrior Payments</label>
-                <comment><![CDATA[Merchant Warrior Payments]]></comment>
                 <attribute type="expanded">1</attribute>
                 <fieldset_css>complex</fieldset_css>
                 <frontend_model>MerchantWarrior\Payment\Block\Adminhtml\System\Config\Fieldset\Group</frontend_model>
-                <include path="MerchantWarrior_Payment::system/getting_started.xml"/>
-                <include path="MerchantWarrior_Payment::system/basic_settings.xml"/>
-                <include path="MerchantWarrior_Payment::system/configure_payment_methods.xml"/>
+                <include path="MerchantWarrior_Payment::system/basic.xml"/>
+                <include path="MerchantWarrior_Payment::system/payment_methods.xml"/>
             </group>
         </section>
     </system>

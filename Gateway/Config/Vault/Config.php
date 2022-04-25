@@ -46,9 +46,6 @@ class Config extends PaymentConfig
      */
     public function isCvvVerifyEnabled(): bool
     {
-        return (bool) $this->getValue(
-            self::CC_VAULT_CVV,
-            $this->config->getStoreId()
-        );
+        return (bool)$this->getValue(self::CC_VAULT_CVV, $this->config->getStoreId());
     }
 }

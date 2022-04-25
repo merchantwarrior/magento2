@@ -1,8 +1,6 @@
 <?xml version="1.0"?>
 <mapping xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="urn:magento:module:Magento_Payment:etc/error_mapping.xsd">
     <message_list>
-        <message code="MW - 006:Card has expired" translate="true">Card has expired.</message>
-        <message code="MW - 011:Invalid transactionID" translate="true">Invalid Transaction ID</message>
         <message code="00" translate="true">Approved</message>
         <message code="01" translate="true">Refer to Card Issuer</message>
         <message code="02" translate="true">Refer to Issuer's special conditions</message>

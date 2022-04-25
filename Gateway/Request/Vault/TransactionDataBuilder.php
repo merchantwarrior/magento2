@@ -52,6 +52,10 @@ class TransactionDataBuilder extends AbstractDataBuilder
         if ($tdsToken = $payment->getAdditionalInformation(RequestApiInterface::PAYFRAME_THREE_DS_TOKEN)) {
             $result[RequestApiInterface::PAYFRAME_THREE_DS_TOKEN] = $tdsToken;
         }
+
+        if ($cvvCode = $payment->getAdditionalInformation(RequestApiInterface::PAYMENT_CARD_CSC)) {
+            $result[RequestApiInterface::PAYMENT_CARD_CSC] = $cvvCode;
+        }
         return $result;
     }
 }
