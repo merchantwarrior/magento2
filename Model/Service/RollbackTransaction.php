@@ -7,6 +7,7 @@ namespace MerchantWarrior\Payment\Model\Service;
 use Magento\Framework\Exception\CouldNotSaveException;
 use Magento\Framework\Exception\InputException;
 use Magento\Framework\Exception\LocalizedException;
+use Magento\Framework\Exception\NoSuchEntityException;
 use Magento\Framework\Exception\StateException;
 use MerchantWarrior\Payment\Api\Direct\ProcessVoidInterface;
 use MerchantWarrior\Payment\Api\Data\TransactionDetailDataInterface;
@@ -61,14 +62,32 @@ class RollbackTransaction
      */
     public function execute(string $incrementId): bool
     {
-        if ($transaction = $this->transactionDetailRepository->getByOrderId($incrementId)) {
-            $this->processVoid->execute($transaction->getTransactionId());
-
-            $this->transactionManagement->changeStatus(
-                $transaction->getTransactionId(),
-                TransactionDetailDataInterface::STATUS_FAILED
-            );
+        if (!$transaction = $this->getTransaction($incrementId)) {
+            return false;
         }
+
+        $this->processVoid->execute($transaction->getTransactionId());
+
+        $this->transactionManagement->changeStatus(
+            $transaction->getTransactionId(),
+            TransactionDetailDataInterface::STATUS_FAILED
+        );
         return true;
+    }
+
+    /**
+     * Get transaction
+     *
+     * @param string $incrementId
+     *
+     * @return TransactionDetailDataInterface|null
+     */
+    private function getTransaction(string $incrementId): ?TransactionDetailDataInterface
+    {
+        try {
+            return $this->transactionDetailRepository->getByOrderId($incrementId);
+        } catch (NoSuchEntityException $e) {
+            return null;
+        }
     }
 }

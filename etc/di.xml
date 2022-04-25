@@ -535,6 +535,12 @@
         </arguments>
     </type>
 
+    <type name="MerchantWarrior\Payment\Gateway\Config\Vault\Config">
+        <arguments>
+            <argument name="methodCode" xsi:type="const">MerchantWarrior\Payment\Model\Ui\Vault\ConfigProvider::METHOD_CODE</argument>
+        </arguments>
+    </type>
+
     <type name="Magento\Quote\Api\CartManagementInterface">
         <plugin name="merchant_warrior_order_cancellation" type="MerchantWarrior\Payment\Plugin\OrderCancelPlugin"/>
     </type>

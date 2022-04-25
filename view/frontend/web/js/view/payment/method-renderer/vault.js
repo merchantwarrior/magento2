@@ -7,7 +7,6 @@ define([
     'Magento_Checkout/js/model/payment/additional-validators',
     'Magento_Checkout/js/model/full-screen-loader',
     'MerchantWarrior_Payment/js/action/place-order',
-    'mage/url'
 ], function (
     ko,
     $,
@@ -16,8 +15,7 @@ define([
     globalMessageList,
     additionalValidators,
     fullScreenLoader,
-    placeOrderAction,
-    url
+    placeOrderAction
 ) {
     'use strict';
 
@@ -28,21 +26,15 @@ define([
             template: 'MerchantWarrior_Payment/payment/cc/vault',
             vaultedCVV: ko.observable(""),
             isValidCvv: false,
-            icon: '',
-            onInstanceReady: function (instance) {
-                instance.on('validityChange', this.onValidityChange.bind(this));
-            }
+            invalidClass: 'mw-hosted-fields-invalid',
+            icon: ''
         },
 
         /**
-         * Event fired by Braintree SDK whenever input value length matches the validation length.
-         * In the case of a CVV, this is 3, or 4 for AMEX.
-         * @param event
+         * Init component
          */
-        onValidityChange: function (event) {
-            if (event.emittedBy === 'cvv') {
-                this.isValidCvv = event.fields.cvv.isValid;
-            }
+        initialize: function () {
+            this._super();
         },
 
         /**
@@ -62,29 +54,6 @@ define([
             let active = this.getId() === this.isChecked();
             this.active(active);
             return active;
-        },
-
-        /**
-         * Fired whenever a payment option is changed.
-         * @param isActive
-         */
-        onActiveChange: function (isActive) {
-            var self = this;
-
-            if (!isActive) {
-                return;
-            }
-
-            if (self.showCvvVerify()) {
-
-            }
-        },
-
-        /**
-         * Initialize the CVV input field with the Hosted Fields SDK.
-         */
-        initHostedCvvField: function () {
-
         },
 
         /**
@@ -153,17 +122,30 @@ define([
          *
          * @returns {boolean}
          */
-        validateCvv: function (selector, state) {
-            let $selector = $(selector),
-                invalidClass = 'mw-hosted-fields-invalid';
+        validateCvv: function (selector) {
+            let $selector = $(selector);
+            let value = $selector.val();
 
-            if (state === true) {
-                $selector.removeClass(invalidClass);
-                return true;
+            $selector.parent('.hosted-control').removeClass(this.invalidClass);
+            $selector.on('change', () => {
+                $selector.parent('.hosted-control').removeClass(this.invalidClass);
+            });
+
+            if (value.length === 0) {
+                $selector.parent('.hosted-control').addClass(this.invalidClass);
+                return false;
             }
 
-            $selector.addClass(invalidClass);
-            return false;
+            if (this.getCardType() === 'amex' && value.length !== 4) {
+                $selector.parent('.hosted-control').addClass(this.invalidClass);
+                return false;
+            }
+
+            if (this.getCardType() !== 'amex' && value.length !== 3) {
+                $selector.parent('.hosted-control').addClass(this.invalidClass);
+                return false;
+            }
+            return true;
         },
 
         /**
@@ -185,7 +167,7 @@ define([
             let self = this;
 
             if (self.showCvvVerify()) {
-                if (!self.validateCvv('#' + self.getId() + '_cid', self.isValidCvv)
+                if (!self.validateCvv('#' + self.getId() + '_cc_cid')
                     || !additionalValidators.validate()
                 ) {
                     return;
@@ -198,28 +180,32 @@ define([
 
             fullScreenLoader.startLoader();
 
-            if (self.showCvvVerify()) {
-                fullScreenLoader.stopLoader();
-                globalMessageList.addErrorMessage({
-                    message: 'CVV verification failed.'
-                });
-            } else {
-                $.when(
-                    placeOrderAction(this.getData())
-                ).fail(
-                    () => {
-                        this.afterPlaceOrder.bind(this);
-                    }
-                ).done(
-                    () => {
-                        this.afterPlaceOrder.bind(this);
-                    }
-                ).always(
-                    () => {
-                        fullScreenLoader.stopLoader(true);
-                    }
-                );
-            }
+            $.when(
+                placeOrderAction(this.getData())
+            ).fail(
+                () => {
+                    this.afterPlaceOrder.bind(this);
+                }
+            ).done(
+                () => {
+                    this.afterPlaceOrder.bind(this);
+                }
+            ).always(
+                () => {
+                   this._resetForm()
+                }
+            );
+        },
+
+        /**
+         * Reset payment form
+         *
+         * @return {void}
+         * @private
+         */
+        _resetForm: function () {
+            fullScreenLoader.stopLoader(true);
+            $('#' + this.getId() + '_cc_cid').val('');
         },
 
         /**
@@ -230,11 +216,16 @@ define([
          * @private
          */
         _formTransactionResultData: function () {
-            return {
+            let transactionResult = {
                 cartId: quote.getQuoteId(),
                 email: quote.guestEmail,
-                public_hash: this.publicHash
+                public_hash: this.publicHash,
             };
+
+            if (this.showCvvVerify()) {
+                transactionResult.paymentCardCSC = $('#' + this.getId() + '_cc_cid').val();
+            }
+            return transactionResult;
         },
     });
 });

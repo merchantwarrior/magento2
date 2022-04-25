@@ -265,6 +265,22 @@ class Config
     }
 
     /**
+     * Get payment action
+     *
+     * @param string $paymentCode
+     *
+     * @return string
+     */
+    public function getPaymentAction(string $paymentCode): string
+    {
+        return $this->scopeConfig->getValue(
+            'payment/' . $paymentCode . '/payment_action',
+            ScopeInterface::SCOPE_STORE,
+            $this->getStoreId()
+        );
+    }
+
+    /**
      * Get store ID
      *
      * @return int
