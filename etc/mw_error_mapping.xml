@@ -103,5 +103,28 @@
         <message code="XA" translate="true">Forward to issuer</message>
         <message code="XD" translate="true">Forward to issuer</message>
         <message code="XX" translate="true">Unknown Code</message>
+        <message code="100" translate="true">Transaction Deny</message>
+        <message code="101" translate="true">Expired Card / Invalid Expiration Date</message>
+        <message code="102" translate="true">Suspected Fraud</message>
+        <message code="104" translate="true">Restricted Card</message>
+        <message code="106" translate="true">Exceeded PIN attempts</message>
+        <message code="109" translate="true">Invalid merchant</message>
+        <message code="110" translate="true">Invalid amount</message>
+        <message code="111" translate="true">Invalid account / Invalid MICR (Travelers Cheque)</message>
+        <message code="115" translate="true">Requested function not supported</message>
+        <message code="117" translate="true">Invalid PIN</message>
+        <message code="119" translate="true">Transaction not permitted to cardholder</message>
+        <message code="122" translate="true">Invalid card security code (a.k.a., CID, 4DBC, 4CSC)</message>
+        <message code="125" translate="true">Invalid effective date</message>
+        <message code="130" translate="true">Additional customer identification required</message>
+        <message code="181" translate="true">Format error</message>
+        <message code="183" translate="true">Invalid currency code</message>
+        <message code="187" translate="true">Deny - New card issued</message>
+        <message code="189" translate="true">Deny - Canceled or Closed Merchant/SE</message>
+        <message code="200" translate="true">Deny - Pick up card</message>
+        <message code="400" translate="true">Reversal Accepted</message>
+        <message code="900" translate="true">Accepted - ATC Synchronization</message>
+        <message code="909" translate="true">System Malfunction (Cryptographic Error)</message>
+        <message code="912" translate="true">Issuer not available</message>
     </message_list>
 </mapping>

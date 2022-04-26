@@ -62,24 +62,31 @@ class CancelStuckOrders
      * Get module version
      *
      * @return void
-     * @throws \Exception
      */
     public function execute(): void
     {
         foreach ($this->getOrders() as $order) {
-            if ((int)$order->getId() !== 94) {
-                continue;
-            }
-
             $diffMinutes = $this->getDiffInHours($order);
             if ($diffMinutes >= 480) {
-                try {
-                    $order->getPayment()->deny();
-                    $this->orderRepository->save($order);
-                } catch (\Exception $err) {
-                    $this->warriorLogger->error($err->getMessage());
-                }
+                $this->cancelOrder($order);
             }
+        }
+    }
+
+    /**
+     * Cancel order
+     *
+     * @param OrderInterface $order
+     *
+     * @return void
+     */
+    private function cancelOrder(OrderInterface  $order): void
+    {
+        try {
+            $order->getPayment()->deny();
+            $this->orderRepository->save($order);
+        } catch (\Exception $err) {
+            $this->warriorLogger->error($err->getMessage());
         }
     }
 

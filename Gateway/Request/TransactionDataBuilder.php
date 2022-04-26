@@ -31,23 +31,7 @@ class TransactionDataBuilder extends AbstractDataBuilder
             RequestApiInterface::TRANSACTION_CURRENCY
                 => $order->getCurrencyCode(),
             RequestApiInterface::TRANSACTION_PRODUCT
-                => $this->getProductData($order)
+                => 'ORDER_ID ' . $order->getOrderIncrementId()
         ];
-    }
-
-    /**
-     * Get product data
-     *
-     * @param OrderAdapterInterface $order
-     *
-     * @return string
-     */
-    private function getProductData(OrderAdapterInterface $order): string
-    {
-        $items = [];
-        foreach ($order->getItems() as $item) {
-            $items[] = $item->getSku();
-        }
-        return implode(',', $items);
     }
 }
