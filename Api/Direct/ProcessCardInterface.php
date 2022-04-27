@@ -15,7 +15,7 @@ interface ProcessCardInterface extends ApiProcessInterface
     /**#@+
      * Api Method constants
      */
-    const API_METHOD = 'processCard';
+    public const API_METHOD = 'processCard';
     /**#@-*/
 
     /**

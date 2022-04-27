@@ -46,6 +46,12 @@ class Process extends RequestApi implements ProcessInterface
      */
     private function validate(array $data): void
     {
+        if (empty($data[self::TRANSACTION_AMOUNT])) {
+            throw new LocalizedException(__('You must enter correct transaction data!'));
+        }
 
+        if (empty($data[self::TRANSACTION_CURRENCY])) {
+            throw new LocalizedException(__('You must enter correct transaction data!'));
+        }
     }
 }

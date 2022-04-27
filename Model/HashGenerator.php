@@ -65,7 +65,7 @@ class HashGenerator
         $apiPassPhrase = $this->config->getPassPhrase();
         $merchantUUID  = $this->config->getMerchantUserId();
 
-        $transactionID = $data[RequestApiInterface::TRANSACTION_ID];
+        $transactionID = $data[RequestApiInterface::TRANSACTION_ID] ?? '';
 
         $hash = md5($apiPassPhrase) . $merchantUUID . $transactionID;
 
@@ -85,8 +85,8 @@ class HashGenerator
         $apiPassPhrase = $this->config->getPassPhrase();
         $merchantUUID  = $this->config->getMerchantUserId();
 
-        $transactionAmount   = $data[RequestApiInterface::TRANSACTION_AMOUNT];
-        $transactionCurrency = $data[RequestApiInterface::TRANSACTION_CURRENCY];
+        $transactionAmount   = $data[RequestApiInterface::TRANSACTION_AMOUNT] ?? '';
+        $transactionCurrency = $data[RequestApiInterface::TRANSACTION_CURRENCY] ?? '';
 
         $hash = md5($apiPassPhrase) . $merchantUUID . $transactionAmount . $transactionCurrency;
 
@@ -105,7 +105,7 @@ class HashGenerator
         $apiPassPhrase = $this->config->getPassPhrase();
         $merchantUUID  = $this->config->getMerchantUserId();
 
-        $transactionID = $data[RequestApiInterface::TRANSACTION_ID];
+        $transactionID = $data[RequestApiInterface::TRANSACTION_ID] ?? '';
 
         $hash = md5($apiPassPhrase) . strtolower($merchantUUID . $transactionID);
 
