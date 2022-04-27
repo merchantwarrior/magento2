@@ -20,6 +20,8 @@ class ProcessCapture extends RequestApi implements ProcessCaptureInterface
             return [];
         }
 
+        $this->validate($transactionParams);
+
         $transactionParams[self::METHOD] = self::API_METHOD;
 
         return $this->sendRequest(self::API_METHOD, $transactionParams);
@@ -38,13 +40,19 @@ class ProcessCapture extends RequestApi implements ProcessCaptureInterface
     /**
      * Validate
      *
-     * @param string $date
+     * @param array $data
      *
      * @return void
      * @throws LocalizedException
      */
-    private function validate(string $date): void
+    private function validate(array $data): void
     {
-        // TODO: Add additional validation
+        if (empty($data[self::TRANSACTION_AMOUNT])) {
+            throw new LocalizedException(__('You must enter correct transaction data!'));
+        }
+
+        if (empty($data[self::TRANSACTION_CURRENCY])) {
+            throw new LocalizedException(__('You must enter correct transaction data!'));
+        }
     }
 }

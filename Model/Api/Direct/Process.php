@@ -62,10 +62,10 @@ class Process extends RequestApi implements ProcessInterface
      */
     private function validateQueryDD(array $data): void
     {
-        if (!isset($data[self::TRANSACTION_ID])) {
+        if (empty($data[self::TRANSACTION_ID])) {
             throw new LocalizedException(__('You must set Transaction ID!'));
         }
-        if (!isset($data[self::TRANSACTION_REFERENCE_ID])) {
+        if (empty($data[self::TRANSACTION_REFERENCE_ID])) {
             throw new LocalizedException(__('You must set Transaction Reference ID!'));
         }
     }

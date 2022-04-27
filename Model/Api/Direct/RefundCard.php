@@ -46,19 +46,19 @@ class RefundCard extends RequestApi implements RefundCardInterface
      */
     private function validate(array $data): void
     {
-        if (!isset($data[self::TRANSACTION_AMOUNT])) {
+        if (empty($data[self::TRANSACTION_AMOUNT])) {
             throw new LocalizedException(__('Transaction Amount is missed!'));
         }
 
-        if (!isset($data[self::TRANSACTION_CURRENCY])) {
+        if (empty($data[self::TRANSACTION_CURRENCY])) {
             throw new LocalizedException(__('Transaction Currency is missed!'));
         }
 
-        if (!isset($data[self::TRANSACTION_ID])) {
+        if (empty($data[self::TRANSACTION_ID])) {
             throw new LocalizedException(__('Transaction ID is missed!'));
         }
 
-        if (!isset($data[self::REFUND_AMOUNT])) {
+        if (empty($data[self::REFUND_AMOUNT])) {
             throw new LocalizedException(__('Refund Amount is missed!'));
         }
     }

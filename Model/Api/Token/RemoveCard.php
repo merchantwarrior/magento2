@@ -49,7 +49,7 @@ class RemoveCard extends RequestApi implements RemoveCardInterface
      */
     private function validate(array $data): void
     {
-        if (!isset($data['cardID'])) {
+        if (empty($data['cardID'])) {
             throw new LocalizedException(__('Your card data is incorrect!'));
         }
     }

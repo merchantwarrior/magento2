@@ -46,7 +46,7 @@ class AddCard extends RequestApi implements AddCardInterface
      */
     private function validate(array $data): void
     {
-        if (!isset($data['cardID'])) {
+        if (empty($data['cardID'])) {
             throw new LocalizedException(__('Your card ID is incorrect!'));
         }
     }

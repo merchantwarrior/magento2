@@ -43,7 +43,7 @@ class CardRenderer extends AbstractTokenRenderer
      *
      * @return boolean
      */
-    public function canRender(PaymentTokenInterface $token)
+    public function canRender(PaymentTokenInterface $token): bool
     {
         return $token->getPaymentMethodCode() === ConfigProvider::METHOD_CODE;
     }
@@ -51,7 +51,7 @@ class CardRenderer extends AbstractTokenRenderer
     /**
      * @return string
      */
-    public function getNumberLast4Digits()
+    public function getNumberLast4Digits(): string
     {
         return $this->getTokenDetails()['maskedCC'];
     }
@@ -59,7 +59,7 @@ class CardRenderer extends AbstractTokenRenderer
     /**
      * @return string
      */
-    public function getType()
+    public function getType(): string
     {
         return $this->getTokenDetails()['type'];
     }
@@ -67,7 +67,7 @@ class CardRenderer extends AbstractTokenRenderer
     /**
      * @return string
      */
-    public function getExpDate()
+    public function getExpDate(): string
     {
         return $this->getTokenDetails()['expirationDate'];
     }
