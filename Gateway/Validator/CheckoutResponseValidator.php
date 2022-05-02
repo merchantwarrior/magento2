@@ -8,24 +8,24 @@ use Magento\Payment\Gateway\Helper\SubjectReader;
 use Magento\Payment\Gateway\Validator\AbstractValidator;
 use Magento\Payment\Gateway\Validator\ResultInterface;
 use Magento\Payment\Gateway\Validator\ResultInterfaceFactory;
-use MerchantWarrior\Payment\Logger\MerchantWarriorLogger;
+use Psr\Log\LoggerInterface;
 
 class CheckoutResponseValidator extends AbstractValidator
 {
     /**
-     * @var MerchantWarriorLogger
+     * @var LoggerInterface
      */
-    private MerchantWarriorLogger $logger;
+    private LoggerInterface $logger;
 
     /**
      * CheckoutResponseValidator constructor.
      *
      * @param ResultInterfaceFactory $resultFactory
-     * @param MerchantWarriorLogger $logger
+     * @param LoggerInterface $logger
      */
     public function __construct(
         ResultInterfaceFactory $resultFactory,
-        MerchantWarriorLogger $logger
+        LoggerInterface $logger
     ) {
         $this->logger = $logger;
         parent::__construct($resultFactory);

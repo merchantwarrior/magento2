@@ -22,12 +22,8 @@ define([
     return VaultComponent.extend({
         defaults: {
             active: false,
-            hostedFieldsInstance: null,
             template: 'MerchantWarrior_Payment/payment/cc/vault',
-            vaultedCVV: ko.observable(""),
-            isValidCvv: false,
             invalidClass: 'mw-hosted-fields-invalid',
-            icon: ''
         },
 
         /**

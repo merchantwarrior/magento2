@@ -5,8 +5,8 @@ declare(strict_types=1);
 namespace MerchantWarrior\Payment\Model;
 
 use Magento\Framework\DataObject;
-use MerchantWarrior\Payment\Logger\MerchantWarriorLogger;
 use Monolog\Utils;
+use Psr\Log\LoggerInterface;
 
 class Debugger
 {
@@ -16,9 +16,9 @@ class Debugger
     private Config $config;
 
     /**
-     * @var MerchantWarriorLogger
+     * @var LoggerInterface
      */
-    private MerchantWarriorLogger $logger;
+    private LoggerInterface $logger;
 
     /**
      * @var DataObject
@@ -29,30 +29,15 @@ class Debugger
      * DebugObserver constructor.
      *
      * @param Config $config
-     * @param MerchantWarriorLogger $logger
+     * @param LoggerInterface $logger
      */
     public function __construct(
         Config $config,
-        MerchantWarriorLogger $logger
+        LoggerInterface $logger
     ) {
         $this->config = $config;
         $this->logger = $logger;
         $this->debugData = new DataObject();
-    }
-
-    /**
-     * Add debug data
-     *
-     * @param string $key
-     * @param string|array|int $value
-     *
-     * @return Debugger
-     */
-    public function addDataByKey(string $key, $value): Debugger
-    {
-        $this->debugData->setData($key, $value);
-
-        return $this;
     }
 
     /**
@@ -79,22 +64,22 @@ class Debugger
     public function execute(): void
     {
         if ($this->config->isDebuggerEnabled()) {
-            $this->logger->addMerchantWarriorDebug('Start Log: ==================');
+            $this->logger->debug('Start Log: ==================');
 
             if ($this->debugData->hasData('responseCode')) {
-                $this->logger->addMerchantWarriorDebug('Response Code: ' . $this->debugData->getData('responseCode'));
+                $this->logger->debug('Response Code: ' . $this->debugData->getData('responseCode'));
                 $this->debugData->unsetData('responseCode');
             }
 
             if ($this->debugData->hasData('responseMessage')) {
-                $this->logger->addMerchantWarriorDebug('Response Message: ' . $this->debugData->getData('responseMessage'));
+                $this->logger->debug('Response Message: ' . $this->debugData->getData('responseMessage'));
                 $this->debugData->unsetData('responseMessage');
             }
 
-            $this->logger->addMerchantWarriorDebug(
+            $this->logger->debug(
                 Utils::jsonEncode($this->debugData->toArray(), JSON_PRETTY_PRINT)
             );
-            $this->logger->addMerchantWarriorDebug('End Log: ====================');
+            $this->logger->debug('End Log: ====================');
         }
 
         $this->debugData->unsetData();
