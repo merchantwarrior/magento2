@@ -30,6 +30,26 @@
     <preference for="MerchantWarrior\Payment\Api\Data\TransactionDetailDataInterface"
                 type="MerchantWarrior\Payment\Model\TransactionDetail" />
 
+    <!-- Loggers Init -->
+    <virtualType name="MerchantWarrior\Payment\Model\Debug" type="Magento\Framework\Logger\Handler\Debug">
+        <arguments>
+            <argument name="fileName" xsi:type="string">/var/log/merchant_warrior/debug.log</argument>
+        </arguments>
+    </virtualType>
+    <virtualType name="MerchantWarrior\Payment\Model\Error" type="Magento\Framework\Logger\Handler\Exception">
+        <arguments>
+            <argument name="fileName" xsi:type="string">/var/log/merchant_warrior/exception.log</argument>
+        </arguments>
+    </virtualType>
+    <virtualType name="MerchantWarrior\Payment\Model\Logger" type="Magento\Framework\Logger\Monolog">
+        <arguments>
+            <argument name="handlers" xsi:type="array">
+                <item name="debug" xsi:type="object">MerchantWarrior\Payment\Model\Debug</item>
+                <item name="error" xsi:type="object">MerchantWarrior\Payment\Model\Error</item>
+            </argument>
+        </arguments>
+    </virtualType>
+
     <virtualType name="MerchantWarrior\Payment\Block\Form\DirectApi" type="Magento\Payment\Block\Form\Cc">
         <arguments>
             <argument name="data" xsi:type="array">
@@ -72,7 +92,7 @@
             <argument name="valueHandlerPool" xsi:type="object">MerchantWarriorPaymentValueHandlerPool</argument>
             <argument name="validatorPool" xsi:type="object">MerchantWarriorDirectAPIValidatorPool</argument>
             <argument name="commandPool" xsi:type="object">MerchantWarriorPaymentCommandPool</argument>
-            <argument name="logger" xsi:type="object">MerchantWarrior\Payment\Logger\MerchantWarriorLogger</argument>
+            <argument name="logger" xsi:type="object">MerchantWarrior\Payment\Model\Logger</argument>
         </arguments>
     </virtualType>
 
@@ -85,7 +105,7 @@
             <argument name="valueHandlerPool" xsi:type="object">MerchantWarriorPaymentPayFrameValueHandlerPool</argument>
             <argument name="commandPool" xsi:type="object">MerchantWarriorPaymentPayFrameCommandPool</argument>
             <argument name="validatorPool" xsi:type="object">MerchantWarriorValidatorPool</argument>
-            <argument name="logger" xsi:type="object">MerchantWarrior\Payment\Logger\MerchantWarriorLogger</argument>
+            <argument name="logger" xsi:type="object">MerchantWarrior\Payment\Model\Logger</argument>
         </arguments>
     </virtualType>
 
@@ -96,7 +116,7 @@
             <argument name="valueHandlerPool" xsi:type="object">MerchantWarriorVaultPaymentValueHandlerPool</argument>
             <argument name="code" xsi:type="const">MerchantWarrior\Payment\Model\Ui\ConfigProvider::CC_VAULT_CODE</argument>
             <argument name="vaultProvider" xsi:type="object">MerchantWarriorPayFrameFacade</argument>
-            <argument name="logger" xsi:type="object">MerchantWarrior\Payment\Logger\MerchantWarriorLogger</argument>
+            <argument name="logger" xsi:type="object">MerchantWarrior\Payment\Model\Logger</argument>
         </arguments>
     </virtualType>
 
@@ -234,7 +254,7 @@
     <!-- Checkout Response validator -->
     <virtualType name="CheckoutResponseValidator" type="MerchantWarrior\Payment\Gateway\Validator\CheckoutResponseValidator">
         <arguments>
-            <argument name="loggerInterface" xsi:type="object">MerchantWarrior\Payment\Logger\MerchantWarriorLogger</argument>
+            <argument name="loggerInterface" xsi:type="object">MerchantWarrior\Payment\Model\Logger</argument>
         </arguments>
     </virtualType>
 
@@ -518,23 +538,6 @@
         </arguments>
     </virtualType>
 
-    <type name="MerchantWarrior\Payment\Logger\MerchantWarriorLogger">
-        <arguments>
-            <argument name="name" xsi:type="string">MerchantWarriorLogger</argument>
-            <argument name="handlers"  xsi:type="array">
-                <item name="merchantWarriorDebug" xsi:type="object">MerchantWarrior\Payment\Logger\Handler\MerchantWarriorDebug</item>
-                <item name="merchantWarriorNotification" xsi:type="object">MerchantWarrior\Payment\Logger\Handler\MerchantWarriorNotification</item>
-                <item name="merchantWarriorResult" xsi:type="object">MerchantWarrior\Payment\Logger\Handler\MerchantWarriorResult</item>
-                <item name="merchantWarriorCronjob" xsi:type="object">MerchantWarrior\Payment\Logger\Handler\MerchantWarriorCronjob</item>
-                <item name="merchantWarriorInfo" xsi:type="object">MerchantWarrior\Payment\Logger\Handler\MerchantWarriorInfo</item>
-                <item name="merchantWarriorError" xsi:type="object">MerchantWarrior\Payment\Logger\Handler\MerchantWarriorError</item>
-                <item name="merchantWarriorWarning" xsi:type="object">MerchantWarrior\Payment\Logger\Handler\MerchantWarriorWarning</item>
-                <item name="system" xsi:type="object">Magento\Framework\Logger\Handler\System</item>
-                <item name="debug" xsi:type="object">Magento\Framework\Logger\Handler\Debug</item>
-            </argument>
-        </arguments>
-    </type>
-
     <type name="MerchantWarrior\Payment\Gateway\Config\Vault\Config">
         <arguments>
             <argument name="methodCode" xsi:type="const">MerchantWarrior\Payment\Model\Ui\Vault\ConfigProvider::METHOD_CODE</argument>
@@ -550,6 +553,22 @@
             <argument name="commands" xsi:type="array">
                 <item name="merchant_warrior_cancel_orders" xsi:type="object">MerchantWarrior\Payment\Console\CancelOrdersCommand</item>
             </argument>
+        </arguments>
+    </type>
+
+    <type name="MerchantWarrior\Payment\Model\Debugger">
+        <arguments>
+            <argument name="logger" xsi:type="object">MerchantWarrior\Payment\Model\Logger</argument>
+        </arguments>
+    </type>
+    <type name="MerchantWarrior\Payment\Model\Service\CancelStuckOrders">
+        <arguments>
+            <argument name="logger" xsi:type="object">MerchantWarrior\Payment\Model\Logger</argument>
+        </arguments>
+    </type>
+    <type name="MerchantWarrior\Payment\Gateway\Response\VaultDetailsHandler">
+        <arguments>
+            <argument name="logger" xsi:type="object">MerchantWarrior\Payment\Model\Logger</argument>
         </arguments>
     </type>
 </config>

@@ -4,6 +4,8 @@ declare(strict_types=1);
 
 namespace MerchantWarrior\Payment\Gateway\Request;
 
+use MerchantWarrior\Payment\Model\Api\RequestApiInterface;
+
 /**
  * Class RefundDataBuilder
  */
@@ -24,10 +26,12 @@ class RefundDataBuilder extends AbstractDataBuilder
         $creditMemo = $payment->getCreditMemo();
 
         return [
-            'transactionAmount' => $this->getTransactionAmount($creditMemo->getGrandTotal()),
-            'transactionCurrency' => $creditMemo->getOrderCurrencyCode(),
-            'transactionID' => $this->clearTransactionId($payment->getTransactionId()),
-            'refundAmount' => $this->getTransactionAmount($creditMemo->getGrandTotal())
+            RequestApiInterface::TRANSACTION_ID => $this->clearTransactionId(
+                $payment->getAdditionalInformation(RequestApiInterface::TRANSACTION_ID)
+            ),
+            RequestApiInterface::TRANSACTION_AMOUNT => $this->getTransactionAmount($creditMemo->getGrandTotal()),
+            RequestApiInterface::TRANSACTION_CURRENCY => $creditMemo->getOrderCurrencyCode(),
+            RequestApiInterface::REFUND_AMOUNT => $this->getTransactionAmount($creditMemo->getGrandTotal())
         ];
     }
 }

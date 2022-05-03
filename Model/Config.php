@@ -44,10 +44,12 @@ class Config
     public const XML_PATH_PAYFRAME_ALLOWED_SPECIFIC = 'payment/merchant_warrior_payframe/allowspecific';
     public const XML_PATH_PAYFRAME_ALLOWED_SPECIFICCOUNTRY = 'payment/merchant_warrior_payframe/specificcountry';
     /**#@-*/
+
     public const XML_PATH_DIRECTAPI_ACTIVE = 'payment/merchant_warrior/active';
     public const XML_PATH_DIRECTAPI_ALLOWED_CC = 'payment/merchant_warrior/cctypes';
     public const XML_PATH_DIRECTAPI_ALLOWED_SPECIFIC = 'payment/merchant_warrior/allowspecific';
     public const XML_PATH_DIRECTAPI_ALLOWED_SPECIFICCOUNTRY = 'payment/merchant_warrior/specificcountry';
+
     /**#@+
      * Configuration debugger constants
      */

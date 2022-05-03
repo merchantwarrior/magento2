@@ -13,8 +13,8 @@ use Magento\Payment\Gateway\Helper;
 use Magento\Sales\Api\Data\OrderInterface;
 use Magento\Sales\Model\Order;
 use Magento\Sales\Model\Order\Payment;
-use MerchantWarrior\Payment\Logger\MerchantWarriorLogger;
 use MerchantWarrior\Payment\Model\TransactionManagement;
+use Psr\Log\LoggerInterface;
 
 abstract class AbstractHandler implements HandlerInterface
 {
@@ -24,9 +24,9 @@ abstract class AbstractHandler implements HandlerInterface
     protected Session $checkoutSession;
 
     /**
-     * @var MerchantWarriorLogger
+     * @var LoggerInterface
      */
-    protected MerchantWarriorLogger $logger;
+    protected LoggerInterface $logger;
 
     /**
      * @var TransactionManagement
@@ -36,12 +36,12 @@ abstract class AbstractHandler implements HandlerInterface
     /**
      * @param Session $checkoutSession
      * @param TransactionManagement $transactionManagement
-     * @param MerchantWarriorLogger $logger
+     * @param LoggerInterface $logger
      */
     public function __construct(
         Session $checkoutSession,
         TransactionManagement $transactionManagement,
-        MerchantWarriorLogger $logger
+        LoggerInterface $logger
     ) {
         $this->logger = $logger;
         $this->transactionManagement = $transactionManagement;

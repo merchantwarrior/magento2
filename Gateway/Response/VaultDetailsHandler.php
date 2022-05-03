@@ -9,9 +9,7 @@ use DateTime;
 use DateTimeZone;
 use Exception;
 use Magento\Payment\Gateway\Helper;
-use Magento\Checkout\Model\Session;
 use Magento\Framework\Serialize\SerializerInterface;
-use Magento\Framework\Exception\InputException;
 use Magento\Framework\Exception\NoSuchEntityException;
 use Magento\Payment\Gateway\Data\PaymentDataObjectInterface;
 use Magento\Payment\Gateway\Response\HandlerInterface;
@@ -20,10 +18,10 @@ use Magento\Sales\Api\Data\OrderPaymentExtensionInterfaceFactory;
 use Magento\Sales\Api\Data\OrderPaymentExtensionInterface;
 use Magento\Vault\Api\Data\PaymentTokenInterface;
 use Magento\Vault\Api\PaymentTokenManagementInterface;
-use MerchantWarrior\Payment\Logger\MerchantWarriorLogger;
 use MerchantWarrior\Payment\Model\Config;
 use MerchantWarrior\Payment\Model\Ui\PayFrame\ConfigProvider;
 use Magento\Vault\Api\Data\PaymentTokenFactoryInterface;
+use Psr\Log\LoggerInterface;
 
 class VaultDetailsHandler implements HandlerInterface
 {
@@ -53,9 +51,9 @@ class VaultDetailsHandler implements HandlerInterface
     private SerializerInterface $serializer;
 
     /**
-     * @var MerchantWarriorLogger
+     * @var LoggerInterface
      */
-    private MerchantWarriorLogger $logger;
+    private LoggerInterface $logger;
 
     /**
      * VaultDetailsHandler constructor.
@@ -65,7 +63,7 @@ class VaultDetailsHandler implements HandlerInterface
      * @param OrderPaymentExtensionInterfaceFactory $paymentExtensionFactory
      * @param Config $config
      * @param SerializerInterface $serializer
-     * @param MerchantWarriorLogger $logger
+     * @param LoggerInterface $logger
      */
     public function __construct(
         PaymentTokenFactoryInterface $paymentTokenFactory,
@@ -73,7 +71,7 @@ class VaultDetailsHandler implements HandlerInterface
         OrderPaymentExtensionInterfaceFactory $paymentExtensionFactory,
         Config $config,
         SerializerInterface $serializer,
-        MerchantWarriorLogger $logger
+        LoggerInterface $logger
     ) {
         $this->paymentTokenFactory = $paymentTokenFactory;
         $this->paymentTokenManagement = $paymentTokenManagement;

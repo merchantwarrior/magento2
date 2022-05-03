@@ -22,25 +22,21 @@ define([
     return VaultComponent.extend({
         defaults: {
             active: false,
-            hostedFieldsInstance: null,
             template: 'MerchantWarrior_Payment/payment/cc/vault',
-            vaultedCVV: ko.observable(""),
-            isValidCvv: false,
             invalidClass: 'mw-hosted-fields-invalid',
-            icon: ''
         },
 
         /**
          * Init component
          */
-        initialize: function () {
+        initialize() {
             this._super();
         },
 
         /**
          * @returns {exports}
          */
-        initObservable: function () {
+        initObservable() {
             this._super().observe(['active']);
             return this;
         },
@@ -50,7 +46,7 @@ define([
          *
          * @returns {boolean}
          */
-        isActive: function () {
+        isActive() {
             let active = this.getId() === this.isChecked();
             this.active(active);
             return active;
@@ -61,7 +57,7 @@ define([
          *
          * @returns {string}
          */
-        getCode: function () {
+        getCode() {
             return 'merchant_warrior_cc_vault';
         },
 
@@ -69,7 +65,7 @@ define([
          * Get last 4 digits of card
          * @returns {String}
          */
-        getMaskedCard: function () {
+        getMaskedCard() {
             return this.details.maskedCC;
         },
 
@@ -77,7 +73,7 @@ define([
          * Get expiration date
          * @returns {String}
          */
-        getExpirationDate: function () {
+        getExpirationDate() {
             return this.details.expirationDate;
         },
 
@@ -85,7 +81,7 @@ define([
          * Get card type
          * @returns {String}
          */
-        getCardType: function () {
+        getCardType() {
             return this.details.type;
         },
 
@@ -93,7 +89,7 @@ define([
          * Get show CVV Field
          * @returns {Boolean}
          */
-        showCvvVerify: function () {
+        showCvvVerify() {
             return window.checkoutConfig.payment[this.code].cvvVerify;
         },
 
@@ -104,7 +100,7 @@ define([
          *
          * @return {*}
          */
-        getIcon: function (cctype) {
+        getIcon(cctype) {
             let type = cctype.toLocaleLowerCase(),
                 icons = window.checkoutConfig.payment[this.code].icons;
 
@@ -118,31 +114,31 @@ define([
          * Show or hide the error message.
          *
          * @param selector
-         * @param state
          *
          * @returns {boolean}
          */
-        validateCvv: function (selector) {
+        validateCvv(selector) {
             let $selector = $(selector);
-            let value = $selector.val();
+            let value = $selector.val(),
+                hostedElClass = '.hosted-control';
 
-            $selector.parent('.hosted-control').removeClass(this.invalidClass);
+            $selector.parent(hostedElClass).removeClass(this.invalidClass);
             $selector.on('change', () => {
-                $selector.parent('.hosted-control').removeClass(this.invalidClass);
+                $selector.parent(hostedElClass).removeClass(this.invalidClass);
             });
 
             if (value.length === 0) {
-                $selector.parent('.hosted-control').addClass(this.invalidClass);
+                $selector.parent(hostedElClass).addClass(this.invalidClass);
                 return false;
             }
 
             if (this.getCardType() === 'amex' && value.length !== 4) {
-                $selector.parent('.hosted-control').addClass(this.invalidClass);
+                $selector.parent(hostedElClass).addClass(this.invalidClass);
                 return false;
             }
 
             if (this.getCardType() !== 'amex' && value.length !== 3) {
-                $selector.parent('.hosted-control').addClass(this.invalidClass);
+                $selector.parent(hostedElClass).addClass(this.invalidClass);
                 return false;
             }
             return true;
@@ -153,7 +149,7 @@ define([
          *
          * @return {{additional_data: {transaction_result: *}, method}}
          */
-        getData: function() {
+        getData() {
             return {
                 'method': this.item.method,
                 'additional_data': this._formTransactionResultData()
@@ -163,13 +159,9 @@ define([
         /**
          * Place order
          */
-        placeOrder: function () {
-            let self = this;
-
-            if (self.showCvvVerify()) {
-                if (!self.validateCvv('#' + self.getId() + '_cc_cid')
-                    || !additionalValidators.validate()
-                ) {
+        placeOrder() {
+            if (this.showCvvVerify()) {
+                if (!this.validateCvv('#' + this.getId() + '_cc_cid') || !additionalValidators.validate()) {
                     return;
                 }
             } else {
@@ -203,7 +195,7 @@ define([
          * @return {void}
          * @private
          */
-        _resetForm: function () {
+        _resetForm() {
             fullScreenLoader.stopLoader(true);
             $('#' + this.getId() + '_cc_cid').val('');
         },
@@ -215,7 +207,7 @@ define([
          *
          * @private
          */
-        _formTransactionResultData: function () {
+        _formTransactionResultData() {
             let transactionResult = {
                 cartId: quote.getQuoteId(),
                 email: quote.guestEmail,

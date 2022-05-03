@@ -1,7 +1,6 @@
 define([
     'jquery',
     'ko',
-    'underscore',
     'Magento_Checkout/js/view/payment/default',
     'Magento_Checkout/js/model/quote',
     'Magento_Catalog/js/price-utils',
@@ -13,7 +12,6 @@ define([
 ], function (
     $,
     ko,
-    _,
     Component,
     quote,
     priceUtils,
@@ -50,7 +48,7 @@ define([
         /**
          * Init component
          */
-        initialize: function () {
+        initialize() {
             this._super();
 
             if (!this.isActive()) {
@@ -60,17 +58,17 @@ define([
             this.vaultEnabler = new VaultEnabler();
             this.vaultEnabler.setPaymentCode(this.getVaultCode());
 
-            this.isChecked.subscribe(function(methodCode) {
+            this.isChecked.subscribe((methodCode) => {
                 if (methodCode === this.item.method) {
                     this._initMwPayFrame();
                 }
-            }.bind(this));
+            });
         },
 
         /**
          * After render action
          */
-        initForm: function () {
+        initForm() {
             if (this.isChecked() === 'merchant_warrior_payframe') {
                 this._initMwPayFrame();
             }
@@ -81,7 +79,7 @@ define([
          *
          * @return {void}
          */
-        processCardAction: function () {
+        processCardAction() {
             $.when(
                 placeOrderAction(this.getData())
             ).fail(
@@ -106,7 +104,7 @@ define([
          *
          * @return {*|String} - return formatted price, 10 -> 10.00
          */
-        getFormattedPrice: function (price) {
+        getFormattedPrice(price) {
             return priceUtils.formatPrice(
                 price,
                 {
@@ -126,9 +124,9 @@ define([
          *
          * @return {string}
          */
-        getItemsSku: function () {
+        getItemsSku() {
             let skus = '';
-            _.each(quote.getItems(), (item) => {
+            quote.getItems().forEach((item) => {
                 skus += item.sku + ', ';
             });
             return skus;
@@ -139,7 +137,7 @@ define([
          *
          * @return {boolean} - is enabled
          */
-        isActive: function () {
+        isActive() {
             return !!(window.checkoutConfig.payment.merchant_warrior_payframe && this._getPaymentConfig('active'));
         },
 
@@ -148,7 +146,7 @@ define([
          *
          * @returns {String}
          */
-        getVaultCode: function () {
+        getVaultCode() {
             return this._getPaymentConfig('ccVaultCode');
         },
 
@@ -157,7 +155,7 @@ define([
          *
          * @returns {Boolean}
          */
-        isVaultEnabled: function () {
+        isVaultEnabled() {
             return this.vaultEnabler.isVaultEnabled();
         },
 
@@ -166,7 +164,7 @@ define([
          *
          * @return {{additional_data: {transaction_result: *}, method}}
          */
-        getData: function() {
+        getData() {
             return {
                 'method': this.item.method,
                 'additional_data': this._formTransactionResultData()
@@ -176,7 +174,7 @@ define([
         /**
          * Save order
          */
-        placeOrder: function (data, event) {
+        placeOrder(data, event) {
             if (event) {
                 event.preventDefault();
             }
@@ -194,7 +192,7 @@ define([
          *
          * @return {string}
          */
-        getSaveToVaultId: function () {
+        getSaveToVaultId() {
             return this.getCode() + '_enable_vault';
         },
 
@@ -202,10 +200,9 @@ define([
          * Form and return transaction data
          *
          * @return {{payframeKey: *, cartId: *, payframeToken: *, tdsToken: *, email}}
-         *
          * @private
          */
-        _formTransactionResultData: function () {
+        _formTransactionResultData() {
             let transactionResult = {
                 payframeToken: this.payframeToken,
                 payframeKey: this.payframeKey,
@@ -227,12 +224,12 @@ define([
          * @return {boolean}
          * @private
          */
-        _isSaveToVaultEnabled: function () {
+        _isSaveToVaultEnabled() {
             if (!this.isVaultEnabled()) {
                 return false;
             }
 
-            let isSaveToVault = document.getElementById(this.getSaveToVaultId());
+            const isSaveToVault = document.getElementById(this.getSaveToVaultId());
             if (typeof isSaveToVault !== "undefined" && isSaveToVault !== null) {
                 return isSaveToVault.checked;
             }
@@ -244,9 +241,9 @@ define([
          *
          * @private
          */
-        _initMwPayFrame: function () {
+        _initMwPayFrame() {
             fullScreenLoader.startLoader();
-            $('#' + this.mwCardDivId).html('');
+            document.getElementById(this.mwCardDivId).innerHTML = ''
 
             this.mwPayframe = this._initPayFrame(
                 this._getPaymentConfig('uuid'),
@@ -295,7 +292,7 @@ define([
          * @return {payframe}
          * @private
          */
-        _initPayFrame: function (uuid, apiKey, payFrameDivId, payframeSrc, submitUrl, iframeStyle, acceptedCardTypes) {
+        _initPayFrame(uuid, apiKey, payFrameDivId, payframeSrc, submitUrl, iframeStyle, acceptedCardTypes) {
             return new payframe(uuid, apiKey, payFrameDivId, payframeSrc, submitUrl, iframeStyle, acceptedCardTypes);
         },
 
@@ -311,7 +308,7 @@ define([
          * @return {tdsCheck}
          * @private
          */
-        _initTdsCheck: function (uuid, apiKey, tdsDivId, submitUrl, tstStyle) {
+        _initTdsCheck(uuid, apiKey, tdsDivId, submitUrl, tstStyle) {
             return new tdsCheck(uuid, apiKey, tdsDivId, submitUrl, tstStyle);
         },
 
@@ -324,7 +321,7 @@ define([
          *
          * @private
          */
-        _payFrameCallback: function (tokenStatus, payframeToken, payframeKey) {
+        _payFrameCallback(tokenStatus, payframeToken, payframeKey) {
             if (tokenStatus === 'HAS_TOKEN' && payframeToken && payframeKey) {
                 this.payframeToken = payframeToken;
                 this.payframeKey = payframeKey;
@@ -343,13 +340,18 @@ define([
                     this.getItemsSku()
                 );
             } else {
-                if (this.mwPayframe.responseCode == -2 || this.mwPayframe.responseCode == -3) {
+                if (this.mwPayframe.responseCode === -2 || this.mwPayframe.responseCode === -3) {
                     fullScreenLoader.stopLoader(true);
                 }
             }
         },
 
-        _payFrameLoaded: function () {
+        /**
+         * Callback function for PayFrameLoaded action
+         *
+         * @private
+         */
+        _payFrameLoaded() {
             this.isVaultShow(true);
 
             fullScreenLoader.stopLoader(true);
@@ -363,7 +365,7 @@ define([
          *
          * @private
          */
-        _tdsCallBack: function (liabilityShifted, tdsToken) {
+        _tdsCallBack(liabilityShifted, tdsToken) {
             this.tdsToken = tdsToken;
 
             if (liabilityShifted) {
@@ -395,7 +397,7 @@ define([
          * @return {*} - return string|int variables
          * @private
          */
-        _getPaymentConfig: function (key) {
+        _getPaymentConfig(key) {
             return window.checkoutConfig.payment.merchant_warrior_payframe[key];
         },
 
@@ -405,7 +407,7 @@ define([
          * @return {void}
          * @private
          */
-        _resetForm: function () {
+        _resetForm() {
             this.payframeToken = '';
             this.payframeKey = '';
             this.tdsToken = '';

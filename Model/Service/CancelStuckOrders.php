@@ -11,7 +11,7 @@ use Magento\Sales\Model\ResourceModel\Order\Collection;
 use Magento\Framework\Stdlib\DateTime\TimezoneInterface;
 use MerchantWarrior\Payment\Model\Ui\ConfigProvider;
 use MerchantWarrior\Payment\Model\Ui\PayFrame\ConfigProvider as PFConfigProvider;
-use MerchantWarrior\Payment\Logger\MerchantWarriorLogger;
+use Psr\Log\LoggerInterface;
 
 /**
  * Class CancelStuckOrders
@@ -29,9 +29,9 @@ class CancelStuckOrders
     private TimezoneInterface $timezone;
 
     /**
-     * @var MerchantWarriorLogger
+     * @var LoggerInterface
      */
-    private MerchantWarriorLogger $warriorLogger;
+    private LoggerInterface $logger;
 
     /**
      * @var OrderRepositoryInterface
@@ -44,18 +44,18 @@ class CancelStuckOrders
      * @param Collection $collection
      * @param TimezoneInterface $timezone
      * @param OrderRepositoryInterface $orderRepository
-     * @param MerchantWarriorLogger $warriorLogger
+     * @param LoggerInterface $logger
      */
     public function __construct(
         Collection $collection,
         TimezoneInterface $timezone,
         OrderRepositoryInterface $orderRepository,
-        MerchantWarriorLogger $warriorLogger
+        LoggerInterface $logger
     ) {
         $this->collection = $collection;
         $this->timezone = $timezone;
         $this->orderRepository = $orderRepository;
-        $this->warriorLogger = $warriorLogger;
+        $this->logger = $logger;
     }
 
     /**
@@ -86,7 +86,7 @@ class CancelStuckOrders
             $order->getPayment()->deny();
             $this->orderRepository->save($order);
         } catch (\Exception $err) {
-            $this->warriorLogger->error($err->getMessage());
+            $this->logger->error($err->getMessage());
         }
     }
 
