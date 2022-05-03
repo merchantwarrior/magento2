@@ -36,9 +36,9 @@
             <argument name="fileName" xsi:type="string">/var/log/merchant_warrior/debug.log</argument>
         </arguments>
     </virtualType>
-    <virtualType name="MerchantWarrior\Payment\Model\Error" type="Magento\Framework\Logger\Handler\Base">
+    <virtualType name="MerchantWarrior\Payment\Model\Error" type="Magento\Framework\Logger\Handler\Exception">
         <arguments>
-            <argument name="fileName" xsi:type="string">/var/log/merchant_warrior/error.log</argument>
+            <argument name="fileName" xsi:type="string">/var/log/merchant_warrior/exception.log</argument>
         </arguments>
     </virtualType>
     <virtualType name="MerchantWarrior\Payment\Model\Logger" type="Magento\Framework\Logger\Monolog">

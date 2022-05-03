@@ -2,6 +2,7 @@
 /**
  * Fieldset renderer for Merchant Warrior solutions group
  */
+declare(strict_types=1);
 
 namespace MerchantWarrior\Payment\Block\Adminhtml\System\Config\Fieldset;
 
@@ -32,6 +33,7 @@ class Group extends Fieldset
      * Return header comment part of html for fieldset
      *
      * @param AbstractElement $element
+     *
      * @return string
      */
     protected function _getHeaderCommentHtml($element)
@@ -56,6 +58,7 @@ class Group extends Fieldset
      * Return collapse state
      *
      * @param AbstractElement $element
+     *
      * @return bool
      */
     protected function _isCollapseState($element)
@@ -69,7 +72,6 @@ class Group extends Fieldset
         if (!empty($groupConfig['expanded'])) {
             return true;
         }
-
         return false;
     }
 }

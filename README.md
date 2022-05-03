@@ -1,10 +1,16 @@
 # MerchantWarrior Payment module M2
 Official Magento2 Plugin to connect to Payment Service Provider Merchant Warrior.
-## Install instructions:
 
-## Functionality
+## Installation
+You can install our plugin through Composer:
+```
+composer merchantwarrior/module-payment
+bin/magento module:enable MerchantWarrior_Payment
+bin/magento setup:upgrade
+```
 
-## Configurations
+## Documentation
+[API documentation](https://dox.merchantwarrior.com/)
 
 ## Support
 Magento 2.2 | Magento 2.3 | Magento 2.4
