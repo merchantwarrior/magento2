@@ -14,6 +14,8 @@
                 type="MerchantWarrior\Payment\Model\Api\Direct\ProcessCapture" />
     <preference for="MerchantWarrior\Payment\Api\Direct\ProcessCardInterface"
                 type="MerchantWarrior\Payment\Model\Api\Direct\ProcessCard" />
+    <preference for="MerchantWarrior\Payment\Api\Direct\GetSettlementInterface"
+                type="MerchantWarrior\Payment\Model\Api\Direct\GetSettlement" />
     <!-- PayFrame API -->
     <preference for="MerchantWarrior\Payment\Api\Payframe\ProcessInterface"
                 type="MerchantWarrior\Payment\Model\Api\Payframe\Process" />

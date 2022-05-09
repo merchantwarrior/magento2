@@ -21,22 +21,27 @@ class CancelStuckOrders
     /**
      * @var Collection
      */
-    private Collection $collection;
+    private $collection;
 
     /**
      * @var TimezoneInterface
      */
-    private TimezoneInterface $timezone;
+    private $timezone;
 
     /**
      * @var LoggerInterface
      */
-    private LoggerInterface $logger;
+    private $logger;
 
     /**
      * @var OrderRepositoryInterface
      */
-    private OrderRepositoryInterface $orderRepository;
+    private $orderRepository;
+
+    /**
+     * @var GetSettlementData
+     */
+    private $getSettlementData;
 
     /**
      * CancelStuckOrders constructor.
@@ -50,11 +55,13 @@ class CancelStuckOrders
         Collection $collection,
         TimezoneInterface $timezone,
         OrderRepositoryInterface $orderRepository,
+        GetSettlementData $getSettlementData,
         LoggerInterface $logger
     ) {
         $this->collection = $collection;
         $this->timezone = $timezone;
         $this->orderRepository = $orderRepository;
+        $this->getSettlementData = $getSettlementData;
         $this->logger = $logger;
     }
 
@@ -65,6 +72,8 @@ class CancelStuckOrders
      */
     public function execute(): void
     {
+        $data = $this->getSettlementData->execute('2022-05-01', '2022-05-09');
+
         foreach ($this->getOrders() as $order) {
             $diffMinutes = $this->getDiffInHours($order);
             if ($diffMinutes >= 480) {

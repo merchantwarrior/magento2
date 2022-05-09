@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace MerchantWarrior\Payment\Model;
 
 use Magento\Framework\App\Config\ScopeConfigInterface;
+use Magento\Framework\App\Filesystem\DirectoryList;
 use Magento\Framework\Exception\NoSuchEntityException;
 use Magento\Framework\Encryption\EncryptorInterface;
 use Magento\Store\Model\ScopeInterface;
@@ -56,25 +57,36 @@ class Config
     public const XML_DEBUGGER_IS_ENABLED = 'payment/merchant_warrior/debug';
     /**#@-*/
 
+    /**#@+
+     * Configuration file directories
+     */
+    public const SETTLEMENT_DIR = 'merchant_warrior/settlement';
+    /**#@-*/
+
     /**
      * @var ScopeConfigInterface
      */
-    protected ScopeConfigInterface $scopeConfig;
+    protected $scopeConfig;
 
     /**
      * @var StoreManagerInterface
      */
-    protected StoreManagerInterface $storeManager;
+    protected $storeManager;
 
     /**
      * @var EncryptorInterface
      */
-    protected EncryptorInterface $encryptor;
+    protected $encryptor;
 
     /**
      * @var DataInterface
      */
-    protected DataInterface $dataStorage;
+    protected $dataStorage;
+
+    /**
+     * @var DirectoryList
+     */
+    protected $directoryList;
 
     /**
      * Config constructor.
@@ -83,17 +95,20 @@ class Config
      * @param StoreManagerInterface $storeManager
      * @param EncryptorInterface $encryptor
      * @param DataInterface $dataStorage
+     * @param DirectoryList $directoryList
      */
     public function __construct(
         ScopeConfigInterface $scopeConfig,
         StoreManagerInterface $storeManager,
         EncryptorInterface $encryptor,
-        DataInterface $dataStorage
+        DataInterface $dataStorage,
+        DirectoryList $directoryList
     ) {
         $this->scopeConfig = $scopeConfig;
         $this->storeManager = $storeManager;
         $this->encryptor = $encryptor;
         $this->dataStorage = $dataStorage;
+        $this->directoryList = $directoryList;
     }
 
     /**
@@ -293,6 +308,23 @@ class Config
             return (int)$this->storeManager->getStore()->getId();
         } catch (NoSuchEntityException $e) {
             return (int)Store::DEFAULT_STORE_ID;
+        }
+    }
+
+    /**
+     * Get full path to directory with backups
+     *
+     * @return string
+     */
+    public function getSettlementDir(): string
+    {
+        try {
+            return $this->directoryList->getPath(DirectoryList::VAR_DIR)
+                . DIRECTORY_SEPARATOR
+                . self::SETTLEMENT_DIR
+                . DIRECTORY_SEPARATOR;
+        } catch (\Exception $e) {
+            return '';
         }
     }
 

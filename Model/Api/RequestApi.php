@@ -11,8 +11,10 @@ use Magento\Framework\Event\ManagerInterface;
 use Magento\Framework\Xml\Parser;
 use Magento\Framework\Serialize\SerializerInterface;
 use Magento\Framework\Stdlib\DateTime\TimezoneInterface;
+use MerchantWarrior\Payment\Api\Direct\GetSettlementInterface;
 use MerchantWarrior\Payment\Model\Config;
 use MerchantWarrior\Payment\Model\HashGenerator;
+use MerchantWarrior\Payment\Model\Service\SaveToZipData;
 
 abstract class RequestApi implements RequestApiInterface
 {
@@ -25,57 +27,62 @@ abstract class RequestApi implements RequestApiInterface
     /**
      * @var Config
      */
-    protected Config $config;
+    protected $config;
 
     /**
      * @var ClientInterface
      */
-    protected ClientInterface $client;
+    protected $client;
 
     /**
      * @var ManagerInterface
      */
-    protected ManagerInterface $eventManager;
+    protected $eventManager;
 
     /**
      * @var TimezoneInterface
      */
-    protected TimezoneInterface $timezone;
+    protected $timezone;
 
     /**
      * @var SerializerInterface
      */
-    protected SerializerInterface $serializer;
+    protected $serializer;
 
     /**
      * @var HashGenerator
      */
-    protected HashGenerator $hashGenerator;
+    protected $hashGenerator;
 
     /**
      * @var Parser
      */
-    protected Parser $xmlParser;
+    protected $xmlParser;
+
+    /**
+     * @var SaveToZipData
+     */
+    protected $saveToZipData;
 
     /**
      * @var int|null
      */
-    protected ?int $callTime = null;
+    protected $callTime = null;
 
     /**
      * @var array
      */
-    protected array $data = [];
+    protected $data = [];
 
     /**
      * @var array
      */
-    protected array $response = [];
+    protected $response = [];
 
     /**
      * @var int
      */
-    protected int $status = 200;
+    protected $status = 200;
 
     /**
      * Abstract API constructor.
@@ -86,6 +93,7 @@ abstract class RequestApi implements RequestApiInterface
      * @param ManagerInterface $manager
      * @param TimezoneInterface $timezone
      * @param SerializerInterface $serializer
+     * @param SaveToZipData $saveToZipData
      * @param Parser $xmlParser
      */
     public function __construct(
@@ -95,6 +103,7 @@ abstract class RequestApi implements RequestApiInterface
         ManagerInterface $manager,
         TimezoneInterface $timezone,
         SerializerInterface $serializer,
+        SaveToZipData $saveToZipData,
         Parser $xmlParser
     ) {
         $this->config = $config;
@@ -103,6 +112,7 @@ abstract class RequestApi implements RequestApiInterface
         $this->eventManager = $manager;
         $this->timezone = $timezone;
         $this->serializer = $serializer;
+        $this->saveToZipData = $saveToZipData;
         $this->xmlParser = $xmlParser;
     }
 
@@ -256,7 +266,16 @@ abstract class RequestApi implements RequestApiInterface
         $this->response[$key] = new DataObject([]);
 
         $result = $this->client->getBody();
-        if (!empty($result)) {
+        if (empty($result)) {
+            return $this->response[$key];
+        }
+
+        if ($key === GetSettlementInterface::API_METHOD) {
+            $result = [
+                'mwResponse' => $result,
+                'responseCode' => '0'
+            ];
+        } else {
             if (self::REQUEST_MODE_JSON) {
                 $result = $this->serializer->unserialize($result);
             } else {
@@ -267,8 +286,9 @@ abstract class RequestApi implements RequestApiInterface
                     $result = [];
                 }
             }
-            $this->response[$key] = (!is_array($result)) ? new DataObject([$result]) : new DataObject($result);
         }
+        $this->response[$key] = (!is_array($result)) ? new DataObject([$result]) : new DataObject($result);
+
         return $this->response[$key];
     }
 

@@ -20,17 +20,17 @@ class GetModuleVersion
     /**
      * @var DriverInterface
      */
-    private DriverInterface $driver;
+    private $driver;
 
     /**
      * @var SerializerInterface
      */
-    private SerializerInterface $serializer;
+    private $serializer;
 
     /**
      * @var ComponentRegistrarInterface
      */
-    private ComponentRegistrarInterface $componentRegistrar;
+    private $componentRegistrar;
 
     /**
      * GetModuleVersion constructor.

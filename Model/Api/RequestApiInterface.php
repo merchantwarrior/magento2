@@ -61,4 +61,11 @@ interface RequestApiInterface
      */
     public const PAYFRAME_ADD_TO_CARD_KEY = 'addCard';
     /**#@-*/
+
+    /**#@+
+     * Additional Api Settlement Method constants
+     */
+    public const SETTLEMENT_FROM = 'settlementFrom';
+    public const SETTLEMENT_TO = 'settlementTo';
+    /**#@-*/
 }
