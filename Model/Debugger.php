@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace MerchantWarrior\Payment\Model;
 
 use Magento\Framework\DataObject;
+use MerchantWarrior\Payment\Api\Direct\GetSettlementInterface;
 use Monolog\Utils;
 use Psr\Log\LoggerInterface;
 
@@ -13,17 +14,17 @@ class Debugger
     /**
      * @var Config
      */
-    private Config $config;
+    private $config;
 
     /**
      * @var LoggerInterface
      */
-    private LoggerInterface $logger;
+    private $logger;
 
     /**
      * @var DataObject
      */
-    private DataObject $debugData;
+    private $debugData;
 
     /**
      * DebugObserver constructor.
@@ -113,8 +114,15 @@ class Debugger
         if (isset($data['passed_data']['apiKey'])) {
             $data['passed_data']['apiKey'] = '*****';
         }
+
         if (isset($data['call_time'])) {
             $data['call_time'] = $this->getFormattedDate($data['call_time']);
+        }
+
+        if (isset($data['response_data']['method'])
+            && $data['response_data']['method'] == GetSettlementInterface::API_METHOD
+        ) {
+            $data['response_data']['mwResponse'] = '';
         }
         return $data;
     }

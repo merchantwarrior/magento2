@@ -573,4 +573,9 @@
             <argument name="logger" xsi:type="object">MerchantWarrior\Payment\Model\Logger</argument>
         </arguments>
     </type>
+    <type name="MerchantWarrior\Payment\Model\Service\GetSettlementData">
+        <arguments>
+            <argument name="logger" xsi:type="object">MerchantWarrior\Payment\Model\Logger</argument>
+        </arguments>
+    </type>
 </config>

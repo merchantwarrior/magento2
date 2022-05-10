@@ -4,11 +4,12 @@ declare(strict_types=1);
 
 namespace MerchantWarrior\Payment\Model\Service;
 
+use Exception;
 use Magento\Sales\Api\Data\OrderInterface;
 use Magento\Sales\Api\OrderRepositoryInterface;
+use Magento\Sales\Api\Data\OrderPaymentInterface;
 use Magento\Sales\Model\Order;
 use Magento\Sales\Model\ResourceModel\Order\Collection;
-use Magento\Framework\Stdlib\DateTime\TimezoneInterface;
 use MerchantWarrior\Payment\Model\Ui\ConfigProvider;
 use MerchantWarrior\Payment\Model\Ui\PayFrame\ConfigProvider as PFConfigProvider;
 use Psr\Log\LoggerInterface;
@@ -22,11 +23,6 @@ class CancelStuckOrders
      * @var Collection
      */
     private $collection;
-
-    /**
-     * @var TimezoneInterface
-     */
-    private $timezone;
 
     /**
      * @var LoggerInterface
@@ -47,19 +43,16 @@ class CancelStuckOrders
      * CancelStuckOrders constructor.
      *
      * @param Collection $collection
-     * @param TimezoneInterface $timezone
      * @param OrderRepositoryInterface $orderRepository
      * @param LoggerInterface $logger
      */
     public function __construct(
         Collection $collection,
-        TimezoneInterface $timezone,
         OrderRepositoryInterface $orderRepository,
         GetSettlementData $getSettlementData,
         LoggerInterface $logger
     ) {
         $this->collection = $collection;
-        $this->timezone = $timezone;
         $this->orderRepository = $orderRepository;
         $this->getSettlementData = $getSettlementData;
         $this->logger = $logger;
@@ -70,16 +63,70 @@ class CancelStuckOrders
      *
      * @return void
      */
+    /**
+     * @return void
+     * @throws Exception
+     */
     public function execute(): void
     {
-        $data = $this->getSettlementData->execute('2022-05-01', '2022-05-09');
+        $pendingOrders = $this->getOrders();
+        if ($pendingOrders->count() == 0) {
+            return;
+        }
 
-        foreach ($this->getOrders() as $order) {
-            $diffMinutes = $this->getDiffInHours($order);
-            if ($diffMinutes >= 480) {
+        $transactions = $this->getTransactions($pendingOrders->getFirstItem());
+        if (!count($transactions)) {
+            return;
+        }
+
+        foreach ($pendingOrders as $order) {
+            if ($this->isTransactionDeclined($order, $transactions)) {
                 $this->cancelOrder($order);
             }
         }
+    }
+
+    /**
+     * Get transactions by order
+     *
+     * @param OrderInterface $order
+     *
+     * @return array
+     */
+    private function getTransactions(OrderInterface $order): array
+    {
+        try {
+            $from = new \DateTime($order->getCreatedAt());
+
+            $from->modify('-1 day');
+            $to = clone $from;
+
+            return $this->getSettlementData->execute(
+                $from->format('Y-m-d'),
+                $to->modify('+7 day')->format('Y-m-d')
+            );
+        } catch (Exception $e) {
+            $this->logger->error($e->getMessage());
+        }
+        return [];
+    }
+
+    /**
+     * Check is transaction declined
+     *
+     * @param OrderInterface $order
+     * @param array $transactions
+     *
+     * @return bool
+     */
+    private function isTransactionDeclined(OrderInterface $order, array $transactions): bool
+    {
+        if (!isset($transactions[$order->getIncrementId()])) {
+            return false;
+        }
+
+        $statuses = $transactions[$order->getIncrementId()]['statuses'];
+        return (in_array(['declined', 'void'], $statuses));
     }
 
     /**
@@ -94,26 +141,9 @@ class CancelStuckOrders
         try {
             $order->getPayment()->deny();
             $this->orderRepository->save($order);
-        } catch (\Exception $err) {
+        } catch (Exception $err) {
             $this->logger->error($err->getMessage());
         }
-    }
-
-    /**
-     * Get diff in hours
-     *
-     * @param OrderInterface $order
-     *
-     * @return float
-     */
-    private function getDiffInHours(OrderInterface $order): float
-    {
-        $timeZone = new \DateTimeZone($this->timezone->getConfigTimezone('store', $order->getStore()));
-
-        $now = $this->timezone->date()->setTimezone($timeZone)->getTimestamp();
-        $orderCreatedAt = $this->timezone->date($order->getCreatedAt())->setTimezone($timeZone)->getTimestamp();
-
-        return round (($now - $orderCreatedAt) / 60);
     }
 
     /**
@@ -135,7 +165,7 @@ class CancelStuckOrders
             );
 
         $collection->addFieldToFilter(
-            'payment.method',
+            'payment.' . OrderPaymentInterface::METHOD,
             [
                 [
                     'in' => [PFConfigProvider::METHOD_CODE, ConfigProvider::METHOD_CODE, ConfigProvider::CC_VAULT_CODE]
@@ -148,6 +178,8 @@ class CancelStuckOrders
                     'eq' => Order::STATE_PAYMENT_REVIEW
                 ]
             ]
+        )->setOrder(
+            OrderInterface::CREATED_AT, 'DESC'
         );
         return $collection;
     }

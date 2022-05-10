@@ -10,6 +10,7 @@ use Magento\Framework\Archive\Zip;
 use Magento\Framework\File\Csv;
 use MerchantWarrior\Payment\Api\Direct\GetSettlementInterface;
 use MerchantWarrior\Payment\Model\Config;
+use Psr\Log\LoggerInterface;
 
 /**
  * Class GetModuleVersion
@@ -43,6 +44,11 @@ class GetSettlementData
     private $getSettlement;
 
     /**
+     * @var LoggerInterface
+     */
+    private $logger;
+
+    /**
      * GetSettlementData constructor.
      *
      * @param Csv $csv
@@ -50,39 +56,50 @@ class GetSettlementData
      * @param File $file
      * @param Config $config
      * @param GetSettlementInterface $getSettlement
+     * @param LoggerInterface $logger
      */
     public function __construct(
         Csv $csv,
         Zip $zip,
         File $file,
         Config $config,
-        GetSettlementInterface $getSettlement
+        GetSettlementInterface $getSettlement,
+        LoggerInterface $logger
     ) {
         $this->csv = $csv;
         $this->zip = $zip;
         $this->file = $file;
         $this->config = $config;
         $this->getSettlement = $getSettlement;
+        $this->logger = $logger;
     }
 
     /**
      * Get transactions list
      *
+     * @param string $settlementFrom
+     * @param string $settlementTo
+     *
      * @return array
      */
     public function execute(string $settlementFrom, string $settlementTo): array
     {
-        $directory = $this->config->getSettlementDir();
+        $fileName = $this->config->getSettlementDir() . $settlementFrom . '-' . $settlementTo;
+        if (!$zipData = $this->getZipFile($fileName, $settlementFrom, $settlementTo)) {
+            return [];
+        }
 
-        $zipData = $this->getZipFile($directory, $settlementFrom, $settlementTo);
+        try {
+            $csvFile = $this->zip->unpack($zipData, $fileName . '.csv');
+            $transactionList = $this->mapTransactions($this->csv->getData($csvFile));
 
-        $csvFile = $this->zip->unpack(
-            $zipData,
-            $directory . $settlementFrom . '-' . $settlementTo . '.csv',
-        );
-        $transactionList = $this->mapTransactions($this->csv->getData($csvFile));
-        $this->file->deleteFile($csvFile);
+            $this->file->deleteFile($fileName . '.csv');
+            $this->file->deleteFile($fileName . '.zip');
+        } catch (\Exception $e) {
+            $this->logger->error($e->getMessage());
 
+            return [];
+        }
         return $transactionList;
     }
 
@@ -98,12 +115,23 @@ class GetSettlementData
         unset($transactions[0]);
 
         $mapped = [];
-        for ($i = 0; $i <= count($transactions); $i++) {
-            $mapped[] = [
-                'transaction_id' => $transactions[$i][0],
-                'status' => $transactions[$i][1],
-                'order_id' => $transactions[$i][4]
-            ];
+        for ($i = 1; $i <= count($transactions); $i++) {
+            $transactionID = $transactions[$i][0];
+            $orderID       = str_replace('ORDER_ID ', '', $transactions[$i][4]);
+
+            if (isset($mapped[$orderID])) {
+                $mapped[$orderID]['statuses'][] = $transactions[$i][1];
+                $mapped[$orderID]['transactions'][] = $transactionID;
+            } else {
+                $mapped[$orderID] = [
+                    'transactions' => [
+                        $transactionID
+                    ],
+                    'statuses' => [
+                        $transactions[$i][1]
+                    ]
+                ];
+            }
         }
         return $mapped;
     }
@@ -111,20 +139,22 @@ class GetSettlementData
     /**
      * Get Zip File and is not exists create it
      *
-     * @param string $directory
+     * @param string $fileName
      * @param string $settlementFrom
      * @param string $settlementTo
      *
      * @return string|null
      */
-    private function getZipFile(string $directory, string $settlementFrom, string $settlementTo): ?string
+    private function getZipFile(string $fileName, string $settlementFrom, string $settlementTo): ?string
     {
         try {
-            if (!$this->file->isExists($directory . $settlementFrom . '-' . $settlementTo . '.zip')) {
+            if (!$this->file->isExists($fileName . '.zip')) {
                 return $this->getSettlement->execute($settlementFrom, $settlementTo);
             }
-            return $directory . $settlementFrom . '-' . $settlementTo . '.zip';
+            return $fileName . '.zip';
         } catch (\Exception $e) {
+            $this->logger->error($e->getMessage());
+
             return null;
         }
     }

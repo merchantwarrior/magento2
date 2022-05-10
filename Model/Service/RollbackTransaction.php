@@ -22,17 +22,17 @@ class RollbackTransaction
     /**
      * @var ProcessVoidInterface
      */
-    private ProcessVoidInterface $processVoid;
+    private $processVoid;
 
     /**
      * @var TransactionDetailDataRepositoryInterface
      */
-    private TransactionDetailDataRepositoryInterface $transactionDetailRepository;
+    private $transactionDetailRepository;
 
     /**
      * @var TransactionManagement
      */
-    private TransactionManagement $transactionManagement;
+    private $transactionManagement;
 
     /**
      * @param ProcessVoidInterface $processVoid

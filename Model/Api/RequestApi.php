@@ -272,6 +272,7 @@ abstract class RequestApi implements RequestApiInterface
 
         if ($key === GetSettlementInterface::API_METHOD) {
             $result = [
+                'method' => GetSettlementInterface::API_METHOD,
                 'mwResponse' => $result,
                 'responseCode' => '0'
             ];
