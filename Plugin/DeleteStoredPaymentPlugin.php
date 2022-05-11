@@ -14,12 +14,12 @@ class DeleteStoredPaymentPlugin
     /**
      * @var RemoveCardInterface
      */
-    private RemoveCardInterface $removeCard;
+    private $removeCard;
 
     /**
      * @var string
      */
-    private string $token;
+    private $token;
 
     /**
      * Remove saved cart constructor
