@@ -14,7 +14,7 @@ class TransactionSale implements ClientInterface
     /**
      * @var ProcessCardInterface
      */
-    private ProcessCardInterface $process;
+    private $process;
 
     /**
      * @param ProcessCardInterface $process

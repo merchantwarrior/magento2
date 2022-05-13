@@ -127,6 +127,7 @@ abstract class RequestApi implements RequestApiInterface
     {
         return [
             'responseCode' => $this->getResponseCode($method),
+            'responseMessage' => $this->getResponseMessage($method),
             'responseAuthCode' => $this->getAuthResponseCode($method),
             'error' => __($this->getAuthResponseMessage($method))->render()
         ];

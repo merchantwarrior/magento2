@@ -10,6 +10,8 @@ use Magento\Sales\Api\OrderRepositoryInterface;
 use Magento\Sales\Api\Data\OrderPaymentInterface;
 use Magento\Sales\Model\Order;
 use Magento\Sales\Model\ResourceModel\Order\Collection;
+use MerchantWarrior\Payment\Api\Direct\GetSettlementInterface;
+use MerchantWarrior\Payment\Model\Api\RequestApiInterface;
 use MerchantWarrior\Payment\Model\Ui\ConfigProvider;
 use MerchantWarrior\Payment\Model\Ui\PayFrame\ConfigProvider as PFConfigProvider;
 use Psr\Log\LoggerInterface;
@@ -44,6 +46,7 @@ class CancelStuckOrders
      *
      * @param Collection $collection
      * @param OrderRepositoryInterface $orderRepository
+     * @param GetSettlementData $getSettlementData
      * @param LoggerInterface $logger
      */
     public function __construct(
@@ -63,10 +66,6 @@ class CancelStuckOrders
      *
      * @return void
      */
-    /**
-     * @return void
-     * @throws Exception
-     */
     public function execute(): void
     {
         $pendingOrders = $this->getOrders();
@@ -80,7 +79,7 @@ class CancelStuckOrders
         }
 
         foreach ($pendingOrders as $order) {
-            if ($this->isTransactionDeclined($order, $transactions)) {
+            if ($this->isTransactionDeclined($order->getIncrementId(), $transactions)) {
                 $this->cancelOrder($order);
             }
         }
@@ -88,6 +87,7 @@ class CancelStuckOrders
 
     /**
      * Get transactions by order
+     * Will be loaded all transaction in period: from: Order Created At - 1 day to ( Order Created At - 1 ) + 7 days
      *
      * @param OrderInterface $order
      *
@@ -96,15 +96,9 @@ class CancelStuckOrders
     private function getTransactions(OrderInterface $order): array
     {
         try {
-            $from = new \DateTime($order->getCreatedAt());
+            extract($this->getFromToRange($order->getCreatedAt()));
 
-            $from->modify('-1 day');
-            $to = clone $from;
-
-            return $this->getSettlementData->execute(
-                $from->format('Y-m-d'),
-                $to->modify('+7 day')->format('Y-m-d')
-            );
+            return $this->getSettlementData->execute($from, $to);
         } catch (Exception $e) {
             $this->logger->error($e->getMessage());
         }
@@ -112,21 +106,47 @@ class CancelStuckOrders
     }
 
     /**
+     * Get date ranges
+     *
+     * @param string $date
+     *
+     * @return array
+     * @throws Exception
+     */
+    private function getFromToRange(string $date): array
+    {
+        $from = new \DateTime($date);
+
+        $from->modify('-1 day');
+        $to = clone $from;
+        $to->modify('+7 day');
+
+        return [
+            'from' => $from->format(GetSettlementInterface::DATE_FORMAT),
+            'to'   => $to->format(GetSettlementInterface::DATE_FORMAT)
+        ];
+    }
+
+    /**
      * Check is transaction declined
      *
-     * @param OrderInterface $order
+     * @param string $orderIncrementId
      * @param array $transactions
      *
      * @return bool
      */
-    private function isTransactionDeclined(OrderInterface $order, array $transactions): bool
+    private function isTransactionDeclined(string $orderIncrementId, array $transactions): bool
     {
-        if (!isset($transactions[$order->getIncrementId()])) {
+        if (!isset($transactions[$orderIncrementId])) {
             return false;
         }
 
-        $statuses = $transactions[$order->getIncrementId()]['statuses'];
-        return (in_array(['declined', 'void'], $statuses));
+        $statuses = $transactions[$orderIncrementId]['statuses'];
+        return (
+            count(
+                array_intersect($statuses, [RequestApiInterface::STATUS_DECLINED, RequestApiInterface::STATUS_VOID])
+            ) > 0
+        );
     }
 
     /**
@@ -136,7 +156,7 @@ class CancelStuckOrders
      *
      * @return void
      */
-    private function cancelOrder(OrderInterface  $order): void
+    private function cancelOrder(OrderInterface $order): void
     {
         try {
             $order->getPayment()->deny();
@@ -179,7 +199,7 @@ class CancelStuckOrders
                 ]
             ]
         )->setOrder(
-            OrderInterface::CREATED_AT, 'DESC'
+            OrderInterface::CREATED_AT, 'ASC'
         );
         return $collection;
     }

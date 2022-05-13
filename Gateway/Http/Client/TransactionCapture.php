@@ -14,7 +14,7 @@ class TransactionCapture implements ClientInterface
     /**
      * @var ProcessCaptureInterface
      */
-    private ProcessCaptureInterface $process;
+    private $process;
 
     /**
      * @param ProcessCaptureInterface $process

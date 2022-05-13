@@ -11,7 +11,7 @@ class CancelOrders
     /**
      * @var CancelStuckOrders
      */
-    private CancelStuckOrders $cancelStuckOrders;
+    private $cancelStuckOrders;
 
     /**
      * @param CancelStuckOrders $cancelStuckOrders

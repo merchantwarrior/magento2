@@ -13,8 +13,8 @@ use MerchantWarrior\Payment\Model\Config;
 use Psr\Log\LoggerInterface;
 
 /**
- * Class GetModuleVersion
- * Return current module version
+ * Class GetSettlementData
+ * Return mapped settlement data
  */
 class GetSettlementData
 {
@@ -77,8 +77,8 @@ class GetSettlementData
     /**
      * Get transactions list
      *
-     * @param string $settlementFrom
-     * @param string $settlementTo
+     * @param string $settlementFrom - 'Y-m-d'
+     * @param string $settlementTo - 'Y-m-d'
      *
      * @return array
      */

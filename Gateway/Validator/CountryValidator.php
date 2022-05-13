@@ -19,10 +19,17 @@ class CountryValidator extends AbstractValidator
     /**
      * @var ScopeConfigInterface
      */
-    private ScopeConfigInterface $scopeConfig;
+    private $scopeConfig;
 
-    protected string $allowedSpecificConfigPath = Config::XML_PATH_PAYFRAME_ALLOWED_SPECIFIC;
-    protected string $allowedCountryConfigPath = Config::XML_PATH_PAYFRAME_ALLOWED_SPECIFICCOUNTRY;
+    /**
+     * @var string
+     */
+    protected $allowedSpecificConfigPath = Config::XML_PATH_PAYFRAME_ALLOWED_SPECIFIC;
+
+    /**
+     * @var string
+     */
+    protected $allowedCountryConfigPath = Config::XML_PATH_PAYFRAME_ALLOWED_SPECIFICCOUNTRY;
 
     /**
      * @param ResultInterfaceFactory $resultFactory

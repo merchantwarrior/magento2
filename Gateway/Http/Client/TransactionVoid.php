@@ -15,7 +15,7 @@ class TransactionVoid implements ClientInterface
     /**
      * @var ProcessVoidInterface
      */
-    private ProcessVoidInterface $process;
+    private $process;
 
     /**
      * @param ProcessVoidInterface $process
@@ -42,9 +42,29 @@ class TransactionVoid implements ClientInterface
                 $result = $this->process->execute($transactionData[RequestApiInterface::TRANSACTION_ID]);
             } catch (LocalizedException $err) {
                 $result = $this->process->getError(ProcessVoidInterface::API_METHOD);
+                $result = $this->validateError($result);
             }
             return $result;
         }
         return [];
+    }
+
+    /**
+     * Validate returned error
+     * In case transaction been voided from MW sided - cancel order
+     *
+     * @param array $errorResult
+     *
+     * @return array|string[]
+     */
+    private function validateError(array $errorResult): array
+    {
+        if (0 !== strpos($errorResult['responseMessage'], 'transaction has already been voided')) {
+            $errorResult = [
+                'responseCode' => '0',
+                'error' => ''
+            ];
+        }
+        return $errorResult;
     }
 }

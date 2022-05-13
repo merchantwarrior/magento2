@@ -28,32 +28,32 @@ class VaultDetailsHandler implements HandlerInterface
     /**
      * @var PaymentTokenFactoryInterface
      */
-    private PaymentTokenFactoryInterface $paymentTokenFactory;
+    private $paymentTokenFactory;
 
     /**
      * @var PaymentTokenManagementInterface
      */
-    private PaymentTokenManagementInterface $paymentTokenManagement;
+    private $paymentTokenManagement;
 
     /**
      * @var OrderPaymentExtensionInterfaceFactory
      */
-    private OrderPaymentExtensionInterfaceFactory $paymentExtensionFactory;
+    private $paymentExtensionFactory;
 
     /**
      * @var Config
      */
-    private Config $config;
+    private $config;
 
     /**
      * @var SerializerInterface
      */
-    private SerializerInterface $serializer;
+    private $serializer;
 
     /**
      * @var LoggerInterface
      */
-    private LoggerInterface $logger;
+    private $logger;
 
     /**
      * VaultDetailsHandler constructor.

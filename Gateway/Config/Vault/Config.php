@@ -19,7 +19,7 @@ class Config extends PaymentConfig
     /**
      * @var MWConfig
      */
-    private MWConfig $config;
+    private $config;
 
     /**
      * Config constructor.

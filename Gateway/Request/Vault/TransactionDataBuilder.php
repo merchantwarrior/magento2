@@ -16,7 +16,7 @@ class TransactionDataBuilder extends AbstractDataBuilder
     /**
      * @var PaymentTokenManagementInterface
      */
-    private PaymentTokenManagementInterface $paymentTokenManagement;
+    private $paymentTokenManagement;
 
     /**
      * @param PaymentTokenManagementInterface $paymentTokenManagement

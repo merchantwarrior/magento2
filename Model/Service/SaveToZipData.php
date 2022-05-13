@@ -14,6 +14,12 @@ use MerchantWarrior\Payment\Model\Config;
  */
 class SaveToZipData
 {
+    /**#@+
+     * Debug directory
+     */
+    const DEBUG_DIRECTORY = DIRECTORY_SEPARATOR . 'debug' . DIRECTORY_SEPARATOR;
+    /**#@-*/
+
     /**
      * @var DriverInterface
      */
@@ -48,16 +54,39 @@ class SaveToZipData
      */
     public function execute(string $fileName, string $content): ?string
     {
-        $directory = $this->config->getSettlementDir();
         try {
-            if (!$this->file->isExists($this->config->getSettlementDir())) {
-                $this->file->createDirectory($this->config->getSettlementDir());
-            }
+            $directory = $this->getDir();
+
             $this->file->filePutContents($directory . $fileName . '.zip', $content);
 
+            if ($this->config->isDebuggerEnabled()) {
+                $this->file->copy(
+                    $directory . $fileName . '.zip',
+                    $directory . self::DEBUG_DIRECTORY . $fileName . '.zip'
+                );
+            }
             return $directory . $fileName . '.zip';
         } catch (FileSystemException $exception) {
             return null;
         }
+    }
+
+    /**
+     * Get settlement dir
+     *
+     * @return string
+     * @throws FileSystemException
+     */
+    private function getDir(): string
+    {
+        $directory = $this->config->getSettlementDir();
+        if (!$this->file->isExists($directory)) {
+            $this->file->createDirectory($directory);
+        }
+
+        if ($this->config->isDebuggerEnabled() && !$this->file->isExists($directory . self::DEBUG_DIRECTORY)) {
+            $this->file->createDirectory($directory . self::DEBUG_DIRECTORY);
+        }
+        return $directory;
     }
 }

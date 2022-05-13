@@ -18,6 +18,12 @@ interface GetSettlementInterface extends ApiProcessInterface
     const API_METHOD = 'getSettlement';
     /**#@-*/
 
+    /**#@+
+     * Date format
+     */
+    const DATE_FORMAT = 'Y-m-d';
+    /**#@-*/
+
     /**
      * Execute refund card
      * Expects dates from and to in format: Y-m-d ( 2020-01-01 )

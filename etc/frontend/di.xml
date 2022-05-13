@@ -26,8 +26,4 @@
         <plugin name="merchant_warrior_delete_stored_payment"
                 type="MerchantWarrior\Payment\Plugin\DeleteStoredPaymentPlugin" />
     </type>
-
-    <type name="Magento\Framework\Data\Form\FormKey\Validator">
-        <plugin name="mw_csrv_validator" type="MerchantWarrior\Payment\Plugin\Data\Form\FormKey\ValidatorPlugin" sortOrder="1" />
-    </type>
 </config>
