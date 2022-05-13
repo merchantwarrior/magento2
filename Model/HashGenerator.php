@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace MerchantWarrior\Payment\Model;
 
+use MerchantWarrior\Payment\Api\Direct\GetSettlementInterface;
 use MerchantWarrior\Payment\Api\Direct\ProcessAuthInterface;
 use MerchantWarrior\Payment\Api\Direct\ProcessCaptureInterface;
 use MerchantWarrior\Payment\Api\Direct\ProcessVoidInterface;
@@ -16,7 +17,7 @@ class HashGenerator
     /**
      * @var Config
      */
-    private Config $config;
+    private $config;
 
     /**
      * @param Config $config
@@ -47,6 +48,9 @@ class HashGenerator
             case ProcessInterface::API_METHOD_CARD:
             case ProcessInterface::API_METHOD_AUTH:
                 $hash = $this->prepareTransactionTypeHash($data);
+                break;
+            case GetSettlementInterface::API_METHOD:
+                $hash = $this->prepareSettlementHash($data);
                 break;
         }
         return $hash;
@@ -107,8 +111,28 @@ class HashGenerator
 
         $transactionID = $data[RequestApiInterface::TRANSACTION_ID] ?? '';
 
-        $hash = md5($apiPassPhrase) . strtolower($merchantUUID . $transactionID);
+        return md5(
+            md5($apiPassPhrase) . strtolower($merchantUUID . $transactionID)
+        );
+    }
 
-        return md5($hash);
+    /**
+     * Prepare hash for settlement
+     *
+     * @param array $data
+     *
+     * @return string
+     */
+    private function prepareSettlementHash(array $data): string
+    {
+        $apiPassPhrase = $this->config->getPassPhrase();
+        $merchantUUID  = $this->config->getMerchantUserId();
+
+        $settlementFrom = $data[RequestApiInterface::SETTLEMENT_FROM] ?? '';
+        $settlementTo = $data[RequestApiInterface::SETTLEMENT_TO] ?? '';
+
+        return md5(
+            md5($apiPassPhrase) . strtolower($merchantUUID) . $settlementFrom . $settlementTo
+        );
     }
 }

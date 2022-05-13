@@ -17,6 +17,7 @@ use MerchantWarrior\Payment\Model\Api\RequestApiInterface;
 use MerchantWarrior\Payment\Model\Api\Payframe\Process;
 use MerchantWarrior\Payment\Model\Config;
 use MerchantWarrior\Payment\Model\HashGenerator;
+use MerchantWarrior\Payment\Model\Service\SaveToZipData;
 use PHPUnit\Framework\MockObject\MockObject;
 use PHPUnit\Framework\TestCase;
 
@@ -60,6 +61,11 @@ class ProcessTest extends TestCase
     protected $hashGenerator;
 
     /**
+     * @var SaveToZipData|MockObject
+     */
+    protected $saveToZipData;
+
+    /**
      * @var Parser|MockObject
      */
     protected $xmlParser;
@@ -75,6 +81,7 @@ class ProcessTest extends TestCase
         $this->eventManager = $this->createMock(ManagerInterface::class);
         $this->timezone = $this->createMock(TimezoneInterface::class);
         $this->serializer = $this->createMock(SerializerInterface::class);
+        $this->saveToZipData = $this->createMock(SaveToZipData::class);
         $this->xmlParser = $this->createMock(Parser::class);
     }
 
@@ -100,6 +107,7 @@ class ProcessTest extends TestCase
             $this->eventManager,
             $this->timezone,
             $this->serializer,
+            $this->saveToZipData,
             $this->xmlParser
         );
 
@@ -180,6 +188,7 @@ class ProcessTest extends TestCase
             $this->eventManager,
             $this->timezone,
             $this->serializer,
+            $this->saveToZipData,
             $this->xmlParser
         );
 

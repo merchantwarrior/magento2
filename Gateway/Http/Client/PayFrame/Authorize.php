@@ -14,7 +14,7 @@ class Authorize implements ClientInterface
     /**
      * @var ProcessInterface
      */
-    private ProcessInterface $process;
+    private $process;
 
     /**
      * @param ProcessInterface $process

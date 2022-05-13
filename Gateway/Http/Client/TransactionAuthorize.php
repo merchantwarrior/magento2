@@ -14,7 +14,7 @@ class TransactionAuthorize implements ClientInterface
     /**
      * @var ProcessAuthInterface
      */
-    private ProcessAuthInterface $process;
+    private $process;
 
     /**
      * @param ProcessAuthInterface $process

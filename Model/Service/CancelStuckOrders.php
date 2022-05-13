@@ -4,11 +4,14 @@ declare(strict_types=1);
 
 namespace MerchantWarrior\Payment\Model\Service;
 
+use Exception;
 use Magento\Sales\Api\Data\OrderInterface;
 use Magento\Sales\Api\OrderRepositoryInterface;
+use Magento\Sales\Api\Data\OrderPaymentInterface;
 use Magento\Sales\Model\Order;
 use Magento\Sales\Model\ResourceModel\Order\Collection;
-use Magento\Framework\Stdlib\DateTime\TimezoneInterface;
+use MerchantWarrior\Payment\Api\Direct\GetSettlementInterface;
+use MerchantWarrior\Payment\Model\Api\RequestApiInterface;
 use MerchantWarrior\Payment\Model\Ui\ConfigProvider;
 use MerchantWarrior\Payment\Model\Ui\PayFrame\ConfigProvider as PFConfigProvider;
 use Psr\Log\LoggerInterface;
@@ -21,40 +24,40 @@ class CancelStuckOrders
     /**
      * @var Collection
      */
-    private Collection $collection;
-
-    /**
-     * @var TimezoneInterface
-     */
-    private TimezoneInterface $timezone;
+    private $collection;
 
     /**
      * @var LoggerInterface
      */
-    private LoggerInterface $logger;
+    private $logger;
 
     /**
      * @var OrderRepositoryInterface
      */
-    private OrderRepositoryInterface $orderRepository;
+    private $orderRepository;
+
+    /**
+     * @var GetSettlementData
+     */
+    private $getSettlementData;
 
     /**
      * CancelStuckOrders constructor.
      *
      * @param Collection $collection
-     * @param TimezoneInterface $timezone
      * @param OrderRepositoryInterface $orderRepository
+     * @param GetSettlementData $getSettlementData
      * @param LoggerInterface $logger
      */
     public function __construct(
         Collection $collection,
-        TimezoneInterface $timezone,
         OrderRepositoryInterface $orderRepository,
+        GetSettlementData $getSettlementData,
         LoggerInterface $logger
     ) {
         $this->collection = $collection;
-        $this->timezone = $timezone;
         $this->orderRepository = $orderRepository;
+        $this->getSettlementData = $getSettlementData;
         $this->logger = $logger;
     }
 
@@ -65,12 +68,85 @@ class CancelStuckOrders
      */
     public function execute(): void
     {
-        foreach ($this->getOrders() as $order) {
-            $diffMinutes = $this->getDiffInHours($order);
-            if ($diffMinutes >= 480) {
+        $pendingOrders = $this->getOrders();
+        if ($pendingOrders->count() == 0) {
+            return;
+        }
+
+        $transactions = $this->getTransactions($pendingOrders->getFirstItem());
+        if (!count($transactions)) {
+            return;
+        }
+
+        foreach ($pendingOrders as $order) {
+            if ($this->isTransactionDeclined($order->getIncrementId(), $transactions)) {
                 $this->cancelOrder($order);
             }
         }
+    }
+
+    /**
+     * Get transactions by order
+     * Will be loaded all transaction in period: from: Order Created At - 1 day to ( Order Created At - 1 ) + 7 days
+     *
+     * @param OrderInterface $order
+     *
+     * @return array
+     */
+    private function getTransactions(OrderInterface $order): array
+    {
+        try {
+            extract($this->getFromToRange($order->getCreatedAt()));
+
+            return $this->getSettlementData->execute($from, $to);
+        } catch (Exception $e) {
+            $this->logger->error($e->getMessage());
+        }
+        return [];
+    }
+
+    /**
+     * Get date ranges
+     *
+     * @param string $date
+     *
+     * @return array
+     * @throws Exception
+     */
+    private function getFromToRange(string $date): array
+    {
+        $from = new \DateTime($date);
+
+        $from->modify('-1 day');
+        $to = clone $from;
+        $to->modify('+7 day');
+
+        return [
+            'from' => $from->format(GetSettlementInterface::DATE_FORMAT),
+            'to'   => $to->format(GetSettlementInterface::DATE_FORMAT)
+        ];
+    }
+
+    /**
+     * Check is transaction declined
+     *
+     * @param string $orderIncrementId
+     * @param array $transactions
+     *
+     * @return bool
+     */
+    private function isTransactionDeclined(string $orderIncrementId, array $transactions): bool
+    {
+        if (!isset($transactions[$orderIncrementId])) {
+            return false;
+        }
+
+        $statuses = $transactions[$orderIncrementId]['statuses'];
+        return (
+            count(
+                array_intersect($statuses, [RequestApiInterface::STATUS_DECLINED, RequestApiInterface::STATUS_VOID])
+            ) > 0
+        );
     }
 
     /**
@@ -80,31 +156,14 @@ class CancelStuckOrders
      *
      * @return void
      */
-    private function cancelOrder(OrderInterface  $order): void
+    private function cancelOrder(OrderInterface $order): void
     {
         try {
             $order->getPayment()->deny();
             $this->orderRepository->save($order);
-        } catch (\Exception $err) {
+        } catch (Exception $err) {
             $this->logger->error($err->getMessage());
         }
-    }
-
-    /**
-     * Get diff in hours
-     *
-     * @param OrderInterface $order
-     *
-     * @return float
-     */
-    private function getDiffInHours(OrderInterface $order): float
-    {
-        $timeZone = new \DateTimeZone($this->timezone->getConfigTimezone('store', $order->getStore()));
-
-        $now = $this->timezone->date()->setTimezone($timeZone)->getTimestamp();
-        $orderCreatedAt = $this->timezone->date($order->getCreatedAt())->setTimezone($timeZone)->getTimestamp();
-
-        return round (($now - $orderCreatedAt) / 60);
     }
 
     /**
@@ -126,7 +185,7 @@ class CancelStuckOrders
             );
 
         $collection->addFieldToFilter(
-            'payment.method',
+            'payment.' . OrderPaymentInterface::METHOD,
             [
                 [
                     'in' => [PFConfigProvider::METHOD_CODE, ConfigProvider::METHOD_CODE, ConfigProvider::CC_VAULT_CODE]
@@ -139,6 +198,8 @@ class CancelStuckOrders
                     'eq' => Order::STATE_PAYMENT_REVIEW
                 ]
             ]
+        )->setOrder(
+            OrderInterface::CREATED_AT, 'ASC'
         );
         return $collection;
     }

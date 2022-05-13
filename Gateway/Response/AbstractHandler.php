@@ -21,17 +21,17 @@ abstract class AbstractHandler implements HandlerInterface
     /**
      * @var Session
      */
-    protected Session $checkoutSession;
+    protected $checkoutSession;
 
     /**
      * @var LoggerInterface
      */
-    protected LoggerInterface $logger;
+    protected $logger;
 
     /**
      * @var TransactionManagement
      */
-    private TransactionManagement $transactionManagement;
+    private $transactionManagement;
 
     /**
      * @param Session $checkoutSession

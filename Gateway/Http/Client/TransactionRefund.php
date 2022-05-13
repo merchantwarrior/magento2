@@ -14,7 +14,7 @@ class TransactionRefund implements ClientInterface
     /**
      * @var RefundCardInterface
      */
-    private RefundCardInterface $process;
+    private $process;
 
     /**
      * @param RefundCardInterface $process

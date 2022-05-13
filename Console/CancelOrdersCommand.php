@@ -19,12 +19,12 @@ class CancelOrdersCommand extends Command
     /**
      * @var State
      */
-    private State $appState;
+    private $appState;
 
     /**
      * @var CancelStuckOrders
      */
-    private CancelStuckOrders $cancelStuckOrders;
+    private $cancelStuckOrders;
 
     /**
      * ProcessOrdersCommand constructor.

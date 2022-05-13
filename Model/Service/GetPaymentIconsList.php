@@ -25,17 +25,17 @@ class GetPaymentIconsList
     /**
      * @var Repository
      */
-    private Repository $assetRepo;
+    private $assetRepo;
 
     /**
      * @var Source
      */
-    private Source $assetSource;
+    private $assetSource;
 
     /**
      * @var Config
      */
-    private Config $config;
+    private $config;
 
     /**
      * GetPaymentIconsList constructor.

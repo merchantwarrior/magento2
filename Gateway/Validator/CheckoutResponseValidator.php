@@ -15,7 +15,7 @@ class CheckoutResponseValidator extends AbstractValidator
     /**
      * @var LoggerInterface
      */
-    private LoggerInterface $logger;
+    private $logger;
 
     /**
      * CheckoutResponseValidator constructor.

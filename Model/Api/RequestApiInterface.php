@@ -61,4 +61,20 @@ interface RequestApiInterface
      */
     public const PAYFRAME_ADD_TO_CARD_KEY = 'addCard';
     /**#@-*/
+
+    /**#@+
+     * Additional Api Settlement Method constants
+     */
+    public const SETTLEMENT_FROM = 'settlementFrom';
+    public const SETTLEMENT_TO = 'settlementTo';
+    /**#@-*/
+
+    /**#@+
+     * Merchant Warrior Order statuses list
+     */
+    public const STATUS_DECLINED = 'declined';
+    public const STATUS_APPROVED = 'approved';
+    public const STATUS_PREAUTH = 'preauth';
+    public const STATUS_VOID = 'void';
+    /**#@-*/
 }

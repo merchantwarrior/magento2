@@ -16,7 +16,7 @@ class GlobalValidator extends AbstractValidator
     /**
      * @var StoreManagerInterface
      */
-    private StoreManagerInterface $storeManager;
+    private $storeManager;
 
     /**
      * @param ResultInterfaceFactory $resultFactory

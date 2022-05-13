@@ -14,6 +14,8 @@
                 type="MerchantWarrior\Payment\Model\Api\Direct\ProcessCapture" />
     <preference for="MerchantWarrior\Payment\Api\Direct\ProcessCardInterface"
                 type="MerchantWarrior\Payment\Model\Api\Direct\ProcessCard" />
+    <preference for="MerchantWarrior\Payment\Api\Direct\GetSettlementInterface"
+                type="MerchantWarrior\Payment\Model\Api\Direct\GetSettlement" />
     <!-- PayFrame API -->
     <preference for="MerchantWarrior\Payment\Api\Payframe\ProcessInterface"
                 type="MerchantWarrior\Payment\Model\Api\Payframe\Process" />
@@ -142,7 +144,6 @@
     <virtualType name="MerchantWarriorValidatorPool" type="Magento\Payment\Gateway\Validator\ValidatorPool">
         <arguments>
             <argument name="validators" xsi:type="array">
-                <item name="global" xsi:type="string">MerchantWarrior\Payment\Gateway\Validator\GlobalValidator</item>
                 <item name="country" xsi:type="string">MerchantWarrior\Payment\Gateway\Validator\CountryValidator</item>
                 <item name="availability" xsi:type="string">MerchantWarrior\Payment\Gateway\Validator\AvailabilityValidator</item>
             </argument>
@@ -567,6 +568,11 @@
         </arguments>
     </type>
     <type name="MerchantWarrior\Payment\Gateway\Response\VaultDetailsHandler">
+        <arguments>
+            <argument name="logger" xsi:type="object">MerchantWarrior\Payment\Model\Logger</argument>
+        </arguments>
+    </type>
+    <type name="MerchantWarrior\Payment\Model\Service\GetSettlementData">
         <arguments>
             <argument name="logger" xsi:type="object">MerchantWarrior\Payment\Model\Logger</argument>
         </arguments>

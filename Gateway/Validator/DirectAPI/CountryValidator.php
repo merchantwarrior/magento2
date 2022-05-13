@@ -12,6 +12,13 @@ use MerchantWarrior\Payment\Model\Config;
  */
 class CountryValidator extends \MerchantWarrior\Payment\Gateway\Validator\CountryValidator
 {
-    protected string $allowedSpecificConfigPath = Config::XML_PATH_DIRECTAPI_ALLOWED_SPECIFIC;
-    protected string $allowedCountryConfigPath = Config::XML_PATH_DIRECTAPI_ALLOWED_SPECIFICCOUNTRY;
+    /**
+     * @var string
+     */
+    protected $allowedSpecificConfigPath = Config::XML_PATH_DIRECTAPI_ALLOWED_SPECIFIC;
+
+    /**
+     * @var string
+     */
+    protected $allowedCountryConfigPath = Config::XML_PATH_DIRECTAPI_ALLOWED_SPECIFICCOUNTRY;
 }

@@ -18,12 +18,12 @@ class OrderCancelPlugin
     /**
      * @var RollbackTransaction
      */
-    private RollbackTransaction $rollbackTransaction;
+    private $rollbackTransaction;
 
     /**
      * @var CartRepositoryInterface
      */
-    private CartRepositoryInterface $quoteRepository;
+    private $quoteRepository;
 
     /**
      * @param RollbackTransaction $rollbackTransaction
