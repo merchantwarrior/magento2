@@ -21,6 +21,12 @@ use Psr\Log\LoggerInterface;
  */
 class CancelStuckOrders
 {
+    /**#@+
+     * Count orders const
+     */
+    const COUNT_PROCESSED_ORDERS = 50;
+    /**#@-*/
+
     /**
      * @var Collection
      */
@@ -200,6 +206,8 @@ class CancelStuckOrders
             ]
         )->setOrder(
             OrderInterface::CREATED_AT, 'ASC'
+        )->setPageSize(
+            self::COUNT_PROCESSED_ORDERS
         );
         return $collection;
     }
