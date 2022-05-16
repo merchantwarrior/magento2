@@ -248,6 +248,7 @@
                 <item name="void" xsi:type="string">MerchantWarriorPaymentCancelCommand</item>
                 <item name="refund" xsi:type="string">MerchantWarriorPaymentRefundCommand</item>
                 <item name="cancel" xsi:type="string">MerchantWarriorPaymentCancelCommand</item>
+                <item name="deny_payment" xsi:type="string">MerchantWarriorPaymentCancelCommand</item>
             </argument>
         </arguments>
     </virtualType>
