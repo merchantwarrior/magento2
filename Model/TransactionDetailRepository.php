@@ -20,17 +20,17 @@ class TransactionDetailRepository implements TransactionDetailDataRepositoryInte
     /**
      * @var TransactionDetail
      */
-    private TransactionDetail $transactionDetailResource;
+    private $transactionDetailResource;
 
     /**
      * @var TransactionDetailDataInterfaceFactory
      */
-    private TransactionDetailDataInterfaceFactory $transactionDetailResourceFactory;
+    private $transactionDetailResourceFactory;
 
     /**
      * @var array
      */
-    private array $instancesById = [];
+    private $instancesById = [];
 
     /**
      * @param TransactionDetail $transactionDetailResource

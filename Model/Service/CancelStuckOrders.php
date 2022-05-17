@@ -12,6 +12,7 @@ use Magento\Sales\Model\Order;
 use Magento\Sales\Model\ResourceModel\Order\Collection;
 use MerchantWarrior\Payment\Api\Direct\GetSettlementInterface;
 use MerchantWarrior\Payment\Model\Api\RequestApiInterface;
+use MerchantWarrior\Payment\Model\Config;
 use MerchantWarrior\Payment\Model\Ui\ConfigProvider;
 use MerchantWarrior\Payment\Model\Ui\PayFrame\ConfigProvider as PFConfigProvider;
 use Psr\Log\LoggerInterface;
@@ -48,22 +49,30 @@ class CancelStuckOrders
     private $getSettlementData;
 
     /**
+     * @var Config
+     */
+    private $config;
+
+    /**
      * CancelStuckOrders constructor.
      *
      * @param Collection $collection
      * @param OrderRepositoryInterface $orderRepository
      * @param GetSettlementData $getSettlementData
+     * @param Config $config
      * @param LoggerInterface $logger
      */
     public function __construct(
         Collection $collection,
         OrderRepositoryInterface $orderRepository,
         GetSettlementData $getSettlementData,
+        Config $config,
         LoggerInterface $logger
     ) {
         $this->collection = $collection;
         $this->orderRepository = $orderRepository;
         $this->getSettlementData = $getSettlementData;
+        $this->config = $config;
         $this->logger = $logger;
     }
 
@@ -125,7 +134,7 @@ class CancelStuckOrders
 
         $from->modify('-1 day');
         $to = clone $from;
-        $to->modify('+7 day');
+        $to->modify('+' . $this->config->getSettlementDays() . ' day');
 
         return [
             'from' => $from->format(GetSettlementInterface::DATE_FORMAT),

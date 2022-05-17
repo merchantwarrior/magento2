@@ -28,22 +28,22 @@ class ConfigProvider implements ConfigProviderInterface
     /**
      * @var Config
      */
-    private Config $config;
+    private $config;
 
     /**
      * @var PaymentHelper
      */
-    protected PaymentHelper $paymentHelper;
+    protected $paymentHelper;
 
     /**
      * @var RequestInterface
      */
-    private RequestInterface $request;
+    private $request;
 
     /**
      * @var UrlInterface
      */
-    private UrlInterface $urlBuilder;
+    private $urlBuilder;
 
     /**
      * @param PaymentHelper $paymentHelper

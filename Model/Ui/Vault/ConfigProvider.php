@@ -19,12 +19,12 @@ class ConfigProvider implements ConfigProviderInterface
     /**
      * @var Config
      */
-    private Config $config;
+    private $config;
 
     /**
      * @var GetPaymentIconsList
      */
-    private GetPaymentIconsList $getPaymentIconsList;
+    private $getPaymentIconsList;
 
     /**
      * ConfigProvider constructor.

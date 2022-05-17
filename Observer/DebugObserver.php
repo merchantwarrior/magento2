@@ -16,7 +16,7 @@ class DebugObserver implements ObserverInterface
     /**
      * @var Debugger
      */
-    private Debugger $debugger;
+    private $debugger;
 
     /**
      * DebugObserver constructor.

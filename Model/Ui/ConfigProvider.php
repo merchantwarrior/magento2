@@ -5,7 +5,6 @@ declare(strict_types=1);
 namespace MerchantWarrior\Payment\Model\Ui;
 
 use Magento\Framework\App\RequestInterface;
-use Magento\Framework\UrlInterface;
 use Magento\Payment\Helper\Data as PaymentHelper;
 use Magento\Payment\Model\MethodInterface;
 use MerchantWarrior\Payment\Model\Config;
@@ -28,39 +27,31 @@ class ConfigProvider implements ConfigProviderInterface
     /**
      * @var Config
      */
-    private Config $config;
+    private $config;
 
     /**
      * @var PaymentHelper
      */
-    protected PaymentHelper $paymentHelper;
+    protected $paymentHelper;
 
     /**
      * @var RequestInterface
      */
-    private RequestInterface $request;
-
-    /**
-     * @var UrlInterface
-     */
-    private UrlInterface $urlBuilder;
+    private $request;
 
     /**
      * @param PaymentHelper $paymentHelper
      * @param Config $config
      * @param RequestInterface $request
-     * @param UrlInterface $urlBuilder
      */
     public function __construct(
         PaymentHelper $paymentHelper,
         Config $config,
-        RequestInterface $request,
-        UrlInterface $urlBuilder
+        RequestInterface $request
     ) {
         $this->config = $config;
         $this->paymentHelper = $paymentHelper;
         $this->request = $request;
-        $this->urlBuilder = $urlBuilder;
     }
 
     /**

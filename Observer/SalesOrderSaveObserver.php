@@ -19,7 +19,7 @@ class SalesOrderSaveObserver implements ObserverInterface
     /**
      * @var TransactionManagement
      */
-    private TransactionManagement $transactionManagement;
+    private $transactionManagement;
 
     /**
      * SalesOrderPlaceObserver constructor.

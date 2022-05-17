@@ -31,6 +31,7 @@
                 <useccv>1</useccv>
                 <order_status>pending</order_status>
                 <debug>1</debug>
+                <settlement_days>7</settlement_days>
                 <group>merchant_warrior</group>
             </merchant_warrior>
             <merchant_warrior_payframe>
