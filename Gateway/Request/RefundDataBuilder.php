@@ -29,9 +29,9 @@ class RefundDataBuilder extends AbstractDataBuilder
             RequestApiInterface::TRANSACTION_ID => $this->clearTransactionId(
                 $payment->getAdditionalInformation(RequestApiInterface::TRANSACTION_ID)
             ),
-            RequestApiInterface::TRANSACTION_AMOUNT => $this->getTransactionAmount($creditMemo->getGrandTotal()),
-            RequestApiInterface::TRANSACTION_CURRENCY => $creditMemo->getOrderCurrencyCode(),
-            RequestApiInterface::REFUND_AMOUNT => $this->getTransactionAmount($creditMemo->getGrandTotal())
+            RequestApiInterface::TRANSACTION_AMOUNT => $this->getTransactionAmount($creditMemo->getBaseGrandTotal()),
+            RequestApiInterface::TRANSACTION_CURRENCY => $creditMemo->getBaseCurrencyCode(),
+            RequestApiInterface::REFUND_AMOUNT => $this->getTransactionAmount($creditMemo->getBaseGrandTotal())
         ];
     }
 }

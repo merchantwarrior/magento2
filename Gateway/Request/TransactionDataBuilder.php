@@ -23,11 +23,12 @@ class TransactionDataBuilder extends AbstractDataBuilder
     {
         $paymentDO = $this->readPayment($buildSubject);
 
-        $order = $paymentDO->getOrder();
+        $order   = $paymentDO->getOrder();
+        $payment = $paymentDO->getPayment();
 
         return [
             RequestApiInterface::TRANSACTION_AMOUNT
-                => $this->getTransactionAmount((float)$order->getGrandTotalAmount()),
+                => $this->getTransactionAmount((float)$payment->getBaseAmountOrdered()),
             RequestApiInterface::TRANSACTION_CURRENCY
                 => $order->getCurrencyCode(),
             RequestApiInterface::TRANSACTION_PRODUCT
