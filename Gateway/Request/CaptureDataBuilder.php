@@ -24,10 +24,10 @@ class CaptureDataBuilder extends AbstractDataBuilder
         $order = $paymentDO->getOrder();
 
         return [
-            'transactionAmount' => $this->getTransactionAmount((float)$order->getGrandTotalAmount()),
+            'transactionAmount' => $this->getTransactionAmount((float)$payment->getBaseAmountOrdered()),
             'transactionCurrency' => $order->getCurrencyCode(),
             'transactionID' => $this->clearTransactionId($payment->getTransactionId()),
-            'captureAmount' => $this->getTransactionAmount((float)$order->getGrandTotalAmount())
+            'captureAmount' => $this->getTransactionAmount((float)$payment->getBaseAmountOrdered())
         ];
     }
 }
