@@ -15,7 +15,7 @@ class MWIsActiveObserver extends AbstractDataAssignObserver
     /**
      * @var StoreManagerInterface
      */
-    private StoreManagerInterface $storeManager;
+    private $storeManager;
 
     /**
      * @param StoreManagerInterface $storeManager

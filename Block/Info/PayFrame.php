@@ -15,12 +15,12 @@ class PayFrame extends Info
     /**
      * @var Config
      */
-    private Config $config;
+    private $config;
 
     /**
      * @var DataObjectFactory
      */
-    private DataObjectFactory $dataObjectFactory;
+    private $dataObjectFactory;
 
     /**
      * @param Context $context

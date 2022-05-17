@@ -16,17 +16,17 @@ class TransactionManagement
     /**
      * @var TransactionDetailDataInterfaceFactory
      */
-    private TransactionDetailDataInterfaceFactory $transactionDetailFactory;
+    private $transactionDetailFactory;
 
     /**
      * @var TransactionDetailDataRepositoryInterface
      */
-    private TransactionDetailDataRepositoryInterface $transactionDetailRepository;
+    private $transactionDetailRepository;
 
     /**
      * @var TransactionDetail
      */
-    private TransactionDetail $transactionDetail;
+    private $transactionDetail;
 
     /**
      * @param TransactionDetail $transactionDetail

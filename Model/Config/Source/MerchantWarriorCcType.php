@@ -15,7 +15,7 @@ class MerchantWarriorCcType implements OptionSourceInterface
     /**
      * @var Config
      */
-    private Config $config;
+    private $config;
 
     /**
      * @param Config $config

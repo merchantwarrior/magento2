@@ -25,14 +25,14 @@ class SchemaLocator implements SchemaLocatorInterface
      *
      * @var null|string
      */
-    protected ?string $schema = null;
+    protected $schema = null;
 
     /**
      * Path to corresponding XSD file with validation rules for separate config files
      *
      * @var null|string
      */
-    protected ?string $perFileSchema = null;
+    protected $perFileSchema = null;
 
     /**
      * @param Reader $moduleReader

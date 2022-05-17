@@ -15,12 +15,12 @@ class CardRenderer extends AbstractTokenRenderer
     /**
      * @var GetPaymentIconsList
      */
-    private GetPaymentIconsList $getPaymentIconsList;
+    private $getPaymentIconsList;
 
     /**
      * @var array
      */
-    private array $icon;
+    private $icon;
 
     /**
      * @param Template\Context $context

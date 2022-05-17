@@ -19,12 +19,12 @@ class TokenFormatter implements PaymentTokenFormatterInterface
     /**
      * @var Config
      */
-    private Config $config;
+    private $config;
 
     /**
      * @var SerializerInterface
      */
-    private SerializerInterface $serializer;
+    private $serializer;
 
     /**
      * @param Config $config

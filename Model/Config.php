@@ -16,6 +16,12 @@ use Magento\Framework\Config\DataInterface;
 class Config
 {
     /**#@+
+     * Count transaction days
+     */
+    const COUNT_SETTLEMENT_DAYS = 7;
+    /**#@-*/
+
+    /**#@+
      * MerchantWarrior Api URL
      */
     public const API_SANDBOX_URL = 'https://base.merchantwarrior.com/';
@@ -27,6 +33,7 @@ class Config
      */
     public const XML_PATH_ACTIVE = 'payment/merchant_warrior/active';
     public const XML_PATH_IS_SANDBOX_MODE_ENABLED = 'payment/merchant_warrior/sandbox_mode';
+    public const XML_PATH_SETTLEMENT_DAYS = 'payment/merchant_warrior/settlement_days';
     /**#@-*/
 
     /**#@+
@@ -257,6 +264,19 @@ class Config
             ScopeInterface::SCOPE_STORE,
             $this->getStoreId()
         );
+    }
+
+    /**
+     * Get settlement days
+     *
+     * @return int
+     */
+    public function getSettlementDays(): int
+    {
+        if (!$value = $this->scopeConfig->getValue(self::XML_PATH_SETTLEMENT_DAYS, ScopeInterface::SCOPE_STORE)) {
+            return (int)self::COUNT_SETTLEMENT_DAYS;
+        }
+        return (int)$value;
     }
 
     /**

@@ -14,7 +14,7 @@ class Version extends Field
     /**
      * @var GetModuleVersion
      */
-    protected GetModuleVersion $getModuleVersion;
+    protected $getModuleVersion;
 
     /**
      * Version constructor.
