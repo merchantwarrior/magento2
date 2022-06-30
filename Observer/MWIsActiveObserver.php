@@ -34,7 +34,7 @@ class MWIsActiveObserver extends AbstractDataAssignObserver
         $result = $observer->getData('result');
         $mInstance = $observer->getData('method_instance');
 
-        if (!$this->isCurrencyAllowed->execute($mInstance)) {
+        if (!$this->isCurrencyAllowed->execute($mInstance->getCode())) {
             $result->setData('is_available', false);
         }
     }

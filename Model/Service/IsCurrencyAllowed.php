@@ -4,9 +4,6 @@ declare(strict_types=1);
 
 namespace MerchantWarrior\Payment\Model\Service;
 
-use Magento\Framework\Event\Observer;
-use Magento\Payment\Model\MethodInterface;
-use Magento\Quote\Api\Data\PaymentMethodInterface;
 use Magento\Store\Model\StoreManagerInterface;
 use MerchantWarrior\Payment\Model\Config;
 use MerchantWarrior\Payment\Model\Ui\ConfigProvider as MWConfigProvider;
@@ -28,7 +25,7 @@ class IsCurrencyAllowed
     private $config;
 
     /**
-     * IsCurrencyAllowed constructor.
+     * Check is currency allowed constructor
      *
      * @param StoreManagerInterface $storeManager
      * @param Config $config
@@ -42,17 +39,17 @@ class IsCurrencyAllowed
     }
 
     /**
-     * Save content to ZIP file
+     * Check is currency allowed
      *
-     * @param MethodInterface $paymentMethod
+     * @param string $paymentMethodCode
      * @param string $currency
      *
      * @return bool
      */
-    public function execute(MethodInterface $paymentMethod, string $currency = ''): bool
+    public function execute(string $paymentMethodCode, string $currency = ''): bool
     {
         $allowedCurrency = $this->config->getAllowedCurrencies();
-        if (!$this->isMWPayment($paymentMethod) || !count($allowedCurrency)) {
+        if (!$this->isMWPayment($paymentMethodCode) || !count($allowedCurrency)) {
             return true;
         }
 
@@ -69,14 +66,14 @@ class IsCurrencyAllowed
     /**
      * Check is Payment method is MW
      *
-     * @param MethodInterface $paymentMethod
+     * @param string $paymentMethodCode
      *
      * @return bool
      */
-    private function isMWPayment(MethodInterface $paymentMethod): bool
+    private function isMWPayment(string $paymentMethodCode): bool
     {
         return in_array(
-            $paymentMethod->getCode(),
+            $paymentMethodCode,
             [
                 MWConfigProvider::METHOD_CODE,
                 MWPayFrameConfigProvider::METHOD_CODE
