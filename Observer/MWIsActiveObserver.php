@@ -6,24 +6,22 @@ namespace MerchantWarrior\Payment\Observer;
 
 use Magento\Framework\Event\Observer;
 use Magento\Payment\Observer\AbstractDataAssignObserver;
-use Magento\Store\Model\StoreManagerInterface;
-use MerchantWarrior\Payment\Model\Ui\ConfigProvider as MWConfigProvider;
-use MerchantWarrior\Payment\Model\Ui\PayFrame\ConfigProvider as MWPayFrameConfigProvider;
+use MerchantWarrior\Payment\Model\Service\IsCurrencyAllowed;
 
 class MWIsActiveObserver extends AbstractDataAssignObserver
 {
     /**
-     * @var StoreManagerInterface
+     * @var IsCurrencyAllowed
      */
-    private $storeManager;
+    private $isCurrencyAllowed;
 
     /**
-     * @param StoreManagerInterface $storeManager
+     * @param IsCurrencyAllowed $isCurrencyAllowed
      */
     public function __construct(
-        StoreManagerInterface $storeManager
+        IsCurrencyAllowed $isCurrencyAllowed
     ) {
-        $this->storeManager = $storeManager;
+        $this->isCurrencyAllowed = $isCurrencyAllowed;
     }
 
     /**
@@ -35,30 +33,9 @@ class MWIsActiveObserver extends AbstractDataAssignObserver
     {
         $result = $observer->getData('result');
         $mInstance = $observer->getData('method_instance');
-        if (in_array(
-                $mInstance->getCode(),
-                [
-                    MWConfigProvider::METHOD_CODE,
-                    MWPayFrameConfigProvider::METHOD_CODE
-                ],
-                true
-            ) && !in_array($this->getCurrency(), ['AUD', 'NZD'])
-        ) {
-            $result->setData('is_available', false);
-        }
-    }
 
-    /**
-     * Get currency Code
-     *
-     * @return string|null
-     */
-    private function getCurrency(): ?string
-    {
-        try {
-            return $this->storeManager->getStore()->getCurrentCurrency()->getCode();
-        } catch (\Exception $e) {
-            return null;
+        if (!$this->isCurrencyAllowed->execute($mInstance)) {
+            $result->setData('is_available', false);
         }
     }
 }

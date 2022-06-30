@@ -9,6 +9,7 @@
                 <frontend_model>MerchantWarrior\Payment\Block\Adminhtml\System\Config\Fieldset\Group</frontend_model>
                 <include path="MerchantWarrior_Payment::system/basic.xml"/>
                 <include path="MerchantWarrior_Payment::system/payment_methods.xml"/>
+                <include path="MerchantWarrior_Payment::system/advanced.xml"/>
             </group>
         </section>
     </system>

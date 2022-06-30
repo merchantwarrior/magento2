@@ -6,11 +6,27 @@ namespace MerchantWarrior\Payment\Gateway\Validator;
 
 use Magento\Payment\Gateway\Validator\AbstractValidator;
 use Magento\Payment\Gateway\Validator\ResultInterface;
-use MerchantWarrior\Payment\Model\Ui\ConfigProvider as MWConfigProvider;
-use MerchantWarrior\Payment\Model\Ui\PayFrame\ConfigProvider as MWPayFrameConfigProvider;
+use MerchantWarrior\Payment\Model\Service\IsCurrencyAllowed;
 
 class AvailabilityValidator extends AbstractValidator
 {
+    /**
+     * @var IsCurrencyAllowed
+     */
+    private $isCurrencyAllowed;
+
+    /**
+     * @param ResultInterfaceFactory $resultFactory
+     * @param IsCurrencyAllowed  $isCurrencyAllowed
+     */
+    public function __construct(
+        ResultInterfaceFactory $resultFactory,
+        IsCurrencyAllowed $isCurrencyAllowed
+    ) {
+        parent::__construct($resultFactory);
+        $this->isCurrencyAllowed = $isCurrencyAllowed;
+    }
+
     /**
      * Validate
      *
@@ -21,20 +37,13 @@ class AvailabilityValidator extends AbstractValidator
     public function validate(array $validationSubject): ResultInterface
     {
         $paymentMethod = $validationSubject['payment'];
+        $currency = $paymentMethod->getOrder()->getCurrencyCode();
 
-        if (in_array(
-                $paymentMethod->getPayment()->getMethod(),
-                [
-                    MWConfigProvider::METHOD_CODE,
-                    MWPayFrameConfigProvider::METHOD_CODE
-                ],
-                true
-            ) && !in_array($paymentMethod->getOrder()->getCurrencyCode(), ['AUD', 'NZD'])
-        ) {
+        if (!$this->isCurrencyAllowed->execute($validationSubject['payment'], $currency)) {
             return $this->createResult(
                 false,
                 [
-                    __('Currency: %s not allowed for Merchant Warrior payment method.')
+                    __('Currency: %1 not allowed for Merchant Warrior payment method.', $currency)
                 ]
             );
         }

@@ -33,20 +33,5 @@
             <source_model>MerchantWarrior\Payment\Model\Config\Source\MerchantWarriorCcType</source_model>
             <config_path>payment/merchant_warrior_payframe/cctypes</config_path>
         </field>
-        <group id="merchant_warrior_payframe_country_specific" translate="label" showInDefault="1" showInWebsite="1" sortOrder="50">
-            <label>Country Specific Settings</label>
-            <frontend_model>Magento\Config\Block\System\Config\Form\Fieldset</frontend_model>
-            <field id="allowspecific" translate="label" type="allowspecific" sortOrder="10" showInDefault="1" showInWebsite="1" showInStore="0">
-                <label>Payment from Applicable Countries</label>
-                <source_model>Magento\Payment\Model\Config\Source\Allspecificcountries</source_model>
-                <config_path>payment/merchant_warrior_payframe/allowspecific</config_path>
-            </field>
-            <field id="specificcountry" translate="label" type="multiselect" sortOrder="20" showInDefault="1" showInWebsite="1" showInStore="0">
-                <label>Payment from Specific Countries</label>
-                <source_model>Magento\Directory\Model\Config\Source\Country</source_model>
-                <can_be_empty>1</can_be_empty>
-                <config_path>payment/merchant_warrior_payframe/specificcountry</config_path>
-            </field>
-        </group>
     </group>
 </include>
