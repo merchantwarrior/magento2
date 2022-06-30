@@ -37,7 +37,7 @@ class GlobalValidator extends AbstractValidator
      */
     public function validate(array $validationSubject): ResultInterface
     {
-        if (!$this->isCurrencyAllowed->execute($validationSubject['payment'])) {
+        if (!$this->isCurrencyAllowed->execute($validationSubject['payment']->getMethod())) {
             return $this->createResult(
                 false,
                 [

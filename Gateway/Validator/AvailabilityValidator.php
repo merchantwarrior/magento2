@@ -40,7 +40,7 @@ class AvailabilityValidator extends AbstractValidator
         $paymentMethod = $validationSubject['payment'];
         $currency = $paymentMethod->getOrder()->getCurrencyCode();
 
-        if (!$this->isCurrencyAllowed->execute($validationSubject['payment'], $currency)) {
+        if (!$this->isCurrencyAllowed->execute($paymentMethod->getPayment()->getMethod(), $currency)) {
             return $this->createResult(
                 false,
                 [
