@@ -6,6 +6,7 @@ namespace MerchantWarrior\Payment\Gateway\Validator;
 
 use Magento\Payment\Gateway\Validator\AbstractValidator;
 use Magento\Payment\Gateway\Validator\ResultInterface;
+use Magento\Payment\Gateway\Validator\ResultInterfaceFactory;
 use MerchantWarrior\Payment\Model\Service\IsCurrencyAllowed;
 
 class AvailabilityValidator extends AbstractValidator
