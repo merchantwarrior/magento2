@@ -152,7 +152,7 @@
     <virtualType name="MerchantWarriorDirectAPIValidatorPool" type="MerchantWarriorValidatorPool">
         <arguments>
             <argument name="validators" xsi:type="array">
-                <item name="country" xsi:type="string">MerchantWarrior\Payment\Gateway\Validator\DirectAPI\CountryValidator</item>
+                <item name="country" xsi:type="string">MerchantWarrior\Payment\Gateway\Validator\CountryValidator</item>
             </argument>
         </arguments>
     </virtualType>

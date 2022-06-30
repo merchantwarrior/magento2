@@ -68,6 +68,9 @@
             <label>Debug</label>
             <source_model>Magento\Config\Model\Config\Source\Yesno</source_model>
             <config_path>payment/merchant_warrior/debug</config_path>
+            <tooltip>
+                <![CDATA[This param will enable detailed logging of all transactions. The logs will be in var/log folder.]]>
+            </tooltip>
         </field>
     </group>
 </include>

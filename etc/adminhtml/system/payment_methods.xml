@@ -1,6 +1,7 @@
 <?xml version="1.0"?>
-<include xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="urn:magento:module:Magento_Config:etc/system_include.xsd">
-    <group id="merchant_warrior_configure_payment_methods" translate="label" type="text" sortOrder="120" showInDefault="1"
+<include xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:noNamespaceSchemaLocation="urn:magento:module:Magento_Config:etc/system_include.xsd">
+    <group id="merchant_warrior_configure_payment_methods" translate="label" type="text" sortOrder="100" showInDefault="1"
            showInWebsite="1"
            showInStore="1">
         <label><![CDATA[Configure Payment Methods]]></label>
@@ -8,6 +9,5 @@
         <include path="MerchantWarrior_Payment::system/payframe.xml"/>
         <include path="MerchantWarrior_Payment::system/directapi.xml"/>
         <include path="MerchantWarrior_Payment::system/vault.xml"/>
-<!--        <include path="MerchantWarrior_Payment::system/merchant_warrior_payid.xml"/>-->
     </group>
 </include>

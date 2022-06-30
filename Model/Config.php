@@ -49,14 +49,22 @@ class Config
      */
     public const XML_PATH_PAYFRAME_ACTIVE = 'payment/merchant_warrior_payframe/active';
     public const XML_PATH_PAYFRAME_ALLOWED_CC = 'payment/merchant_warrior_payframe/cctypes';
-    public const XML_PATH_PAYFRAME_ALLOWED_SPECIFIC = 'payment/merchant_warrior_payframe/allowspecific';
-    public const XML_PATH_PAYFRAME_ALLOWED_SPECIFICCOUNTRY = 'payment/merchant_warrior_payframe/specificcountry';
     /**#@-*/
 
+    /**#@+
+     * Configuration for Direct API constants
+     */
     public const XML_PATH_DIRECTAPI_ACTIVE = 'payment/merchant_warrior/active';
     public const XML_PATH_DIRECTAPI_ALLOWED_CC = 'payment/merchant_warrior/cctypes';
-    public const XML_PATH_DIRECTAPI_ALLOWED_SPECIFIC = 'payment/merchant_warrior/allowspecific';
-    public const XML_PATH_DIRECTAPI_ALLOWED_SPECIFICCOUNTRY = 'payment/merchant_warrior/specificcountry';
+    /**#@-*/
+
+    /**#@+
+     * Advanced configurations
+     */
+    public const XML_PATH_ALLOWED_CURRENCY = 'payment/merchant_warrior/allow_currency';
+    public const XML_PATH_ALLOWED_SPECIFIC = 'payment/merchant_warrior/allowspecific';
+    public const XML_PATH_ALLOWED_SPECIFICCOUNTRY = 'payment/merchant_warrior/specificcountry';
+    /**#@-*/
 
     /**#@+
      * Configuration debugger constants
@@ -236,7 +244,28 @@ class Config
     }
 
     /**
+     * Get allowed currency
+     *
+     * @return array
+     */
+    public function getAllowedCurrencies(): array
+    {
+        $currencies = $this->scopeConfig->getValue(
+            Config::XML_PATH_ALLOWED_CURRENCY,
+            ScopeInterface::SCOPE_STORE,
+            $this->getStoreId()
+        );
+        if ($currencies) {
+            return explode(',', $currencies);
+        }
+        return [];
+    }
+
+    /**
+     * Get type cards
+     *
      * @param string $configPath
+     *
      * @return array
      */
     protected function getTypeCardsByConfigPath(string $configPath): array

@@ -7,27 +7,25 @@ namespace MerchantWarrior\Payment\Gateway\Validator;
 use Magento\Payment\Gateway\Validator\AbstractValidator;
 use Magento\Payment\Gateway\Validator\ResultInterface;
 use Magento\Payment\Gateway\Validator\ResultInterfaceFactory;
-use Magento\Store\Model\StoreManagerInterface;
-use MerchantWarrior\Payment\Model\Ui\ConfigProvider as MWConfigProvider;
-use MerchantWarrior\Payment\Model\Ui\PayFrame\ConfigProvider as MWPayFrameConfigProvider;
+use MerchantWarrior\Payment\Model\Service\IsCurrencyAllowed;
 
 class GlobalValidator extends AbstractValidator
 {
     /**
-     * @var StoreManagerInterface
+     * @var IsCurrencyAllowed
      */
-    private $storeManager;
+    private $isCurrencyAllowed;
 
     /**
      * @param ResultInterfaceFactory $resultFactory
-     * @param StoreManagerInterface  $storeManager
+     * @param IsCurrencyAllowed  $isCurrencyAllowed
      */
     public function __construct(
         ResultInterfaceFactory $resultFactory,
-        StoreManagerInterface $storeManager
+        IsCurrencyAllowed $isCurrencyAllowed
     ) {
         parent::__construct($resultFactory);
-        $this->storeManager = $storeManager;
+        $this->isCurrencyAllowed = $isCurrencyAllowed;
     }
 
     /**
@@ -39,38 +37,14 @@ class GlobalValidator extends AbstractValidator
      */
     public function validate(array $validationSubject): ResultInterface
     {
-        $paymentMethod = $validationSubject['payment'];
-
-        if (in_array(
-                $paymentMethod->getMethod(),
-                [
-                    MWConfigProvider::METHOD_CODE,
-                    MWPayFrameConfigProvider::METHOD_CODE
-                ],
-                true
-            ) && !in_array($this->getCurrency(), ['AUD', 'NZD'])
-        ) {
+        if (!$this->isCurrencyAllowed->execute($validationSubject['payment'])) {
             return $this->createResult(
                 false,
                 [
-                    __('Currency: %s not allowed for Merchant Warrior payment method.')
+                    __('Current currency is not allowed for Merchant Warrior payment method.')
                 ]
             );
         }
         return $this->createResult(true);
-    }
-
-    /**
-     * Get currency Code
-     *
-     * @return string|null
-     */
-    private function getCurrency(): ?string
-    {
-        try {
-            return $this->storeManager->getStore()->getCurrentCurrency()->getCode();
-        } catch (\Exception $e) {
-            return null;
-        }
     }
 }

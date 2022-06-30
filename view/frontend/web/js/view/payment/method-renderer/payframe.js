@@ -109,8 +109,8 @@ define([
                 price,
                 {
                     decimalSymbol: ".",
-                    groupLength: 3,
-                    groupSymbol: ",",
+                    groupLength: 0,
+                    groupSymbol: "",
                     integerRequired: false,
                     pattern: "%s",
                     precision: 2,
