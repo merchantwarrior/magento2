@@ -96,7 +96,7 @@ class GetSettlementData
             $this->file->deleteFile($fileName . '.csv');
             $this->file->deleteFile($fileName . '.zip');
         } catch (\Exception $e) {
-            $this->logger->error($e->getMessage());
+            $this->logger->error(__METHOD__ . ': ' . $e->getMessage());
 
             return [];
         }
@@ -153,7 +153,7 @@ class GetSettlementData
             }
             return $fileName . '.zip';
         } catch (\Exception $e) {
-            $this->logger->error($e->getMessage());
+            $this->logger->error(__METHOD__ . ': ' . $e->getMessage());
 
             return null;
         }
