@@ -62,8 +62,9 @@ class OrderCancelPlugin
             $payment = $quote->getPayment();
 
             if (0 === strpos($payment->getMethod(), ConfigProvider::METHOD_CODE)) {
-                $incrementId = $quote->getReservedOrderId();
-                $this->rollbackTransaction->execute($incrementId);
+                if ($incrementId = $quote->getReservedOrderId()) {
+                    $this->rollbackTransaction->execute($incrementId);
+                }
             }
             throw $e;
         }
