@@ -380,12 +380,22 @@ define([
                     this.processCardAction();
                 }
 
+                if (
+                    this.tdsCheck.mwTDSMessage === '3DS Failed'
+                    && this.tdsCheck.mwTDSResult === 'U'
+                ) {
+                    globalMessageList.addErrorMessage({
+                        message: this.tdsCheck.mwTDSMessage
+                    });
+                }
+
                 if (this.tdsCheck.mwTDSResult === 'error') {
                     globalMessageList.addErrorMessage({
                         message: this.tdsCheck.mwTDSMessage
                     });
                 }
                 this.tdsCheck.destroy();
+                this._resetForm();
             }
         },
 
