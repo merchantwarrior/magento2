@@ -30,7 +30,7 @@ define([
             frameStyle: {
                 errorTextColor: 'red',
                 errorBorderColor: 'red',
-                fontSize: '18px',
+                fontSize: '14px',
                 width: '400px',
                 cardTypeDisplay: 'right',
                 padding: '5px',
