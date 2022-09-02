@@ -34,7 +34,8 @@ define([
                 width: '400px',
                 cardTypeDisplay: 'right',
                 padding: '5px',
-                fieldHeight: '60px'
+                fieldHeight: '60px',
+                placeholderStyle: {'fontSize': '14px'}
             }
         },
         mwPayframe: '',
