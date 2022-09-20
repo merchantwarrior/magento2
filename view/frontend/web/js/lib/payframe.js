@@ -88,6 +88,13 @@ function payframe(firstPar,_apikey,_payframeDivId,_src, _submitUrl, _styleInput,
     } else {
         iframeSrc = 'https://secure.merchantwarrior.com/payframe/';
     }
+    //load MW SDK
+    if(iframeSrc.indexOf("payframe/") > 0) {
+        webSDKUrl = iframeSrc.replace("payframe/", "sdk/merchantwarrior.min.js");
+        var webSDKScript = document.createElement('script');
+        webSDKScript.src = webSDKUrl;
+        document.head.appendChild(webSDKScript);
+    }
     this.iframeSrc = iframeSrc;
     //var payform = document.getElementById(payformId);
     this.tokenStatus = 'NO_TOKEN';
@@ -725,9 +732,12 @@ function payframe(firstPar,_apikey,_payframeDivId,_src, _submitUrl, _styleInput,
         payform.appendChild(newInput);
     };
     this.bindEvent(window, 'message', function (e) {
-        //console.log("recieved event from: " + e.origin);
         if(e.origin.indexOf('merchantwarrior') >= 0 && e.data) {
-            var payframeData = JSON.parse(e.data);
+            try {
+                var payframeData = JSON.parse(e.data);
+            } catch(e) {
+                return;
+            }
             if(payframeData.mwOutput && payframeData.mwMessage && mwPayframe.active) {
                 e.stopPropagation();
                 e.stopImmediatePropagation();
@@ -935,7 +945,7 @@ function payframe(firstPar,_apikey,_payframeDivId,_src, _submitUrl, _styleInput,
 }
 
 function tdsCheck(firstPar, _apikey, _tdsDivId, _submitUrl, _style) {
-    let accessToken, uuid, apikey, tdsDivId, submitUrl, style;
+    let accessToken, uuid, apikey, tdsDivId, submitUrl, style, additionalInfo;
     if(typeof firstPar === 'object') {
 
         if(typeof firstPar.accessToken !== 'undefined'){accessToken = firstPar.accessToken;}
@@ -961,26 +971,47 @@ function tdsCheck(firstPar, _apikey, _tdsDivId, _submitUrl, _style) {
     if(document.getElementById(tdsDivId) == null) {
         throw "tdsDivId entered '" + tdsDivId + "' doesn't exist";
     }
+    webSDKOptions = {
+        environment: 'development'
+    }
     if(submitUrl.toLowerCase() == 'camp') {
         submitUrl = 'https://base.merchantwarrior.com/payframe/';
     } else if(submitUrl.toLowerCase() == 'prod' || submitUrl.toLowerCase() == 'production') {
+        webSDKOptions.environment = 'production';
         submitUrl = 'https://api.merchantwarrior.com/payframe/';
     } else if(typeof submitUrl == 'string' && (submitUrl.toLowerCase().indexOf('merchantwarrior.com') > 0 || submitUrl.toLowerCase().indexOf('merchantwarrior.test') > 0)) {
+        if(submitUrl.toLowerCase().indexOf('merchantwarrior.com') > 0){
+            webSDKOptions.environment = 'production';
+        }
         submitUrl = submitUrl;
         if(submitUrl.substring(submitUrl.length-1, submitUrl.length) != "/") {
             submitUrl += "/";
         }
     } else {
         submitUrl = 'https://api.merchantwarrior.com/payframe/';
+        webSDKOptions.environment = 'production';
     }
     this.div = document.getElementById(tdsDivId);
     this.mwPayframe = null;
     var tdsCheck = this;
+    this.mwTDSManager = null;
+    createMerchantWarriorManager = function (paymentInfo) {
+        if(typeof accessToken !== 'undefined') {
+            merchantWarriorManager = MerchantWarrior.createWithToken(accessToken, webSDKOptions);
+        }else{
+            merchantWarriorManager = MerchantWarrior.create(firstPar, _apikey, webSDKOptions);
+        }
+        return merchantWarriorManager.then((mwarrior) => {
+            tdsManager = mwarrior.createTDSManager(paymentInfo);
+            return tdsManager
+        });
+    };
     this.mwCallback = function(){
         throw 'please add a callback function to run when 3ds has been checked - eg tdsCheck.mwCallback = function(){ --code };';
     };
     var customerIP = 'auto';
-    function ajaxSuccess(data, status) {
+
+    function ajaxSuccess(data, status, tdsRequest, additionalInfo = null) {
         var responseCode = data.getElementsByTagName("responseCode");
         if(responseCode && responseCode.length > 0 && responseCode[0].childNodes.length > 0) {
             var output = data.getElementsByTagName("responseCode")[0].childNodes[0].nodeValue;
@@ -991,7 +1022,17 @@ function tdsCheck(firstPar, _apikey, _tdsDivId, _submitUrl, _style) {
                 } else {
                     enrolled = '';
                 }
-                if(enrolled == 'Y') {
+
+                //3DSv2 Check
+                var tdsV2FallbackElement = data.getElementsByTagName("fallback");
+                if(tdsV2FallbackElement && tdsV2FallbackElement.length > 0 && tdsV2FallbackElement[0].childNodes.length > 0) {
+                    tdsV2Fallback = data.getElementsByTagName("fallback")[0].childNodes[0].nodeValue;
+                } else {
+                    tdsV2Fallback = '';
+                }
+
+
+                if(enrolled == 'Y' || tdsV2Fallback == 'Y') {
                     var acsUrl = data.getElementsByTagName("acsURL")[0].childNodes[0].nodeValue;
                     var paReq = data.getElementsByTagName("paReq")[0].childNodes[0].nodeValue;
                     if(style && style.subFrame == true) {
@@ -1003,6 +1044,7 @@ function tdsCheck(firstPar, _apikey, _tdsDivId, _submitUrl, _style) {
                         var subHeight = '600px';
                         if(style.width) subWidth = style.width;
                         if(style.height) subHeight = style.height;
+
                         var msg = {
                             messageType: 'action',
                             action : 'makeTDS',
@@ -1091,6 +1133,131 @@ function tdsCheck(firstPar, _apikey, _tdsDivId, _submitUrl, _style) {
                         tdsCheck.loaded();
                     }
                     tdsCheck.mwCallback(tdsCheck.liabilityShifted, tdsCheck.mwTDSToken);
+
+                } else if(tdsV2Fallback == 'N') {
+                    // 3DSv2 Availability recorded in NM-2.0 ENV and payFramd index existed in 1.0Server, thus we need to call checkEnrollment for the availability check.
+                    // As we already called checkEnrollment, we are going to pass checkEnrollment part in WEB-SDK
+                    // below part can be polish in both payframe or web-sdk level
+                    var checkEnrollmentResponse = {requiredAction: "None",version: "2.0",data:{}}
+                    if(data.getElementsByTagName("acsURL").length > 0 && data.getElementsByTagName("acsURL")[0].childNodes[0]
+                        && data.getElementsByTagName("paReq").length > 0 && data.getElementsByTagName("paReq")[0].childNodes[0]){
+                        checkEnrollmentResponse.requiredAction = "threeDSMethodIframe";
+                        checkEnrollmentResponse.data = {
+                            acsURL : data.getElementsByTagName("acsURL")[0].childNodes[0].nodeValue,
+                            paReq : data.getElementsByTagName("paReq")[0].childNodes[0].nodeValue,
+                        }
+                    }else if(data.getElementsByTagName("threeDSServerTransID").length > 0 && data.getElementsByTagName("threeDSServerTransID")[0].childNodes[0]
+                        && data.getElementsByTagName("threeDSCompInd").length > 0 && data.getElementsByTagName("threeDSCompInd")[0].childNodes[0]){
+                        checkEnrollmentResponse.requiredAction = "checkTDSAuth";
+                        checkEnrollmentResponse.data = {
+                            threeDSServerTransID : data.getElementsByTagName("threeDSServerTransID")[0].childNodes[0].nodeValue,
+                            threeDSCompInd : data.getElementsByTagName("threeDSCompInd")[0].childNodes[0].nodeValue,
+                        }
+                    }
+                    if(checkEnrollmentResponse.requiredAction == "None"){
+                        checkEnrollmentResponse.data = {
+                            responseCode : TDSManager.getXMLValue(data, "responseCode"),
+                            responseMessage : TDSManager.getXMLValue(data, "responseMessage"),
+                            enrolled : TDSManager.getXMLValue(data, "enrolled"),
+                            threeDSEci : TDSManager.getXMLValue(data, "eci")
+                        }
+                    }
+
+                    //Abide Content Security Policy - Invoke 3DSv2 inside MWPayframe-Iframe
+                    if(style && style.subFrame == true) {
+                        if(tdsCheck.mwPayframe == null) {
+                            throw 'If you wish to use the tds subFrame, please link the tdsCheck and mwPayframe with tdsCheck.link(mwPayframe)';
+                        }
+                        tdsCheck.mwPayframe.disable();
+                        var subWidth = '500px';
+                        var subHeight = '600px';
+                        if(style.width) subWidth = style.width;
+                        if(style.height) subHeight = style.height;
+
+                        var msg = {
+                            messageType: 'action',
+                            action : 'makeTDSV2',
+                            width: subWidth,
+                            height: subHeight,
+                            submitUrl: submitUrl,
+                            payframeToken : tdsRequest.payframeToken,
+                            payframeKey : tdsRequest.payframeKey,
+                            transactionAmount : tdsRequest.transactionAmount,
+                            transactionCurrency : tdsRequest.transactionCurrency,
+                            transactionProduct : tdsRequest.transactionProduct,
+                            additionalInfo : additionalInfo,
+                            webSDKOptions : webSDKOptions,
+                            checkEnrollmentResponse : checkEnrollmentResponse,
+                        };
+                        if(typeof accessToken !== 'undefined') {
+                            msg.accessToken = accessToken;
+                        } else {
+                            msg.merchantUUID = uuid;
+                            msg.apiKey = apikey;
+                        }
+                        var jsnMsg = JSON.stringify(msg);
+                        tdsCheck.mwPayframe.sendMessage(jsnMsg);
+
+                    }else{
+
+                        //custom 3DS style
+                        var width = '500px'
+                        var height = '500px';
+                        var childNodes = tdsCheck.div.getElementsByTagName('iframe');
+                        if(childNodes && childNodes.length == 1) {
+                            width = childNodes[0].width;
+                            height = childNodes[0].height;
+                            tdsCheck.div.removeChild(childNodes[0]);
+                        }
+                        if(style) {
+                            if(style.width) width = style.width;
+                            if(style.height) height = style.height;
+                        }
+
+                        //append required threeds-container DIV
+                        tdsV2threedscontainer = document.createElement("div");
+                        tdsV2threedscontainer.id = "threeds-container";
+                        tdsCheck.div.appendChild(tdsV2threedscontainer);
+                        //allocate paymentInfo including additionalInfo
+                        paymentInfo = this.processPaymentInfo(tdsRequest.payframeToken,tdsRequest.payframeKey,tdsRequest.transactionAmount,tdsRequest.transactionCurrency,tdsRequest.transactionProduct,additionalInfo);
+                        this.createMerchantWarriorManager(paymentInfo).then((mwTDSManager) => {
+                            mwTDSManager.loading = tdsCheck.loading;
+                            mwTDSManager.loaded = tdsCheck.loaded;
+                            mwTDSManager.setChallengeIframeScale(width,height);
+                            mwTDSManager.handleCheckEnrollmentResult(checkEnrollmentResponse)
+                            mwTDSManager.mwCallback = function(results){
+                                if(results.threeDSStatus == 'Y' || (results.threeDSStatus == 'N' && (results.threeDSEci == '6' || results.threeDSEci == '06') ) ||
+                                    (results.threeDSStatus == 'A' && ((results.threeDSEci == '6' || results.threeDSEci == '06') || (results.threeDSEci == '1' || results.threeDSEci == '01')))) {
+                                    tdsCheck.mwTDSMessage = '3DS Successful';
+                                    tdsCheck.liabilityShifted = true;
+                                    tdsCheck.mwTDSResult = results.threeDSStatus;
+                                    tdsCheck.mwTDSToken = results.threeDSToken;
+                                    tdsCheck.mwTDSEnrolled = 'Y';
+                                    tdsCheck.mwEci = results.threeDSEci;
+                                    tdsCheck.mwXid = results.threeDSXid;
+                                    tdsCheck.mwCavv = results.threeDSCavv;
+                                    if(typeof tdsCheck.loaded == 'function') {
+                                        tdsCheck.loaded();
+                                    }
+                                    tdsCheck.mwCallback(tdsCheck.liabilityShifted, tdsCheck.mwTDSToken);
+                                } else {
+                                    tdsCheck.mwTDSMessage = '3DS Failed';
+                                    tdsCheck.liabilityShifted = false;
+                                    tdsCheck.mwTDSResult = results.mwTDSResult;
+                                    tdsCheck.mwTDSToken = results.mwTDSToken;
+                                    tdsCheck.mwTDSEnrolled = 'Y';
+                                    tdsCheck.mwEci = results.mwEci;
+                                    tdsCheck.mwXid = results.mwXid;
+                                    tdsCheck.mwCavv = results.mwCavv;
+                                    if(typeof tdsCheck.loaded == 'function') {
+                                        tdsCheck.loaded();
+                                    }
+                                    tdsCheck.mwCallback(tdsCheck.liabilityShifted, tdsCheck.mwTDSToken);
+                                }
+                            };
+
+                        });
+                    }
                 } else {
                     tdsCheck.mwTDSMessage = 'Cardholder not enrolled in 3DS';
                     tdsCheck.liabilityShifted = false;
@@ -1136,8 +1303,8 @@ function tdsCheck(firstPar, _apikey, _tdsDivId, _submitUrl, _style) {
             tdsCheck.mwCallback(tdsCheck.liabilityShifted, tdsCheck.mwTDSToken);
         }
 
-
     }
+
     function ajaxFail(xml, status, error) {
         tdsCheck.mwTDSMessage = status + ' - ' + error;
         tdsCheck.liabilityShifted = false;
@@ -1150,7 +1317,8 @@ function tdsCheck(firstPar, _apikey, _tdsDivId, _submitUrl, _style) {
         tdsCheck.mwCallback(tdsCheck.liabilityShifted, tdsCheck.mwTDSToken);
     }
 
-    this.checkTDS = function checkTDS(payframeToken, mwKey, transactionAmount, transactionCurrency, transactionProduct) {
+
+    this.checkTDS = function checkTDS(payframeToken, mwKey, transactionAmount, transactionCurrency, transactionProduct, additionalInfo = null) {
         if(!payframeToken || !mwKey || !transactionAmount || !transactionCurrency || !transactionProduct) {
             throw 'please call checkTDS with the details of the transaction - tdsCheck.checkTDS(payframeToken, mwKey, transactionAmount, transactionCurrency, transactionProduct)';
         }
@@ -1164,7 +1332,8 @@ function tdsCheck(firstPar, _apikey, _tdsDivId, _submitUrl, _style) {
             'transactionProduct': transactionProduct,
             'customerIP': customerIP,
             'payframeToken': payframeToken,
-            'payframeKey': mwKey
+            'payframeKey': mwKey,
+            'notifyURL': submitUrl.replace("payframe/", "threeds/notify")
         }
         if(typeof accessToken !== 'undefined') {
             tdsData['accessToken'] = accessToken;
@@ -1180,7 +1349,7 @@ function tdsCheck(firstPar, _apikey, _tdsDivId, _submitUrl, _style) {
                 data: tdsData,
                 dataType: 'xml',
                 success:function(data, status) {
-                    ajaxSuccess(data, status);
+                    ajaxSuccess(data, status, tdsData, additionalInfo);
                 },
                 error: function(xml, status, error) {
                     ajaxFail(xml, status, error);
@@ -1198,7 +1367,7 @@ function tdsCheck(firstPar, _apikey, _tdsDivId, _submitUrl, _style) {
                         console.log('http success responseXML');
                         console.log(xhttp.responseXML);*/
                         //document.getElementById("demo").innerHTML = this.responseText;
-                        ajaxSuccess(xhttp.responseXML, xhttp.status + xhttp.statusText);
+                        ajaxSuccess(xhttp.responseXML, xhttp.status + xhttp.statusText, tdsData, additionalInfo);
                     } else {
                         /*console.log('http error status');
                         console.log(xhttp.status);
@@ -1225,6 +1394,37 @@ function tdsCheck(firstPar, _apikey, _tdsDivId, _submitUrl, _style) {
         }
 
     }
+
+    processPaymentInfo = function(payframeToken, mwKey, transactionAmount, transactionCurrency, transactionProduct, additionalInfo = null){
+        var cardInfo = {
+            payframeToken: payframeToken,
+            payframeKey: mwKey,
+        }
+        var paymentInfo = {
+            transactionInfo:{
+                transactionProduct: transactionProduct,
+                transactionAmount: transactionAmount,
+                transactionCurrency: transactionCurrency,
+                cardInfo: cardInfo,
+            },
+            customerName: (additionalInfo && typeof additionalInfo.customerName == "string") ? additionalInfo.customerName : "",
+            billingAddress: {
+                billAddrLine1 : (additionalInfo && typeof additionalInfo.billAddrLine1 == "string") ? additionalInfo.billAddrLine1 : "",
+                billAddrCity: (additionalInfo && typeof additionalInfo.billAddrCity == "string") ? additionalInfo.billAddrCity : "",
+                billAddrState : (additionalInfo && typeof additionalInfo.billAddrState == "string") ? additionalInfo.billAddrState : "",
+                billAddrPostCode :(additionalInfo && typeof additionalInfo.billAddrPostCode == "string") ? additionalInfo.billAddrPostCode : "",
+                billAddrCountry : (additionalInfo && typeof additionalInfo.billAddrCountry == "string") ? additionalInfo.billAddrCountry : "",
+            },
+            threeDS:{
+                notifyURL: false, // Payframe will stick with ALL-IN-One mode. Thus, customer cannot set up their own notifyURL
+            }
+        }
+
+        return paymentInfo;
+    }
+
+
+
     this.bindEvent = function bindEvent(element, eventName, eventHandler) {
         if (element.addEventListener){
             element.addEventListener(eventName, eventHandler, true);
@@ -1250,10 +1450,16 @@ function tdsCheck(firstPar, _apikey, _tdsDivId, _submitUrl, _style) {
         if(tdsCheck.tdsIframe) {
             tdsCheck.div.removeChild(document.getElementById(tdsCheck.tdsIframe.id));
         }
+        if(document.getElementById("threeds-container"))
+            tdsCheck.div.removeChild(document.getElementById("threeds-container"));
     };
     this.bindEvent(window, 'message', function (e) {
         if(e.origin.indexOf('merchantwarrior') >= 0 && e.data) {
-            var tdsCheckData = JSON.parse(e.data);
+            try {
+                var tdsCheckData = JSON.parse(e.data);
+            } catch(e) {
+                return;
+            }
             if(tdsCheckData.mwTDSResult) {
                 e.stopPropagation();
                 e.stopImmediatePropagation();
@@ -1273,13 +1479,23 @@ function tdsCheck(firstPar, _apikey, _tdsDivId, _submitUrl, _style) {
             tdsCheck.mwEci = tdsCheckData.mwEci;
             tdsCheck.mwXid = tdsCheckData.mwXid;
             tdsCheck.mwCavv = tdsCheckData.mwCavv;
+            if(tdsCheck.source ==  "makeTDSV2"){
+                if(typeof tdsCheck.loaded == 'function') {tdsCheck.loaded();}
+            }
             tdsCheck.mwCallback(tdsCheck.liabilityShifted, tdsCheck.mwTDSToken);
+
         } else if(tdsCheckData.mwTDSResult == 'scaleTDSPayframeDimensions' && tdsCheck.mwPayframe) {
             if(tdsCheckData.mwTDSPayframeHeight && tdsCheckData.mwTDSPayframeWidth) {
                 tdsCheck.mwPayframe.mwIframe.width = tdsCheckData.mwTDSPayframeWidth;
                 tdsCheck.mwPayframe.mwIframe.height = tdsCheckData.mwTDSPayframeHeight;
             }
-        } else {
+        } else if(tdsCheckData.mwTDSResult == 'TDSPayframeSubFrameAction' && tdsCheck.mwPayframe){
+            if(tdsCheckData.requiredAction == "loading"){
+                if(typeof tdsCheck.loading == 'function') {tdsCheck.loading();}
+            }else if(tdsCheckData.requiredAction == "loaded"){
+                if(typeof tdsCheck.loaded == 'function') {tdsCheck.loaded();}
+            }
+        }else {
             tdsCheck.mwTDSMessage = '3DS Failed';
             tdsCheck.liabilityShifted = false;
             tdsCheck.mwTDSResult = tdsCheckData.mwTDSResult;
