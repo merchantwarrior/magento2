@@ -29,19 +29,14 @@ class DirectApiTransactionDataBuilder extends AbstractDataBuilder
         $expiry = $leadingZero . $payment->getCcExpMonth() . substr($payment->getCcExpYear(), -2);
 
         $result = [
-            RequestApiInterface::PAYMENT_CARD_NUMBER
-                => $payment->getCcNumber(),
-            RequestApiInterface::PAYMENT_CARD_CSC
-                => $payment->getCcCid(),
-            RequestApiInterface::PAYMENT_CARD_NAME
-                => $payment->getCcOwner(),
-            RequestApiInterface::PAYMENT_CARD_EXPIRY
-                => $expiry,
-            RequestApiInterface::PAYMENT_CARD_TYPE
-                => $payment->getCcType()
+            RequestApiInterface::PAYMENT_CARD_NUMBER    => $payment->getCcNumber(),
+            RequestApiInterface::PAYMENT_CARD_CSC       => $payment->getCcCid(),
+            RequestApiInterface::PAYMENT_CARD_NAME      => $payment->getCcOwner(),
+            RequestApiInterface::PAYMENT_CARD_EXPIRY    => $expiry,
+            RequestApiInterface::PAYMENT_CARD_TYPE      => $payment->getCcType()
         ];
 
-        if ($tdsToken = $payment->getAdditionalInformation(RequestApiInterface::PAYFRAME_THREE_DS_TOKEN)) {
+        if ($tdsToken = $payment->getAdditionalInformation(RequestApiInterface::PAYFRAME_TDS_TOKEN)) {
             $result[RequestApiInterface::PAYFRAME_THREE_DS_TOKEN] = $tdsToken;
         }
         return $result;

@@ -49,7 +49,7 @@ class TransactionDataBuilder extends AbstractDataBuilder
             'cardID' => $data->getGatewayToken()
         ];
 
-        if ($tdsToken = $payment->getAdditionalInformation(RequestApiInterface::PAYFRAME_THREE_DS_TOKEN)) {
+        if ($tdsToken = $payment->getAdditionalInformation(RequestApiInterface::PAYFRAME_TDS_TOKEN)) {
             $result[RequestApiInterface::PAYFRAME_THREE_DS_TOKEN] = $tdsToken;
         }
 

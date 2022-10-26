@@ -220,7 +220,7 @@ define([
         },
 
         /**
-         * Check is save to vault checkbox is checked
+         * Check is the saving to vault checkbox is checked
          *
          * @return {boolean}
          * @private

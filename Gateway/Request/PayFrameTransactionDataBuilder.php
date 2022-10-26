@@ -25,13 +25,15 @@ class PayFrameTransactionDataBuilder extends AbstractDataBuilder
         $payment = $paymentDO->getPayment();
 
         $result = [
-            RequestApiInterface::PAYFRAME_TOKEN
-                => $payment->getAdditionalInformation(RequestApiInterface::PAYFRAME_TOKEN),
-            RequestApiInterface::PAYFRAME_KEY
-                => $payment->getAdditionalInformation(RequestApiInterface::PAYFRAME_KEY)
+            RequestApiInterface::PAYFRAME_TOKEN => $payment->getAdditionalInformation(
+                RequestApiInterface::PAYFRAME_TOKEN
+            ),
+            RequestApiInterface::PAYFRAME_KEY => $payment->getAdditionalInformation(
+                RequestApiInterface::PAYFRAME_KEY
+            )
         ];
 
-        if ($tdsToken = $payment->getAdditionalInformation(RequestApiInterface::PAYFRAME_THREE_DS_TOKEN)) {
+        if ($tdsToken = $payment->getAdditionalInformation(RequestApiInterface::PAYFRAME_TDS_TOKEN)) {
             $result[RequestApiInterface::PAYFRAME_THREE_DS_TOKEN] = $tdsToken;
         }
 

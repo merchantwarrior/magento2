@@ -7,3 +7,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ## [1.0.0] - 16-03-2022
 ### Added
 - Initied module
+
+## [1.0.2] - 26-10-2022
+### Changed
+- Fixed issue with passing tdsToken to transactions
