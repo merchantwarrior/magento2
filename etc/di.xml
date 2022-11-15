@@ -1,0 +1,581 @@
+<?xml version="1.0"?>
+<config xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+        xsi:noNamespaceSchemaLocation="urn:magento:framework:ObjectManager/etc/config.xsd">
+    <!-- Direct API -->
+    <preference for="MerchantWarrior\Payment\Api\Direct\ProcessInterface"
+                type="MerchantWarrior\Payment\Model\Api\Direct\Process" />
+    <preference for="MerchantWarrior\Payment\Api\Direct\RefundCardInterface"
+                type="MerchantWarrior\Payment\Model\Api\Direct\RefundCard" />
+    <preference for="MerchantWarrior\Payment\Api\Direct\ProcessVoidInterface"
+                type="MerchantWarrior\Payment\Model\Api\Direct\ProcessVoid" />
+    <preference for="MerchantWarrior\Payment\Api\Direct\ProcessAuthInterface"
+                type="MerchantWarrior\Payment\Model\Api\Direct\ProcessAuth" />
+    <preference for="MerchantWarrior\Payment\Api\Direct\ProcessCaptureInterface"
+                type="MerchantWarrior\Payment\Model\Api\Direct\ProcessCapture" />
+    <preference for="MerchantWarrior\Payment\Api\Direct\ProcessCardInterface"
+                type="MerchantWarrior\Payment\Model\Api\Direct\ProcessCard" />
+    <preference for="MerchantWarrior\Payment\Api\Direct\GetSettlementInterface"
+                type="MerchantWarrior\Payment\Model\Api\Direct\GetSettlement" />
+    <!-- PayFrame API -->
+    <preference for="MerchantWarrior\Payment\Api\Payframe\ProcessInterface"
+                type="MerchantWarrior\Payment\Model\Api\Payframe\Process" />
+    <!-- Token API -->
+    <preference for="MerchantWarrior\Payment\Api\Token\AddCardInterface"
+                type="MerchantWarrior\Payment\Model\Api\Token\AddCard" />
+    <preference for="MerchantWarrior\Payment\Api\Token\RemoveCardInterface"
+                type="MerchantWarrior\Payment\Model\Api\Token\RemoveCard" />
+    <preference for="MerchantWarrior\Payment\Api\Token\ProcessInterface"
+                type="MerchantWarrior\Payment\Model\Api\Token\Process" />
+    <!-- Resource Models -->
+    <preference for="MerchantWarrior\Payment\Api\TransactionDetailDataRepositoryInterface"
+                type="MerchantWarrior\Payment\Model\TransactionDetailRepository" />
+    <preference for="MerchantWarrior\Payment\Api\Data\TransactionDetailDataInterface"
+                type="MerchantWarrior\Payment\Model\TransactionDetail" />
+
+    <!-- Loggers Init -->
+    <virtualType name="MerchantWarrior\Payment\Model\Debug" type="Magento\Framework\Logger\Handler\Debug">
+        <arguments>
+            <argument name="fileName" xsi:type="string">/var/log/merchant_warrior/debug.log</argument>
+        </arguments>
+    </virtualType>
+    <virtualType name="MerchantWarrior\Payment\Model\Error" type="Magento\Framework\Logger\Handler\Exception">
+        <arguments>
+            <argument name="fileName" xsi:type="string">/var/log/merchant_warrior/exception.log</argument>
+        </arguments>
+    </virtualType>
+    <virtualType name="MerchantWarrior\Payment\Model\Logger" type="Magento\Framework\Logger\Monolog">
+        <arguments>
+            <argument name="handlers" xsi:type="array">
+                <item name="debug" xsi:type="object">MerchantWarrior\Payment\Model\Debug</item>
+                <item name="error" xsi:type="object">MerchantWarrior\Payment\Model\Error</item>
+            </argument>
+        </arguments>
+    </virtualType>
+
+    <virtualType name="MerchantWarrior\Payment\Block\Form\DirectApi" type="Magento\Payment\Block\Form\Cc">
+        <arguments>
+            <argument name="data" xsi:type="array">
+                <item name="template" xsi:type="string">MerchantWarrior_Payment::form/cc.phtml</item>
+            </argument>
+            <argument name="paymentConfig" xsi:type="object">MerchantWarrior\Payment\Model\Configuration</argument>
+        </arguments>
+    </virtualType>
+    <virtualType name="MerchantWarrior\Payment\Model\Configuration" type="Magento\Payment\Model\Config">
+        <arguments>
+            <argument name="dataStorage" xsi:type="object">MerchantWarrior\Payment\Model\Config\Data</argument>
+        </arguments>
+    </virtualType>
+
+    <type name="MerchantWarrior\Payment\Model\Config\Reader">
+        <arguments>
+            <argument name="fileName" xsi:type="string">merchant_warrior_payment.xml</argument>
+            <argument name="converter" xsi:type="object">MerchantWarrior\Payment\Model\Config\Converter</argument>
+            <argument name="schemaLocator" xsi:type="object">MerchantWarrior\Payment\Model\Config\SchemaLocator</argument>
+        </arguments>
+    </type>
+    <virtualType name="MerchantWarrior\Payment\Model\Config\Data" type="Magento\Framework\Config\Data">
+        <arguments>
+            <argument name="reader" xsi:type="object">MerchantWarrior\Payment\Model\Config\Reader\Proxy</argument>
+            <argument name="cacheId" xsi:type="string">merchant_warrior_payment_config</argument>
+        </arguments>
+    </virtualType>
+    <type name="MerchantWarrior\Payment\Model\Config">
+        <arguments>
+            <argument name="dataStorage" xsi:type="object">MerchantWarrior\Payment\Model\Config\Data</argument>
+        </arguments>
+    </type>
+
+    <!-- Payment Method Facade configuration -->
+    <virtualType name="MerchantWarriorFacade" type="Magento\Payment\Model\Method\Adapter">
+        <arguments>
+            <argument name="code" xsi:type="const">MerchantWarrior\Payment\Model\Ui\ConfigProvider::METHOD_CODE</argument>
+            <argument name="formBlockType" xsi:type="string">MerchantWarrior\Payment\Block\Form\DirectApi</argument>
+            <argument name="infoBlockType" xsi:type="string">MerchantWarrior\Payment\Block\Info\PayFrame</argument>
+            <argument name="valueHandlerPool" xsi:type="object">MerchantWarriorPaymentValueHandlerPool</argument>
+            <argument name="validatorPool" xsi:type="object">MerchantWarriorDirectAPIValidatorPool</argument>
+            <argument name="commandPool" xsi:type="object">MerchantWarriorPaymentCommandPool</argument>
+            <argument name="logger" xsi:type="object">MerchantWarrior\Payment\Model\Logger</argument>
+        </arguments>
+    </virtualType>
+
+    <!-- Pay Frame Payment Method Facade configuration -->
+    <virtualType name="MerchantWarriorPayFrameFacade" type="MerchantWarriorFacade">
+        <arguments>
+            <argument name="code" xsi:type="const">MerchantWarrior\Payment\Model\Ui\PayFrame\ConfigProvider::METHOD_CODE</argument>
+            <argument name="formBlockType" xsi:type="string">Magento\Payment\Block\Form</argument>
+            <argument name="infoBlockType" xsi:type="string">MerchantWarrior\Payment\Block\Info\PayFrame</argument>
+            <argument name="valueHandlerPool" xsi:type="object">MerchantWarriorPaymentPayFrameValueHandlerPool</argument>
+            <argument name="commandPool" xsi:type="object">MerchantWarriorPaymentPayFrameCommandPool</argument>
+            <argument name="validatorPool" xsi:type="object">MerchantWarriorValidatorPool</argument>
+            <argument name="logger" xsi:type="object">MerchantWarrior\Payment\Model\Logger</argument>
+        </arguments>
+    </virtualType>
+
+    <!-- CC Vault Payment Method Facade configuration -->
+    <virtualType name="MerchantWarriorCreditCardVaultFacade" type="Magento\Vault\Model\Method\Vault">
+        <arguments>
+            <argument name="config" xsi:type="object">MerchantWarriorVaultPaymentConfig</argument>
+            <argument name="valueHandlerPool" xsi:type="object">MerchantWarriorVaultPaymentValueHandlerPool</argument>
+            <argument name="code" xsi:type="const">MerchantWarrior\Payment\Model\Ui\ConfigProvider::CC_VAULT_CODE</argument>
+            <argument name="vaultProvider" xsi:type="object">MerchantWarriorPayFrameFacade</argument>
+            <argument name="logger" xsi:type="object">MerchantWarrior\Payment\Model\Logger</argument>
+        </arguments>
+    </virtualType>
+
+    <virtualType name="MerchantWarriorVaultPaymentConfig" type="Magento\Payment\Gateway\Config\Config">
+        <arguments>
+            <argument name="methodCode" xsi:type="const">MerchantWarrior\Payment\Model\Ui\ConfigProvider::CC_VAULT_CODE</argument>
+        </arguments>
+    </virtualType>
+    <virtualType name="MerchantWarriorVaultPaymentValueHandler" type="VaultPaymentDefaultValueHandler">
+        <arguments>
+            <argument name="configInterface" xsi:type="object">MerchantWarriorVaultPaymentConfig</argument>
+        </arguments>
+    </virtualType>
+    <virtualType name="MerchantWarriorVaultPaymentValueHandlerPool" type="VaultPaymentValueHandlerPool">
+        <arguments>
+            <argument name="handlers" xsi:type="array">
+                <item name="default" xsi:type="string">MerchantWarriorVaultPaymentValueHandler</item>
+            </argument>
+        </arguments>
+    </virtualType>
+
+    <!-- MW validators infrastructure -->
+    <virtualType name="MerchantWarriorValidatorPool" type="Magento\Payment\Gateway\Validator\ValidatorPool">
+        <arguments>
+            <argument name="validators" xsi:type="array">
+                <item name="country" xsi:type="string">MerchantWarrior\Payment\Gateway\Validator\CountryValidator</item>
+                <item name="availability" xsi:type="string">MerchantWarrior\Payment\Gateway\Validator\AvailabilityValidator</item>
+            </argument>
+        </arguments>
+    </virtualType>
+    <virtualType name="MerchantWarriorDirectAPIValidatorPool" type="MerchantWarriorValidatorPool">
+        <arguments>
+            <argument name="validators" xsi:type="array">
+                <item name="country" xsi:type="string">MerchantWarrior\Payment\Gateway\Validator\CountryValidator</item>
+            </argument>
+        </arguments>
+    </virtualType>
+    <!-- MW validators infrastructure -->
+
+    <!-- Value handlers infrastructure -->
+    <virtualType name="MerchantWarriorPaymentPayFrameValueHandlerPool" type="Magento\Payment\Gateway\Config\ValueHandlerPool">
+        <arguments>
+            <argument name="handlers" xsi:type="array">
+                <item name="default" xsi:type="string">MerchantWarriorPaymentPayFrameConfigValueHandler</item>
+            </argument>
+        </arguments>
+    </virtualType>
+    <virtualType name="MerchantWarriorPaymentValueHandlerPool" type="Magento\Payment\Gateway\Config\ValueHandlerPool">
+        <arguments>
+            <argument name="handlers" xsi:type="array">
+                <item name="default" xsi:type="string">MerchantWarriorPaymentConfigValueHandler</item>
+            </argument>
+        </arguments>
+    </virtualType>
+
+    <!-- Configuration reader -->
+    <virtualType name="MerchantWarriorPaymentPayFrameConfigValueHandler" type="Magento\Payment\Gateway\Config\ConfigValueHandler">
+        <arguments>
+            <argument name="configInterface" xsi:type="object">MerchantWarriorPaymentPayFrameConfig</argument>
+        </arguments>
+    </virtualType>
+    <virtualType name="MerchantWarriorPaymentPayFrameConfig" type="Magento\Payment\Gateway\Config\Config">
+        <arguments>
+            <argument name="methodCode" xsi:type="const">MerchantWarrior\Payment\Model\Ui\PayFrame\ConfigProvider::METHOD_CODE</argument>
+        </arguments>
+    </virtualType>
+    <virtualType name="MerchantWarriorPaymentConfigValueHandler" type="Magento\Payment\Gateway\Config\ConfigValueHandler">
+        <arguments>
+            <argument name="configInterface" xsi:type="object">MerchantWarriorPaymentConfig</argument>
+        </arguments>
+    </virtualType>
+    <virtualType name="MerchantWarriorPaymentConfig" type="Magento\Payment\Gateway\Config\Config">
+        <arguments>
+            <argument name="methodCode" xsi:type="const">MerchantWarrior\Payment\Model\Ui\ConfigProvider::METHOD_CODE</argument>
+        </arguments>
+    </virtualType>
+
+    <!-- Commands infrastructure -->
+    <virtualType name="MerchantWarriorPaymentPayFrameCommandPool" type="Magento\Payment\Gateway\Command\CommandPool">
+        <arguments>
+            <argument name="commands" xsi:type="array">
+                <item name="authorize" xsi:type="string">MerchantWarriorPaymentPayFrameAuthorizeCommand</item>
+                <item name="capture" xsi:type="string">MerchantWarriorPaymentCaptureCommand</item>
+                <item name="sale" xsi:type="string">MerchantWarriorPaymentPayFrameSaleCommand</item>
+                <item name="void" xsi:type="string">MerchantWarriorPaymentCancelCommand</item>
+                <item name="refund" xsi:type="string">MerchantWarriorPaymentRefundCommand</item>
+                <item name="cancel" xsi:type="string">MerchantWarriorPaymentCancelCommand</item>
+                <item name="deny_payment" xsi:type="string">MerchantWarriorPaymentCancelCommand</item>
+            </argument>
+        </arguments>
+    </virtualType>
+
+    <!-- Command managers section for Vault -->
+    <virtualType name="MerchantWarriorPaymentCcCommandManager" type="Magento\Payment\Gateway\Command\CommandManager">
+        <arguments>
+            <argument name="commandPool" xsi:type="object">MerchantWarriorPaymentVaultCommandPool</argument>
+        </arguments>
+    </virtualType>
+    <type name="Magento\Payment\Gateway\Command\CommandManagerPool">
+        <arguments>
+            <argument name="executors" xsi:type="array">
+                <item name="merchant_warrior_payframe" xsi:type="string">MerchantWarriorPaymentCcCommandManager</item>
+            </argument>
+        </arguments>
+    </type>
+
+    <!-- Vault Commands infrastructure -->
+    <virtualType name="MerchantWarriorPaymentVaultCommandPool" type="Magento\Payment\Gateway\Command\CommandPool">
+        <arguments>
+            <argument name="commands" xsi:type="array">
+                <item name="authorize" xsi:type="string">MerchantWarriorVaultAuthorizeCommand</item>
+                <item name="capture" xsi:type="string">MerchantWarriorPaymentCaptureCommand</item>
+                <item name="sale" xsi:type="string">MerchantWarriorVaultSaleCommand</item>
+                <item name="vault_authorize" xsi:type="string">MerchantWarriorVaultAuthorizeCommand</item>
+                <item name="vault_sale" xsi:type="string">MerchantWarriorVaultSaleCommand</item>
+                <item name="vault_capture" xsi:type="string">MerchantWarriorPaymentCaptureCommand</item>
+            </argument>
+        </arguments>
+    </virtualType>
+
+    <virtualType name="MerchantWarriorPaymentCommandPool" type="Magento\Payment\Gateway\Command\CommandPool">
+        <arguments>
+            <argument name="commands" xsi:type="array">
+                <item name="authorize" xsi:type="string">MerchantWarriorPaymentAuthorizeCommand</item>
+                <item name="capture" xsi:type="string">MerchantWarriorPaymentCaptureCommand</item>
+                <item name="sale" xsi:type="string">MerchantWarriorPaymentSaleCommand</item>
+                <item name="void" xsi:type="string">MerchantWarriorPaymentCancelCommand</item>
+                <item name="refund" xsi:type="string">MerchantWarriorPaymentRefundCommand</item>
+                <item name="cancel" xsi:type="string">MerchantWarriorPaymentCancelCommand</item>
+                <item name="deny_payment" xsi:type="string">MerchantWarriorPaymentCancelCommand</item>
+            </argument>
+        </arguments>
+    </virtualType>
+
+    <!-- Checkout Response validator -->
+    <virtualType name="CheckoutResponseValidator" type="MerchantWarrior\Payment\Gateway\Validator\CheckoutResponseValidator">
+        <arguments>
+            <argument name="loggerInterface" xsi:type="object">MerchantWarrior\Payment\Model\Logger</argument>
+        </arguments>
+    </virtualType>
+
+    <!-- Authorization command  -->
+    <virtualType name="MerchantWarriorPaymentPayFrameAuthorizeCommand" type="Magento\Payment\Gateway\Command\GatewayCommand">
+        <arguments>
+            <argument name="requestBuilder" xsi:type="object">MerchantWarriorPaymentPayFrameAuthorizeRequest</argument>
+            <argument name="transferFactory" xsi:type="object">MerchantWarrior\Payment\Gateway\Http\TransferFactory</argument>
+            <argument name="client" xsi:type="object">MerchantWarrior\Payment\Gateway\Http\Client\PayFrame\Authorize</argument>
+            <argument name="validator" xsi:type="object">CheckoutResponseValidator</argument>
+            <argument name="handler" xsi:type="object">MerchantWarriorPayFrameAuthorizeResponseHandler</argument>
+            <argument name="errorMessageMapper" xsi:type="object">MerchantWarrior\Payment\Gateway\ErrorMapper\VirtualErrorMessageMapper</argument>
+        </arguments>
+    </virtualType>
+    <virtualType name="MerchantWarriorPaymentAuthorizeCommand" type="Magento\Payment\Gateway\Command\GatewayCommand">
+        <arguments>
+            <argument name="requestBuilder" xsi:type="object">MerchantWarriorPaymentAuthorizeRequest</argument>
+            <argument name="transferFactory" xsi:type="object">MerchantWarrior\Payment\Gateway\Http\TransferFactory</argument>
+            <argument name="client" xsi:type="object">MerchantWarrior\Payment\Gateway\Http\Client\TransactionAuthorize</argument>
+            <argument name="validator" xsi:type="object">CheckoutResponseValidator</argument>
+            <argument name="handler" xsi:type="object">MerchantWarriorAuthorizeResponseHandler</argument>
+            <argument name="errorMessageMapper" xsi:type="object">MerchantWarrior\Payment\Gateway\ErrorMapper\VirtualErrorMessageMapper</argument>
+        </arguments>
+    </virtualType>
+
+    <!-- Authorization Request -->
+    <virtualType name="MerchantWarriorPaymentAuthorizeRequest" type="Magento\Payment\Gateway\Request\BuilderComposite">
+        <arguments>
+            <argument name="builders" xsi:type="array">
+                <item name="customer" xsi:type="string">MerchantWarrior\Payment\Gateway\Request\CustomerDataBuilder</item>
+                <item name="customer_ip" xsi:type="string">MerchantWarrior\Payment\Gateway\Request\CustomerIpDataBuilder</item>
+                <item name="address" xsi:type="string">MerchantWarrior\Payment\Gateway\Request\AddressDataBuilder</item>
+                <item name="transaction" xsi:type="string">MerchantWarrior\Payment\Gateway\Request\TransactionDataBuilder</item>
+                <item name="mw_transaction_data" xsi:type="string">MerchantWarrior\Payment\Gateway\Request\DirectApiTransactionDataBuilder</item>
+            </argument>
+        </arguments>
+    </virtualType>
+    <virtualType name="MerchantWarriorPaymentPayFrameAuthorizeRequest" type="Magento\Payment\Gateway\Request\BuilderComposite">
+        <arguments>
+            <argument name="builders" xsi:type="array">
+                <item name="customer" xsi:type="string">MerchantWarrior\Payment\Gateway\Request\CustomerDataBuilder</item>
+                <item name="customer_ip" xsi:type="string">MerchantWarrior\Payment\Gateway\Request\CustomerIpDataBuilder</item>
+                <item name="address" xsi:type="string">MerchantWarrior\Payment\Gateway\Request\AddressDataBuilder</item>
+                <item name="transaction" xsi:type="string">MerchantWarrior\Payment\Gateway\Request\TransactionDataBuilder</item>
+                <item name="mw_transaction_data" xsi:type="string">MerchantWarrior\Payment\Gateway\Request\PayFrameTransactionDataBuilder</item>
+                <item name="vault" xsi:type="string">MerchantWarrior\Payment\Gateway\Request\VaultDataBuilder</item>
+            </argument>
+        </arguments>
+    </virtualType>
+
+    <virtualType name="MerchantWarriorPayFrameAuthorizeResponseHandler" type="Magento\Payment\Gateway\Response\HandlerChain">
+        <arguments>
+            <argument name="handlers" xsi:type="array">
+                <item name="payment_details" xsi:type="string">MerchantWarrior\Payment\Gateway\Response\CompleteAuthHandler</item>
+                <item name="vault_details" xsi:type="string">MerchantWarrior\Payment\Gateway\Response\VaultDetailsHandler</item>
+            </argument>
+        </arguments>
+    </virtualType>
+
+    <virtualType name="MerchantWarriorAuthorizeResponseHandler" type="Magento\Payment\Gateway\Response\HandlerChain">
+        <arguments>
+            <argument name="handlers" xsi:type="array">
+                <item name="payment_details" xsi:type="string">MerchantWarrior\Payment\Gateway\Response\CompleteAuthHandler</item>
+            </argument>
+        </arguments>
+    </virtualType>
+
+    <!-- Sale command  -->
+    <virtualType name="MerchantWarriorPaymentPayFrameSaleCommand" type="Magento\Payment\Gateway\Command\GatewayCommand">
+        <arguments>
+            <argument name="requestBuilder" xsi:type="object">MerchantWarriorPaymentPayFrameSaleRequest</argument>
+            <argument name="transferFactory" xsi:type="object">MerchantWarrior\Payment\Gateway\Http\TransferFactory</argument>
+            <argument name="client" xsi:type="object">MerchantWarrior\Payment\Gateway\Http\Client\PayFrame\Sale</argument>
+            <argument name="validator" xsi:type="object">CheckoutResponseValidator</argument>
+            <argument name="handler" xsi:type="object">MerchantWarriorSaleResponseHandler</argument>
+            <argument name="errorMessageMapper" xsi:type="object">MerchantWarrior\Payment\Gateway\ErrorMapper\VirtualErrorMessageMapper</argument>
+        </arguments>
+    </virtualType>
+    <virtualType name="MerchantWarriorPaymentSaleCommand" type="Magento\Payment\Gateway\Command\GatewayCommand">
+        <arguments>
+            <argument name="requestBuilder" xsi:type="object">MerchantWarriorPaymentSaleRequest</argument>
+            <argument name="transferFactory" xsi:type="object">MerchantWarrior\Payment\Gateway\Http\TransferFactory</argument>
+            <argument name="client" xsi:type="object">MerchantWarrior\Payment\Gateway\Http\Client\TransactionSale</argument>
+            <argument name="validator" xsi:type="object">CheckoutResponseValidator</argument>
+            <argument name="handler" xsi:type="object">MerchantWarriorSaleResponseHandler</argument>
+            <argument name="errorMessageMapper" xsi:type="object">MerchantWarrior\Payment\Gateway\ErrorMapper\VirtualErrorMessageMapper</argument>
+        </arguments>
+    </virtualType>
+
+    <!-- Sale Request -->
+    <virtualType name="MerchantWarriorPaymentPayFrameSaleRequest" type="Magento\Payment\Gateway\Request\BuilderComposite">
+        <arguments>
+            <argument name="builders" xsi:type="array">
+                <item name="customer" xsi:type="string">MerchantWarrior\Payment\Gateway\Request\CustomerDataBuilder</item>
+                <item name="customer_ip" xsi:type="string">MerchantWarrior\Payment\Gateway\Request\CustomerIpDataBuilder</item>
+                <item name="address" xsi:type="string">MerchantWarrior\Payment\Gateway\Request\AddressDataBuilder</item>
+                <item name="transaction" xsi:type="string">MerchantWarrior\Payment\Gateway\Request\TransactionDataBuilder</item>
+                <item name="mw_transaction_data" xsi:type="string">MerchantWarrior\Payment\Gateway\Request\PayFrameTransactionDataBuilder</item>
+            </argument>
+        </arguments>
+    </virtualType>
+    <virtualType name="MerchantWarriorPaymentSaleRequest" type="Magento\Payment\Gateway\Request\BuilderComposite">
+        <arguments>
+            <argument name="builders" xsi:type="array">
+                <item name="customer" xsi:type="string">MerchantWarrior\Payment\Gateway\Request\CustomerDataBuilder</item>
+                <item name="customer_ip" xsi:type="string">MerchantWarrior\Payment\Gateway\Request\CustomerIpDataBuilder</item>
+                <item name="address" xsi:type="string">MerchantWarrior\Payment\Gateway\Request\AddressDataBuilder</item>
+                <item name="transaction" xsi:type="string">MerchantWarrior\Payment\Gateway\Request\TransactionDataBuilder</item>
+                <item name="mw_transaction_data" xsi:type="string">MerchantWarrior\Payment\Gateway\Request\DirectApiTransactionDataBuilder</item>
+            </argument>
+        </arguments>
+    </virtualType>
+
+    <virtualType name="MerchantWarriorSaleResponseHandler" type="Magento\Payment\Gateway\Response\HandlerChain">
+        <arguments>
+            <argument name="handlers" xsi:type="array">
+                <item name="payment_details" xsi:type="string">MerchantWarrior\Payment\Gateway\Response\PaymentDetailsHandler</item>
+                <item name="vault_details" xsi:type="string">MerchantWarrior\Payment\Gateway\Response\VaultDetailsHandler</item>
+            </argument>
+        </arguments>
+    </virtualType>
+
+    <!-- Capture Request -->
+    <virtualType name="MerchantWarriorPaymentCaptureCommand" type="Magento\Payment\Gateway\Command\GatewayCommand">
+        <arguments>
+            <argument name="requestBuilder" xsi:type="object">MerchantWarriorPaymentCaptureRequest</argument>
+            <argument name="transferFactory" xsi:type="object">MerchantWarrior\Payment\Gateway\Http\TransferFactory</argument>
+            <argument name="client" xsi:type="object">MerchantWarrior\Payment\Gateway\Http\Client\TransactionCapture</argument>
+            <argument name="validator" xsi:type="object">CheckoutResponseValidator</argument>
+            <argument name="handler" xsi:type="object">MerchantWarriorResponseHandler</argument>
+            <argument name="errorMessageMapper" xsi:type="object">MerchantWarrior\Payment\Gateway\ErrorMapper\VirtualErrorMessageMapper</argument>
+        </arguments>
+    </virtualType>
+
+    <virtualType name="MerchantWarriorPaymentCaptureRequest" type="Magento\Payment\Gateway\Request\BuilderComposite">
+        <arguments>
+            <argument name="builders" xsi:type="array">
+                <item name="transaction_data" xsi:type="string">MerchantWarrior\Payment\Gateway\Request\CaptureDataBuilder</item>
+            </argument>
+        </arguments>
+    </virtualType>
+
+    <virtualType name="MerchantWarriorResponseHandler" type="Magento\Payment\Gateway\Response\HandlerChain">
+        <arguments>
+            <argument name="handlers" xsi:type="array">
+                <item name="payment_details" xsi:type="string">MerchantWarrior\Payment\Gateway\Response\PaymentDetailsHandler</item>
+            </argument>
+        </arguments>
+    </virtualType>
+
+    <!-- Refund Request -->
+    <virtualType name="MerchantWarriorPaymentRefundCommand" type="Magento\Payment\Gateway\Command\GatewayCommand">
+        <arguments>
+            <argument name="requestBuilder" xsi:type="object">MerchantWarriorPaymentRefundRequest</argument>
+            <argument name="transferFactory" xsi:type="object">MerchantWarrior\Payment\Gateway\Http\TransferFactory</argument>
+            <argument name="client" xsi:type="object">MerchantWarrior\Payment\Gateway\Http\Client\TransactionRefund</argument>
+            <argument name="errorMessageMapper" xsi:type="object">MerchantWarrior\Payment\Gateway\ErrorMapper\VirtualErrorMessageMapper</argument>
+            <argument name="validator" xsi:type="object">CheckoutResponseValidator</argument>
+        </arguments>
+    </virtualType>
+
+    <virtualType name="MerchantWarriorPaymentRefundRequest" type="Magento\Payment\Gateway\Request\BuilderComposite">
+        <arguments>
+            <argument name="builders" xsi:type="array">
+                <item name="transaction_data" xsi:type="string">MerchantWarrior\Payment\Gateway\Request\RefundDataBuilder</item>
+            </argument>
+        </arguments>
+    </virtualType>
+
+    <!-- Cancel Request -->
+    <virtualType name="MerchantWarriorPaymentCancelCommand" type="Magento\Payment\Gateway\Command\GatewayCommand">
+        <arguments>
+            <argument name="requestBuilder" xsi:type="object">MerchantWarriorPaymentCancelRequest</argument>
+            <argument name="transferFactory" xsi:type="object">MerchantWarrior\Payment\Gateway\Http\TransferFactory</argument>
+            <argument name="client" xsi:type="object">MerchantWarrior\Payment\Gateway\Http\Client\TransactionVoid</argument>
+            <argument name="errorMessageMapper" xsi:type="object">MerchantWarrior\Payment\Gateway\ErrorMapper\VirtualErrorMessageMapper</argument>
+            <argument name="handler" xsi:type="object">MerchantWarriorCancelResponseHandler</argument>
+            <argument name="validator" xsi:type="object">CheckoutResponseValidator</argument>
+        </arguments>
+    </virtualType>
+
+    <virtualType name="MerchantWarriorPaymentCancelRequest" type="Magento\Payment\Gateway\Request\BuilderComposite">
+        <arguments>
+            <argument name="builders" xsi:type="array">
+                <item name="transaction_data" xsi:type="string">MerchantWarrior\Payment\Gateway\Request\CancelDataBuilder</item>
+            </argument>
+        </arguments>
+    </virtualType>
+
+    <virtualType name="MerchantWarriorCancelResponseHandler" type="Magento\Payment\Gateway\Response\HandlerChain">
+        <arguments>
+            <argument name="handlers" xsi:type="array">
+                <item name="payment_details" xsi:type="string">MerchantWarrior\Payment\Gateway\Response\CancelAuthHandler</item>
+            </argument>
+        </arguments>
+    </virtualType>
+
+    <!-- Vault Authorization command  -->
+    <virtualType name="MerchantWarriorVaultAuthorizeCommand" type="Magento\Payment\Gateway\Command\GatewayCommand">
+        <arguments>
+            <argument name="requestBuilder" xsi:type="object">MerchantWarriorVaultAuthorizeRequest</argument>
+            <argument name="transferFactory" xsi:type="object">MerchantWarrior\Payment\Gateway\Http\TransferFactory</argument>
+            <argument name="client" xsi:type="object">MerchantWarrior\Payment\Gateway\Http\Client\Vault\Authorize</argument>
+            <argument name="validator" xsi:type="object">CheckoutResponseValidator</argument>
+            <argument name="handler" xsi:type="object">MerchantWarriorVaultAuthorizeResponseHandler</argument>
+            <argument name="errorMessageMapper" xsi:type="object">MerchantWarrior\Payment\Gateway\ErrorMapper\VirtualErrorMessageMapper</argument>
+        </arguments>
+    </virtualType>
+
+    <!-- Vault Authorization Request begin -->
+    <virtualType name="MerchantWarriorVaultAuthorizeRequest" type="Magento\Payment\Gateway\Request\BuilderComposite">
+        <arguments>
+            <argument name="builders" xsi:type="array">
+                <item name="customer" xsi:type="string">MerchantWarrior\Payment\Gateway\Request\CustomerDataBuilder</item>
+                <item name="customer_ip" xsi:type="string">MerchantWarrior\Payment\Gateway\Request\CustomerIpDataBuilder</item>
+                <item name="address" xsi:type="string">MerchantWarrior\Payment\Gateway\Request\AddressDataBuilder</item>
+                <item name="transaction" xsi:type="string">MerchantWarrior\Payment\Gateway\Request\TransactionDataBuilder</item>
+                <item name="mw_transaction_data" xsi:type="string">MerchantWarrior\Payment\Gateway\Request\Vault\TransactionDataBuilder</item>
+            </argument>
+        </arguments>
+    </virtualType>
+
+    <virtualType name="MerchantWarriorVaultAuthorizeResponseHandler" type="Magento\Payment\Gateway\Response\HandlerChain">
+        <arguments>
+            <argument name="handlers" xsi:type="array">
+                <item name="payment_details" xsi:type="string">MerchantWarrior\Payment\Gateway\Response\Vault\CompleteAuthHandler</item>
+            </argument>
+        </arguments>
+    </virtualType>
+    <!-- Vault Authorization Request end -->
+
+    <!-- Vault Sale command  -->
+    <virtualType name="MerchantWarriorVaultSaleCommand" type="Magento\Payment\Gateway\Command\GatewayCommand">
+        <arguments>
+            <argument name="requestBuilder" xsi:type="object">MerchantWarriorVaultSaleRequest</argument>
+            <argument name="transferFactory" xsi:type="object">MerchantWarrior\Payment\Gateway\Http\TransferFactory</argument>
+            <argument name="client" xsi:type="object">MerchantWarrior\Payment\Gateway\Http\Client\Vault\Sale</argument>
+            <argument name="validator" xsi:type="object">CheckoutResponseValidator</argument>
+            <argument name="handler" xsi:type="object">MerchantWarriorVaultSaleResponseHandler</argument>
+            <argument name="errorMessageMapper" xsi:type="object">MerchantWarrior\Payment\Gateway\ErrorMapper\VirtualErrorMessageMapper</argument>
+        </arguments>
+    </virtualType>
+
+    <!-- Vault Sale Request Begin -->
+    <virtualType name="MerchantWarriorVaultSaleRequest" type="Magento\Payment\Gateway\Request\BuilderComposite">
+        <arguments>
+            <argument name="builders" xsi:type="array">
+                <item name="customer" xsi:type="string">MerchantWarrior\Payment\Gateway\Request\CustomerDataBuilder</item>
+                <item name="customer_ip" xsi:type="string">MerchantWarrior\Payment\Gateway\Request\CustomerIpDataBuilder</item>
+                <item name="address" xsi:type="string">MerchantWarrior\Payment\Gateway\Request\AddressDataBuilder</item>
+                <item name="transaction" xsi:type="string">MerchantWarrior\Payment\Gateway\Request\TransactionDataBuilder</item>
+                <item name="mw_transaction_data" xsi:type="string">MerchantWarrior\Payment\Gateway\Request\Vault\TransactionDataBuilder</item>
+            </argument>
+        </arguments>
+    </virtualType>
+
+    <virtualType name="MerchantWarriorVaultSaleResponseHandler" type="Magento\Payment\Gateway\Response\HandlerChain">
+        <arguments>
+            <argument name="handlers" xsi:type="array">
+                <item name="payment_details" xsi:type="string">MerchantWarrior\Payment\Gateway\Response\Vault\SaleDetailsHandler</item>
+            </argument>
+        </arguments>
+    </virtualType>
+    <!-- Vault Sale Request End -->
+
+    <!-- Merchant Warrior error code mapper -->
+    <virtualType name="MerchantWarrior\Payment\Gateway\ErrorMapper\VirtualConfigReader" type="Magento\Payment\Gateway\ErrorMapper\VirtualConfigReader">
+        <arguments>
+            <argument name="fileName" xsi:type="string">mw_error_mapping.xml</argument>
+        </arguments>
+    </virtualType>
+    <virtualType name="MerchantWarrior\Payment\Gateway\ErrorMapper\VirtualMappingData" type="Magento\Payment\Gateway\ErrorMapper\MappingData">
+        <arguments>
+            <argument name="reader" xsi:type="object">MerchantWarrior\Payment\Gateway\ErrorMapper\VirtualConfigReader</argument>
+            <argument name="cacheId" xsi:type="string">mw_error_mapper</argument>
+        </arguments>
+    </virtualType>
+    <virtualType name="MerchantWarrior\Payment\Gateway\ErrorMapper\VirtualErrorMessageMapper" type="Magento\Payment\Gateway\ErrorMapper\ErrorMessageMapper">
+        <arguments>
+            <argument name="messageMapping" xsi:type="object">MerchantWarrior\Payment\Gateway\ErrorMapper\VirtualMappingData</argument>
+        </arguments>
+    </virtualType>
+
+    <type name="MerchantWarrior\Payment\Gateway\Config\Vault\Config">
+        <arguments>
+            <argument name="methodCode" xsi:type="const">MerchantWarrior\Payment\Model\Ui\Vault\ConfigProvider::METHOD_CODE</argument>
+        </arguments>
+    </type>
+
+    <type name="Magento\Quote\Api\CartManagementInterface">
+        <plugin name="merchant_warrior_order_cancellation" type="MerchantWarrior\Payment\Plugin\OrderCancelPlugin"/>
+    </type>
+
+    <type name="Magento\Framework\Console\CommandListInterface">
+        <arguments>
+            <argument name="commands" xsi:type="array">
+                <item name="merchant_warrior_cancel_orders" xsi:type="object">MerchantWarrior\Payment\Console\CancelOrdersCommand</item>
+            </argument>
+        </arguments>
+    </type>
+
+    <type name="MerchantWarrior\Payment\Model\Debugger">
+        <arguments>
+            <argument name="logger" xsi:type="object">MerchantWarrior\Payment\Model\Logger</argument>
+        </arguments>
+    </type>
+    <type name="MerchantWarrior\Payment\Model\Service\CancelStuckOrders">
+        <arguments>
+            <argument name="logger" xsi:type="object">MerchantWarrior\Payment\Model\Logger</argument>
+        </arguments>
+    </type>
+    <type name="MerchantWarrior\Payment\Gateway\Response\VaultDetailsHandler">
+        <arguments>
+            <argument name="logger" xsi:type="object">MerchantWarrior\Payment\Model\Logger</argument>
+        </arguments>
+    </type>
+    <type name="MerchantWarrior\Payment\Model\Service\GetSettlementData">
+        <arguments>
+            <argument name="logger" xsi:type="object">MerchantWarrior\Payment\Model\Logger</argument>
+        </arguments>
+    </type>
+</config>

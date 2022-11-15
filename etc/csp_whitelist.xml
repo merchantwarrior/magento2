@@ -1,0 +1,62 @@
+<?xml version="1.0"?>
+<csp_whitelist xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+               xsi:noNamespaceSchemaLocation="urn:magento:module:Magento_Csp:etc/csp_whitelist.xsd">
+    <policies>
+        <policy id="script-src">
+            <values>
+                <value id="mwp-src" type="host">*.merchantwarrior.com</value>
+                <value id="mwp-src-base" type="host">https://base.merchantwarrior.com</value>
+                <value id="mwp-my-card-secure" type="host">*.mycardsecure.com</value>
+            </values>
+        </policy>
+        <policy id="form-action">
+            <values>
+                <value id="mwp-src" type="host">*.merchantwarrior.com</value>
+                <value id="mwp-src-base" type="host">https://base.merchantwarrior.com</value>
+                <value id="mwp-my-card-secure" type="host">*.mycardsecure.com</value>
+            </values>
+        </policy>
+        <policy id="frame-src">
+            <values>
+                <value id="mwp-src" type="host">*.merchantwarrior.com</value>
+                <value id="mwp-src-base" type="host">https://base.merchantwarrior.com</value>
+                <value id="mwp-my-card-secure" type="host">*.mycardsecure.com</value>
+            </values>
+        </policy>
+        <policy id="frame-ancestors">
+            <values>
+                <value id="mwp-src" type="host">*.merchantwarrior.com</value>
+                <value id="mwp-src-base" type="host">https://base.merchantwarrior.com</value>
+                <value id="mwp-my-card-secure" type="host">*.mycardsecure.com</value>
+            </values>
+        </policy>
+        <policy id="connect-src">
+            <values>
+                <value id="mwp-src" type="host">*.merchantwarrior.com</value>
+                <value id="mwp-src-base" type="host">https://base.merchantwarrior.com</value>
+                <value id="mwp-my-card-secure" type="host">*.mycardsecure.com</value>
+            </values>
+        </policy>
+        <policy id="child-src">
+            <values>
+                <value id="mwp-src" type="host">*.merchantwarrior.com</value>
+                <value id="mwp-src-base" type="host">https://base.merchantwarrior.com</value>
+                <value id="mwp-my-card-secure" type="host">*.mycardsecure.com</value>
+            </values>
+        </policy>
+        <policy id="object-src">
+            <values>
+                <value id="mwp-src" type="host">*.merchantwarrior.com</value>
+                <value id="mwp-src-base" type="host">https://base.merchantwarrior.com</value>
+                <value id="mwp-my-card-secure" type="host">*.mycardsecure.com</value>
+            </values>
+        </policy>
+        <policy id="img-src">
+            <values>
+                <value id="mwp-src" type="host">*.merchantwarrior.com</value>
+                <value id="mwp-src-base" type="host">https://base.merchantwarrior.com</value>
+                <value id="mwp-my-card-secure" type="host">*.mycardsecure.com</value>
+            </values>
+        </policy>
+    </policies>
+</csp_whitelist>

@@ -1,0 +1,19 @@
+<?xml version="1.0"?>
+<schema xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+        xsi:noNamespaceSchemaLocation="urn:magento:framework:Setup/Declaration/Schema/etc/schema.xsd">
+    <table name="merchant_warrior_transaction_details" resource="default" engine="innodb" comment="MW Transaction Table">
+        <column xsi:type="int" name="entity_id" unsigned="true" nullable="false"
+                identity="true" comment="Entity ID"/>
+        <column xsi:type="varchar" name="order_id" nullable="true" length="32"
+                comment="Increment ID"/>
+        <column xsi:type="smallint" name="status" unsigned="false" nullable="false" identity="false"
+                default="1" comment="Transaction Status"/>
+        <column xsi:type="text" name="transaction_id" nullable="false" comment="Transaction ID"/>
+        <constraint xsi:type="primary" referenceId="PRIMARY">
+            <column name="entity_id"/>
+        </constraint>
+        <index referenceId="MW_TRANSACTION_ORDER_ID" indexType="btree">
+            <column name="order_id"/>
+        </index>
+    </table>
+</schema>

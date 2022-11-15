@@ -1,0 +1,33 @@
+<?xml version="1.0"?>
+<include xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:noNamespaceSchemaLocation="urn:magento:module:Magento_Config:etc/system_include.xsd">
+    <group id="merchant_warrior_advanced_settings" translate="label" type="text" sortOrder="200" showInDefault="1" showInWebsite="1"
+           showInStore="1">
+        <label><![CDATA[Advanced Settings]]></label>
+        <frontend_model>Magento\Config\Block\System\Config\Form\Fieldset</frontend_model>
+        <field id="allow_currency" translate="label" type="multiselect" sortOrder="10" showInDefault="1" showInWebsite="1" showInStore="1" canRestore="1">
+            <label>Allowed Currencies</label>
+            <source_model>Magento\Config\Model\Config\Source\Locale\Currency</source_model>
+            <can_be_empty>1</can_be_empty>
+            <config_path>payment/merchant_warrior/allow_currency</config_path>
+            <comment>
+                <![CDATA[There can be selected specified currency for payment method. If nothing is selected then allowed all currencies.]]>
+            </comment>
+        </field>
+        <group id="merchant_warrior_directapi_country_specific" translate="label" showInDefault="1" showInWebsite="1" sortOrder="20">
+            <label>Country Specific Settings</label>
+            <frontend_model>Magento\Config\Block\System\Config\Form\Fieldset</frontend_model>
+            <field id="allowspecific" translate="label" type="allowspecific" sortOrder="10" showInDefault="1" showInWebsite="1" showInStore="0">
+                <label>Payment from Applicable Countries</label>
+                <source_model>Magento\Payment\Model\Config\Source\Allspecificcountries</source_model>
+                <config_path>payment/merchant_warrior/allowspecific</config_path>
+            </field>
+            <field id="specificcountry" translate="label" type="multiselect" sortOrder="20" showInDefault="1" showInWebsite="1" showInStore="0">
+                <label>Payment from Specific Countries</label>
+                <source_model>Magento\Directory\Model\Config\Source\Country</source_model>
+                <can_be_empty>1</can_be_empty>
+                <config_path>payment/merchant_warrior/specificcountry</config_path>
+            </field>
+        </group>
+    </group>
+</include>

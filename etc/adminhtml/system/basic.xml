@@ -1,0 +1,76 @@
+<?xml version="1.0"?>
+<include xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:noNamespaceSchemaLocation="urn:magento:module:Magento_Config:etc/system_include.xsd">
+    <group id="merchant_warrior_general_settings" translate="label" type="text" sortOrder="20" showInDefault="1" showInWebsite="1"
+           showInStore="1">
+        <label><![CDATA[Basic Settings]]></label>
+        <comment>
+            <![CDATA[
+                <p>You will need to set your API keys before you can accept payments. If you do not yet have a Merchant Warrior account, please <a href="https://www.merchantwarrior.com/register" target="_blank" rel="noopener noreferrer">click here</a> to register.</p>
+            ]]>
+        </comment>
+        <frontend_model>Magento\Config\Block\System\Config\Form\Fieldset</frontend_model>
+        <field id="version" translate="label" type="label" sortOrder="5" showInDefault="1" showInWebsite="1" showInStore="0">
+            <label>Extension version</label>
+            <frontend_model>MerchantWarrior\Payment\Block\Adminhtml\System\Config\Field\Version</frontend_model>
+        </field>
+        <field id="active" translate="label" type="select" sortOrder="10" showInDefault="1" showInWebsite="1" showInStore="1">
+            <label>Enabled</label>
+            <source_model>Magento\Config\Model\Config\Source\Yesno</source_model>
+            <config_path>payment/merchant_warrior/active</config_path>
+        </field>
+        <field id="merchant_uuid" translate="label" type="text" sortOrder="20" showInDefault="1" showInWebsite="1"
+               showInStore="0">
+            <label>Merchant UUID</label>
+            <tooltip>If you don't know your Merchant UUID, you can find it in your Merchant Warrior account. Navigate to
+                Settings => Merchant Settings.
+            </tooltip>
+            <config_path>payment/merchant_warrior/merchant_uuid</config_path>
+        </field>
+        <field id="api_key" translate="label" type="obscure" sortOrder="30" showInDefault="1" showInWebsite="1"
+               showInStore="0">
+            <label>API Key</label>
+            <backend_model>Magento\Config\Model\Config\Backend\Encrypted</backend_model>
+            <tooltip>If you don't know your Merchant UUID, you can find it in your Merchant Warrior account. Navigate to
+                Settings => Merchant Settings.
+            </tooltip>
+            <config_path>payment/merchant_warrior/api_key</config_path>
+        </field>
+        <field id="api_passphrase" translate="label" type="obscure" sortOrder="40" showInDefault="1" showInWebsite="1"
+               showInStore="0">
+            <label>API Passphrase</label>
+            <tooltip>If you don't know your Merchant UUID, you can find it in your Merchant Warrior account. Navigate to
+                Settings => Merchant Settings.
+            </tooltip>
+            <backend_model>Magento\Config\Model\Config\Backend\Encrypted</backend_model>
+            <config_path>payment/merchant_warrior/api_passphrase</config_path>
+        </field>
+        <field id="sandbox_mode" translate="label" type="select" sortOrder="50" showInDefault="1" showInWebsite="1"
+               showInStore="0">
+            <label>Sandbox Mode</label>
+            <source_model>Magento\Config\Model\Config\Source\Yesno</source_model>
+            <config_path>payment/merchant_warrior/sandbox_mode</config_path>
+            <tooltip>
+                <![CDATA[In the test mode you must use test cards. See section Documentation & Support for the link to the test cards]]>
+            </tooltip>
+        </field>
+        <field id="settlement_days" translate="label" type="select" sortOrder="60" showInDefault="1" showInWebsite="1"
+               showInStore="0">
+            <label>Count Of Days</label>
+            <source_model>MerchantWarrior\Payment\Model\Config\Source\SettlementDays</source_model>
+            <config_path>payment/merchant_warrior/settlement_days</config_path>
+            <tooltip>
+                <![CDATA[This param set count of days for which will be loaded transactions for orders validating ( for Authorise only action ).]]>
+            </tooltip>
+        </field>
+        <field id="debug" translate="label" type="select" sortOrder="110" showInDefault="1" showInWebsite="1"
+               showInStore="0">
+            <label>Debug</label>
+            <source_model>Magento\Config\Model\Config\Source\Yesno</source_model>
+            <config_path>payment/merchant_warrior/debug</config_path>
+            <tooltip>
+                <![CDATA[This param will enable detailed logging of all transactions. The logs will be in var/log folder.]]>
+            </tooltip>
+        </field>
+    </group>
+</include>

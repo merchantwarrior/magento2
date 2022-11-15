@@ -1,0 +1,35 @@
+<?xml version="1.0"?>
+
+<payment xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:noNamespaceSchemaLocation="urn:magento:module:MerchantWarrior_Payment:etc/merchant_warrior_payment.xsd">
+    <credit_cards>
+        <type id="AM" order="0">
+            <label>Amex</label>
+            <code_alt>amex</code_alt>
+        </type>
+        <type id="VI" order="10">
+            <label>Visa</label>
+            <code_alt>visa</code_alt>
+        </type>
+        <type id="MC" order="20">
+            <label>MasterCard</label>
+            <code_alt>mastercard</code_alt>
+        </type>
+        <type id="DI" order="30">
+            <label>Discover</label>
+            <code_alt>discover</code_alt>
+        </type>
+        <type id="JCB" order="50">
+            <label>JCB</label>
+            <code_alt>jcb</code_alt>
+        </type>
+        <type id="DN" order="60">
+            <label>Diners</label>
+            <code_alt>dinersclub</code_alt>
+        </type>
+        <type id="UN" order="70">
+            <label>UnionPay</label>
+            <code_alt>unionpay</code_alt>
+        </type>
+    </credit_cards>
+</payment>
