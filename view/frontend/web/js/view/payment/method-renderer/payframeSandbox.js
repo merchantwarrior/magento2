@@ -1,6 +1,6 @@
 define([
     'MerchantWarrior_Payment/js/view/payment/method-renderer/payframeAbstract',
-    'payframeLib'
+    'payframeSandboxLib'
 ], function (Component) {
     'use strict';
 
