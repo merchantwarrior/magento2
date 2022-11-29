@@ -5,6 +5,7 @@
             <merchant_warrior>
                 <active>1</active>
                 <merchant_uuid></merchant_uuid>
+                <enable_3ds>0</enable_3ds>
                 <sandbox_mode>1</sandbox_mode>
                 <api_key></api_key>
                 <api_passphrase></api_passphrase>
