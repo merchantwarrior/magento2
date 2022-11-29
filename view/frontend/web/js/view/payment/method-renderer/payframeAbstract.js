@@ -261,17 +261,19 @@ define([
             );
             this.mwPayframe.loaded = () => this._payFrameLoaded();
 
-            this.tdsCheck = this._initTdsCheck(
-                this._getPaymentConfig('uuid'),
-                this._getPaymentConfig('apiKey'),
-                this.mwCardDivId,
-                this._getPaymentConfig('submitURL'),
-                {
-                    width: '500px',
-                    subFrame: true
-                }
-            );
-            this.tdsCheck.mwCallback = (liabilityShifted, tdsToken) => this._tdsCallBack(liabilityShifted, tdsToken);
+            if (this._getPaymentConfig('is3dsEnabled')) {
+                this.tdsCheck = this._initTdsCheck(
+                    this._getPaymentConfig('uuid'),
+                    this._getPaymentConfig('apiKey'),
+                    this.mwCardDivId,
+                    this._getPaymentConfig('submitURL'),
+                    {
+                        width: '500px',
+                        subFrame: true
+                    }
+                );
+                this.tdsCheck.mwCallback = (liabilityShifted, tdsToken) => this._tdsCallBack(liabilityShifted, tdsToken);
+            }
 
             this.mwPayframe.deploy();
         },
@@ -326,19 +328,23 @@ define([
                 this.payframeToken = payframeToken;
                 this.payframeKey = payframeKey;
 
-                // If you want the tdsCheck to use the same loading
-                // or loaded functions as the mwPayframe, call link() on the tdsCheck object
-                this.tdsCheck.link(this.mwPayframe);
-                // When you have the payframeToken and payframeKey, call checkTDS,
-                // passing in the payframeToken, payframeKey, transactionAmount, transactionCurrency
-                // and transactionProduct
-                this.tdsCheck.checkTDS(
-                    this.payframeToken,
-                    this.payframeKey,
-                    this.getFormattedPrice(quote.totals().grand_total),
-                    quote.totals().base_currency_code,
-                    this.getItemsSku()
-                );
+                if (this._getPaymentConfig('is3dsEnabled')) {
+                    // If you want the tdsCheck to use the same loading
+                    // or loaded functions as the mwPayframe, call link() on the tdsCheck object
+                    this.tdsCheck.link(this.mwPayframe);
+                    // When you have the payframeToken and payframeKey, call checkTDS,
+                    // passing in the payframeToken, payframeKey, transactionAmount, transactionCurrency
+                    // and transactionProduct
+                    this.tdsCheck.checkTDS(
+                        this.payframeToken,
+                        this.payframeKey,
+                        this.getFormattedPrice(quote.totals().grand_total),
+                        quote.totals().base_currency_code,
+                        this.getItemsSku()
+                    );
+                } else {
+                    this.processCardAction();
+                }
             } else {
                 if (this.mwPayframe.responseCode === -2 || this.mwPayframe.responseCode === -3) {
                     fullScreenLoader.stopLoader(true);

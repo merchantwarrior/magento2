@@ -15,3 +15,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ## [1.0.3] - 17-11-2022
 ### Changed
 - Switched source of payframe.js file based on plugin mode i.e sandbox or production. 
+
+## [1.0.4] - 29-11-2022
+### Added
+- Added admin configuration to enable/disable 3ds. 
