@@ -79,6 +79,8 @@ class ConfigProvider implements ConfigProviderInterface
                     'uuid'      => $this->config->getMerchantUserId(),
                     'apiKey'    => $this->config->getApiKey(),
                     'payframeSrc' => $this->getPayFrameSrc(),
+                    'is3dsEnabled' => $this->config->is3dsEnabled(),
+                    'isSandBoxEnabled' => $this->config->isSandBoxModeEnabled(),
                     'submitURL'   => $this->getSubmitUrl(),
                     'allowedTypeCards' => $this->getAllowedCCList(),
                     'ccVaultCode' => MWConfigProvider::CC_VAULT_CODE,

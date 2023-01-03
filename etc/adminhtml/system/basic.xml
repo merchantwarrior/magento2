@@ -45,7 +45,13 @@
             <backend_model>Magento\Config\Model\Config\Backend\Encrypted</backend_model>
             <config_path>payment/merchant_warrior/api_passphrase</config_path>
         </field>
-        <field id="sandbox_mode" translate="label" type="select" sortOrder="50" showInDefault="1" showInWebsite="1"
+        <field id="enable_3ds" translate="label" type="select" sortOrder="50" showInDefault="1" showInWebsite="1"
+               showInStore="0">
+            <label>Enable 3DS</label>
+            <source_model>Magento\Config\Model\Config\Source\Yesno</source_model>
+            <config_path>payment/merchant_warrior/enable_3ds</config_path>
+        </field>
+        <field id="sandbox_mode" translate="label" type="select" sortOrder="60" showInDefault="1" showInWebsite="1"
                showInStore="0">
             <label>Sandbox Mode</label>
             <source_model>Magento\Config\Model\Config\Source\Yesno</source_model>
@@ -54,7 +60,7 @@
                 <![CDATA[In the test mode you must use test cards. See section Documentation & Support for the link to the test cards]]>
             </tooltip>
         </field>
-        <field id="settlement_days" translate="label" type="select" sortOrder="60" showInDefault="1" showInWebsite="1"
+        <field id="settlement_days" translate="label" type="select" sortOrder="70" showInDefault="1" showInWebsite="1"
                showInStore="0">
             <label>Count Of Days</label>
             <source_model>MerchantWarrior\Payment\Model\Config\Source\SettlementDays</source_model>

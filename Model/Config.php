@@ -32,6 +32,7 @@ class Config
      * Configuration constants
      */
     public const XML_PATH_ACTIVE = 'payment/merchant_warrior/active';
+    public const XML_PATH_IS_3DS_ENABLED = 'payment/merchant_warrior/enable_3ds';
     public const XML_PATH_IS_SANDBOX_MODE_ENABLED = 'payment/merchant_warrior/sandbox_mode';
     public const XML_PATH_SETTLEMENT_DAYS = 'payment/merchant_warrior/settlement_days';
     /**#@-*/
@@ -142,6 +143,20 @@ class Config
             && ($this->getMerchantUserId() !== null)
             && ($this->getApiKey() !== null)
             && $isEnabled;
+    }
+
+    /**
+     * Is 3DS enabled
+     *
+     * @return boolean
+     */
+    public function is3dsEnabled(): bool
+    {
+        return (bool)$this->scopeConfig->isSetFlag(
+            self::XML_PATH_IS_3DS_ENABLED,
+            ScopeInterface::SCOPE_STORE,
+            $this->getStoreId()
+        );
     }
 
     /**
