@@ -12,11 +12,11 @@
     ],
     "require": {
         "php": "~7.3.0||~7.4.0||~8.0.0||~8.1.0",
-        "magento/framework": "*",
-        "magento/module-vault": "*",
-        "magento/module-payment": "*",
-        "magento/module-checkout": "*",
-        "magento/module-sales": "*",
+        "magento/framework": ">=102.0.3",
+        "magento/module-vault": ">=101.1.3",
+        "magento/module-payment": ">=100.3.3",
+        "magento/module-checkout": ">=100.3.3",
+        "magento/module-sales": ">=102.0.3",
         "ext-json": "*"
     },
     "require-dev": {
