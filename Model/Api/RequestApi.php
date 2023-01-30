@@ -182,7 +182,6 @@ abstract class RequestApi implements RequestApiInterface
             } else {
                 $this->client->post($this->getApiUrl(), $data);
             }
-
             $this->afterCall($key);
         } catch (\Exception $e) {
             $this->eventManager->dispatch(

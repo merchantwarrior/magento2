@@ -27,6 +27,7 @@ class AddressDataBuilder extends AbstractDataBuilder implements BuilderInterface
         $billingAddress = $order->getBillingAddress();
 
         $customerAddress = implode(', ', $billingAddress->getStreet());
+        
         return [
             RequestApiInterface::CUSTOMER_COUNTRY   => $billingAddress->getCountryId(),
             RequestApiInterface::CUSTOMER_STATE     => $billingAddress->getRegionCode(),

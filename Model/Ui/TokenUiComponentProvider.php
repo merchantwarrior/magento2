@@ -53,6 +53,7 @@ class TokenUiComponentProvider implements TokenUiComponentProviderInterface
     public function getComponentForToken(PaymentTokenInterface $paymentToken): TokenUiComponentInterface
     {
         $jsonDetails = $this->serializer->unserialize($paymentToken->getTokenDetails() ?: '{}');
+        $jsonDetails['cardID'] = $paymentToken->getGatewayToken();
         return $this->componentFactory->create(
             [
                 'config' => [
