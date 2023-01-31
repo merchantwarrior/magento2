@@ -210,7 +210,7 @@ class ProcessTest extends TestCase
                     RequestApiInterface::TRANSACTION_ID => '1-1-1-1'
                 ],
                 'expected' => [
-                    'hash' => md5(strtolower(md5(self::API_PASSPHRASE) . self::API_UUID . '1-1-1-1')),
+                    'hash' => hash('md5',strtolower(hash('md5',self::API_PASSPHRASE) . self::API_UUID . '1-1-1-1')),
                     'merchantUUID' => self::API_UUID,
                     'apiKey' => self::API_KEY,
                     RequestApiInterface::METHOD => ProcessVoidInterface::API_METHOD,
@@ -224,9 +224,9 @@ class ProcessTest extends TestCase
                     RequestApiInterface::TRANSACTION_CURRENCY => 'AUD'
                 ],
                 'expected' => [
-                    'hash' =>  md5(
+                    'hash' =>  hash('md5',
                         strtolower(
-                            md5(self::API_PASSPHRASE) . self::API_UUID . '100' . 'AUD'
+                            hash('md5',self::API_PASSPHRASE) . self::API_UUID . '100' . 'AUD'
                         )
                     ),
                     'merchantUUID' => self::API_UUID,

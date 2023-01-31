@@ -73,7 +73,7 @@ class HashGeneratorTest extends TestCase
                     RequestApiInterface::METHOD => ProcessVoidInterface::API_METHOD,
                     RequestApiInterface::TRANSACTION_ID => '1-1-1-1'
                 ],
-                'expected' => md5(strtolower(md5(self::API_PASSPHRASE) . self::API_UUID . '1-1-1-1'))
+                'expected' => hash('md5',strtolower(hash('md5',self::API_PASSPHRASE) . self::API_UUID . '1-1-1-1'))
             ],
             'case_2_process_auth' => [
                 'params' => [
@@ -81,9 +81,9 @@ class HashGeneratorTest extends TestCase
                     RequestApiInterface::TRANSACTION_AMOUNT   => '100',
                     RequestApiInterface::TRANSACTION_CURRENCY => 'AUD'
                 ],
-                'expected' => md5(
+                'expected' => hash('md5',
                     strtolower(
-                        md5(self::API_PASSPHRASE) . self::API_UUID . '100' . 'AUD'
+                        hash('md5',self::API_PASSPHRASE) . self::API_UUID . '100' . 'AUD'
                     )
                 )
             ],
@@ -101,9 +101,9 @@ class HashGeneratorTest extends TestCase
                     RequestApiInterface::TRANSACTION_AMOUNT   => '100',
                     RequestApiInterface::TRANSACTION_CURRENCY => ''
                 ],
-                'expected' => md5(
+                'expected' => hash('md5',
                     strtolower(
-                        md5(self::API_PASSPHRASE) . self::API_UUID . '100'
+                        hash('md5',self::API_PASSPHRASE) . self::API_UUID . '100'
                     )
                 )
             ],
@@ -112,9 +112,9 @@ class HashGeneratorTest extends TestCase
                     RequestApiInterface::METHOD => ProcessAuthInterface::API_METHOD,
                     RequestApiInterface::TRANSACTION_AMOUNT   => '100'
                 ],
-                'expected' => md5(
+                'expected' => hash('md5',
                     strtolower(
-                        md5(self::API_PASSPHRASE) . self::API_UUID . '100'
+                        hash('md5',self::API_PASSPHRASE) . self::API_UUID . '100'
                     )
                 )
             ]
