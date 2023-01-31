@@ -120,6 +120,7 @@ define([
         getIcon(cctype) {
             let type = cctype.toLocaleLowerCase(),
                 icons = window.checkoutConfig.payment[this.code].icons;
+            if(type == "mc") type = "mastercard";
 
             if (icons[type].url) {
                 return icons[type].url;
