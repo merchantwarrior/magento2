@@ -162,11 +162,6 @@ define([
             return true;
         },
         /**
-         * After render action
-         */
-        initForm() {
-        },
-        /**
          * Init TDS Check function
          *
          * @param uuid
@@ -250,8 +245,8 @@ define([
                 // passing in the payframeToken, payframeKey, transactionAmount, transactionCurrency
                 // and transactionProduct
                 this.tdsCheck.checkTDS(
-                    window.checkoutConfig.payment.vault.merchant_warrior_cc_vault_12.config.details.cardID,
-                    window.checkoutConfig.payment.vault.merchant_warrior_cc_vault_12.config.details.cardKey,
+                    this.details.cardID,
+                    this.details.cardKey,
                     this.getFormattedPrice(quote.totals().grand_total),
                     quote.totals().base_currency_code,
                     this.getItemsSku(),
@@ -260,14 +255,6 @@ define([
             } else {
                 this.processCardAction();
             }
-
-        },
-        /**
-         * Check TDS for Token
-         *
-         * @return {void}
-         */
-        _checkTDS(){
 
         },
 
@@ -393,7 +380,7 @@ define([
          * - submitUrl
          * - iframeStyle
          * - acceptedCardTypesInput - with empty: only Visa and Mastercard will be accepted.
-         * - methodInput - addCard | getPayframeToken, by default: getPayframeToken
+         * - methodInput - addCard | getPayframeToken | tokenTDS, by default: getPayframeToken
          *
          * @return {payframe}
          * @private
@@ -425,6 +412,7 @@ define([
                 cartId: quote.getQuoteId(),
                 email: quote.guestEmail,
                 public_hash: this.publicHash,
+                tdsToken: this.tdsToken,
             };
 
             if (this.showCvvVerify()) {
