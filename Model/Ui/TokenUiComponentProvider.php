@@ -30,7 +30,7 @@ class TokenUiComponentProvider implements TokenUiComponentProviderInterface
     private $serializer;
 
     /**
-     * @var SerializerInterface
+     * @var Config
      */
     private $config;
 
