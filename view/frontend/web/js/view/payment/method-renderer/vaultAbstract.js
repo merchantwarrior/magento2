@@ -213,12 +213,13 @@ define([
                 }
             }
             fullScreenLoader.startLoader();
+            document.getElementById(this.mwCardDivId + this.getId()).innerHTML = ''
             if (this._getPaymentConfig('is3dsEnabled')) {
 
                 this.mwPayframe = this._initPayFrame(
                     this._getPaymentConfig('uuid'),
                     this._getPaymentConfig('apiKey'),
-                    this.mwCardDivId,
+                    this.mwCardDivId + this.getId(),
                     this._getPaymentConfig('payframeSrc'),
                     this._getPaymentConfig('submitURL'),
                     this.frameStyle,
@@ -229,7 +230,7 @@ define([
                 this.tdsCheck = this._initTdsCheck(
                     this._getPaymentConfig('uuid'),
                     this._getPaymentConfig('apiKey'),
-                    this.mwCardDivId,
+                    this.mwCardDivId + this.getId(),
                     this._getPaymentConfig('submitURL'),
                     {
                         width: '500px',

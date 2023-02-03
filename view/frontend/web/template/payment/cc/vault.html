@@ -33,7 +33,7 @@
                 <!-- ko template: getTemplate() --><!-- /ko -->
             <!--/ko-->
         </div>
-        <div class="cardData" id="payframe-vault-data"></div>
+        <div class="cardData" data-bind="attr: { id: 'payframe-vault-data' + getId() }"></div>
         <!-- ko if: showCvvVerify() -->
         <div class="field cvv required" data-bind="attr: {id: getId() + '_cvv_div'}">
             <label data-bind="attr: {for: getId() + '_cid'}" class="label">
