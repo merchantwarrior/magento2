@@ -328,6 +328,7 @@ define([
                 }
             }
             this.tdsCheck.destroy();
+            this.tdsCheck.removeEventListener();
             this.mwPayframe.removeEventListener();
             this._resetForm();
             $(".checkout").prop('disabled', false);
@@ -449,7 +450,7 @@ define([
                 }
             }
             if(window.checkoutConfig.payment.mwPayframeClass)window.checkoutConfig.payment.mwPayframeClass.removeEventListener();
-            if(window.checkoutConfig.payment.mwtdsCheckClass)window.checkoutConfig.payment.mwtdsCheckClass.destroy();
+            if(window.checkoutConfig.payment.mwtdsCheckClass)window.checkoutConfig.payment.mwtdsCheckClass.removeEventListener();
             $(".checkout").prop('disabled', false);
         }
     });
