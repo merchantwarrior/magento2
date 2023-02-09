@@ -235,10 +235,10 @@ define([
                     this._getPaymentConfig('allowedTypeCards'),
 
                 );
-
+                this.mwPayframe.loaded = () => this._payFrameLoaded();
+                this.mwPayframe.deploy();
                 let vaultClass = this;
                 let payframeEvent = function () {
-                    vaultClass.mwPayframe.loaded = () => vaultClass._payFrameLoaded();
                     vaultClass.tdsCheck = vaultClass._initTdsCheck(
                         vaultClass._getPaymentConfig('uuid'),
                         vaultClass._getPaymentConfig('apiKey'),
@@ -267,19 +267,10 @@ define([
                     );
 
                 }
-                
-                let previousHeight = 0;
-                let mwIframe = this.mwPayframe.mwIframe
-                if(mwIframe){
+                if(this.mwPayframe.mwIframe){
                     const checkLoaded = setInterval(function () {
-                        // trick for detecting laoded iframe
-                        if (mwIframe.contentDocument && mwIframe.contentDocument.body.offsetHeight !== previousHeight) {
-                            previousHeight = mwIframe.contentDocument.body.offsetHeight;
-                        } else {
+                        if(vaultClass.mwPayframe.payframeTestLoaded){
                             clearInterval(checkLoaded);
-                            var now = new Date().getTime();
-                            while(new Date().getTime() < now + 2000){ /* grace time for loading child-iframe */ }
-                            // console.log("fully loaded");
                             payframeEvent();
                         }
                     }, 100);//Vault purchase need to check Parent-Iframe are fully loaded
