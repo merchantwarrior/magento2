@@ -248,7 +248,7 @@ define([
          */
         _initMwPayFrame() {
             fullScreenLoader.startLoader();
-            document.getElementById(this.mwCardDivId).innerHTML = ''
+            this._cleanGeneratedPayframe();
 
             this.mwPayframe = this._initPayFrame(
                 this._getPaymentConfig('uuid'),
