@@ -73,10 +73,10 @@ define([
             }
         },
 
-        selectPaymentMethod(){
-            this._super();
+        selectPaymentMethod (paymentMethod) {
             this._cleanGeneratedPayframe();
             this._resetForm();
+            return this._super(paymentMethod);
         },
 
         /**

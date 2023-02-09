@@ -202,9 +202,9 @@ define([
             fullScreenLoader.stopLoader(true);
         },
 
-        selectPaymentMethod(){
-            this._super();
+        selectPaymentMethod (paymentMethod) {
             this._cleanGeneratedPayframe();
+            return this._super(paymentMethod);
         },
         /**
          * Place order
