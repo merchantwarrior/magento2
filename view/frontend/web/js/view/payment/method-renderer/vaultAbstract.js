@@ -235,33 +235,56 @@ define([
                     this._getPaymentConfig('allowedTypeCards'),
 
                 );
-                this.mwPayframe.loaded = () => this._payFrameLoaded();
-                this.tdsCheck = this._initTdsCheck(
-                    this._getPaymentConfig('uuid'),
-                    this._getPaymentConfig('apiKey'),
-                    this.mwCardDivId + this.getId(),
-                    this._getPaymentConfig('submitURL'),
-                    {
-                        width: '500px',
-                        subFrame: true
-                    }
-                );
-                this.tdsCheck.mwCallback = (liabilityShifted, tdsToken) => this._tdsCallBack(liabilityShifted, tdsToken);
-                this.tdsCheck.link(this.mwPayframe);
-                var tdsAdditionalInfo = {tokenType : "vault"};
-                this.mwPayframe.deploy();
 
-                // When you have the payframeToken and payframeKey, call checkTDS,
-                // passing in the payframeToken, payframeKey, transactionAmount, transactionCurrency
-                // and transactionProduct
-                this.tdsCheck.checkTDS(
-                    this.details.cardID,
-                    this.details.cardKey,
-                    this.getFormattedPrice(quote.totals().grand_total),
-                    quote.totals().base_currency_code,
-                    this.getItemsSku(),
-                    tdsAdditionalInfo,
-                );
+                let vaultClass = this;
+                let payframeEvent = function () {
+                    vaultClass.mwPayframe.loaded = () => vaultClass._payFrameLoaded();
+                    vaultClass.tdsCheck = vaultClass._initTdsCheck(
+                        vaultClass._getPaymentConfig('uuid'),
+                        vaultClass._getPaymentConfig('apiKey'),
+                        vaultClass.mwCardDivId + vaultClass.getId(),
+                        vaultClass._getPaymentConfig('submitURL'),
+                        {
+                            width: '500px',
+                            subFrame: true
+                        }
+                    );
+                    vaultClass.tdsCheck.mwCallback = (liabilityShifted, tdsToken) => vaultClass._tdsCallBack(liabilityShifted, tdsToken);
+                    vaultClass.tdsCheck.link(vaultClass.mwPayframe);
+                    var tdsAdditionalInfo = {tokenType : "vault"};
+                    vaultClass.mwPayframe.deploy();
+
+                    // When you have the payframeToken and payframeKey, call checkTDS,
+                    // passing in the payframeToken, payframeKey, transactionAmount, transactionCurrency
+                    // and transactionProduct
+                    vaultClass.tdsCheck.checkTDS(
+                        vaultClass.details.cardID,
+                        vaultClass.details.cardKey,
+                        vaultClass.getFormattedPrice(quote.totals().grand_total),
+                        quote.totals().base_currency_code,
+                        vaultClass.getItemsSku(),
+                        tdsAdditionalInfo,
+                    );
+
+                }
+                
+                let previousHeight = 0;
+                let mwIframe = this.mwPayframe.mwIframe
+                if(mwIframe){
+                    const checkLoaded = setInterval(function () {
+                        // trick for detecting laoded iframe
+                        if (mwIframe.contentDocument && mwIframe.contentDocument.body.offsetHeight !== previousHeight) {
+                            previousHeight = mwIframe.contentDocument.body.offsetHeight;
+                        } else {
+                            clearInterval(checkLoaded);
+                            var now = new Date().getTime();
+                            while(new Date().getTime() < now + 2000){ /* grace time for loading child-iframe */ }
+                            // console.log("fully loaded");
+                            payframeEvent();
+                        }
+                    }, 100);//Vault purchase need to check Parent-Iframe are fully loaded
+                }
+
             } else {
                 this.processCardAction();
             }
