@@ -252,7 +252,6 @@ define([
                     vaultClass.tdsCheck.mwCallback = (liabilityShifted, tdsToken) => vaultClass._tdsCallBack(liabilityShifted, tdsToken);
                     vaultClass.tdsCheck.link(vaultClass.mwPayframe);
                     var tdsAdditionalInfo = {tokenType : "vault"};
-                    vaultClass.mwPayframe.deploy();
 
                     // When you have the payframeToken and payframeKey, call checkTDS,
                     // passing in the payframeToken, payframeKey, transactionAmount, transactionCurrency
