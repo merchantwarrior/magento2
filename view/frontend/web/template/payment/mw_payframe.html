@@ -16,7 +16,7 @@
                 <!-- ko template: getTemplate() --><!-- /ko -->
             <!--/ko-->
         </div>
-        <div class="cardData" id="payframe-card-data" afterRender="initForm"></div>
+        <div class="cardData payframe-card-div" id="payframe-card-data" afterRender="initForm"></div>
         <!-- ko if: (isVaultEnabled() && isVaultShow())-->
             <div class="field choice">
                 <input type="checkbox"
@@ -47,7 +47,6 @@
                         data-bind="
                         click: placeOrder,
                         attr: {title: $t('Place Order')},
-                        enable: (getCode() == isChecked()),
                         css: {disabled: !isPlaceOrderActionAllowed()}
                         "
                         disabled>

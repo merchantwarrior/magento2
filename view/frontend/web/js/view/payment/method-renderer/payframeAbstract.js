@@ -38,7 +38,6 @@ define([
             }
         },
         mwPayframe: '',
-        tdsCheck: '',
         payframeToken: '',
         payframeKey: '',
         tdsToken: '',
@@ -50,11 +49,11 @@ define([
          */
         initialize() {
             this._super();
-
             if (!this.isActive()) {
                 return;
             }
 
+            this._cleanGeneratedPayframe();
             this.vaultEnabler = new VaultEnabler();
             this.vaultEnabler.setPaymentCode(this.getVaultCode());
 
@@ -72,6 +71,12 @@ define([
             if (this.isChecked() === 'merchant_warrior_payframe') {
                 this._initMwPayFrame();
             }
+        },
+
+        selectPaymentMethod (paymentMethod) {
+            this._cleanGeneratedPayframe();
+            this._resetForm();
+            return this._super(paymentMethod);
         },
 
         /**
@@ -243,7 +248,7 @@ define([
          */
         _initMwPayFrame() {
             fullScreenLoader.startLoader();
-            document.getElementById(this.mwCardDivId).innerHTML = ''
+            this._cleanGeneratedPayframe();
 
             this.mwPayframe = this._initPayFrame(
                 this._getPaymentConfig('uuid'),
@@ -260,20 +265,6 @@ define([
                 tokenStatus, payframeToken, payframeKey
             );
             this.mwPayframe.loaded = () => this._payFrameLoaded();
-
-            if (this._getPaymentConfig('is3dsEnabled')) {
-                this.tdsCheck = this._initTdsCheck(
-                    this._getPaymentConfig('uuid'),
-                    this._getPaymentConfig('apiKey'),
-                    this.mwCardDivId,
-                    this._getPaymentConfig('submitURL'),
-                    {
-                        width: '500px',
-                        subFrame: true
-                    }
-                );
-                this.tdsCheck.mwCallback = (liabilityShifted, tdsToken) => this._tdsCallBack(liabilityShifted, tdsToken);
-            }
 
             this.mwPayframe.deploy();
         },
@@ -295,7 +286,9 @@ define([
          * @private
          */
         _initPayFrame(uuid, apiKey, payFrameDivId, payframeSrc, submitUrl, iframeStyle, acceptedCardTypes) {
-            return new payframe(uuid, apiKey, payFrameDivId, payframeSrc, submitUrl, iframeStyle, acceptedCardTypes);
+            var mwPayframeClass = new payframe(uuid, apiKey, payFrameDivId, payframeSrc, submitUrl, iframeStyle, acceptedCardTypes);
+            window.checkoutConfig.payment.mwPayframeClass = mwPayframeClass;
+            return mwPayframeClass;
         },
 
         /**
@@ -311,7 +304,9 @@ define([
          * @private
          */
         _initTdsCheck(uuid, apiKey, tdsDivId, submitUrl, tstStyle) {
-            return new tdsCheck(uuid, apiKey, tdsDivId, submitUrl, tstStyle);
+            var mwtdsCheckClass =  new tdsCheck(uuid, apiKey, tdsDivId, submitUrl, tstStyle);
+            window.checkoutConfig.payment.mwtdsCheckClass = mwtdsCheckClass;
+            return mwtdsCheckClass;
         },
 
         /**
@@ -324,17 +319,32 @@ define([
          * @private
          */
         _payFrameCallback(tokenStatus, payframeToken, payframeKey) {
+
             if (tokenStatus === 'HAS_TOKEN' && payframeToken && payframeKey) {
                 this.payframeToken = payframeToken;
                 this.payframeKey = payframeKey;
 
                 if (this._getPaymentConfig('is3dsEnabled')) {
+
+                    this.tdsCheck = this._initTdsCheck(
+                        this._getPaymentConfig('uuid'),
+                        this._getPaymentConfig('apiKey'),
+                        this.mwCardDivId,
+                        this._getPaymentConfig('submitURL'),
+                        {
+                            width: '500px',
+                            subFrame: true
+                        }
+                    );
+
+                    this.tdsCheck.mwCallback = (liabilityShifted, tdsToken) => this._tdsCallBack(liabilityShifted, tdsToken);
                     // If you want the tdsCheck to use the same loading
                     // or loaded functions as the mwPayframe, call link() on the tdsCheck object
                     this.tdsCheck.link(this.mwPayframe);
                     // When you have the payframeToken and payframeKey, call checkTDS,
                     // passing in the payframeToken, payframeKey, transactionAmount, transactionCurrency
                     // and transactionProduct
+
                     this.tdsCheck.checkTDS(
                         this.payframeToken,
                         this.payframeKey,
@@ -374,6 +384,7 @@ define([
         _tdsCallBack(liabilityShifted, tdsToken) {
             this.tdsToken = tdsToken;
 
+            
             if (liabilityShifted) {
                 // If the bank has taken liability for the transaction,
                 // submit the tdsToken with a processCard or processAuth transaction
@@ -400,9 +411,13 @@ define([
                         message: this.tdsCheck.mwTDSMessage
                     });
                 }
-                this.tdsCheck.destroy();
-                this._resetForm();
             }
+
+            this.tdsCheck.destroy();
+            this.tdsCheck.removeEventListener();
+            this.mwPayframe.removeEventListener();
+            this._resetForm();
+            $(".checkout").prop('disabled', false);
         },
 
         /**
@@ -432,5 +447,23 @@ define([
 
             fullScreenLoader.stopLoader(true);
         },
+        /**
+         * clean up generated payment form
+         *
+         * @return {void}
+         * @private
+         */
+        _cleanGeneratedPayframe(){
+            var payframeDiv = null;
+            payframeDiv = document.getElementsByClassName("payframe-card-div");
+            if(payframeDiv)for (let i = 0; i < payframeDiv.length; i++) {
+                if(payframeDiv[i].innerHTML){
+                    payframeDiv[i].innerHTML = "";
+                }
+            }
+            if(window.checkoutConfig.payment.mwPayframeClass)window.checkoutConfig.payment.mwPayframeClass.removeEventListener();
+            if(window.checkoutConfig.payment.mwtdsCheckClass)window.checkoutConfig.payment.mwtdsCheckClass.removeEventListener();
+            $(".checkout").prop('disabled', false);
+        }
     });
 });

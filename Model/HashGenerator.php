@@ -71,9 +71,9 @@ class HashGenerator
 
         $transactionID = $data[RequestApiInterface::TRANSACTION_ID] ?? '';
 
-        $hash = md5($apiPassPhrase) . $merchantUUID . $transactionID;
+        $hash = hash('md5', $apiPassPhrase) . $merchantUUID . $transactionID;
 
-        return md5(strtolower($hash));
+        return hash('md5',strtolower($hash)); 
     }
 
     /**
@@ -92,9 +92,9 @@ class HashGenerator
         $transactionAmount   = $data[RequestApiInterface::TRANSACTION_AMOUNT] ?? '';
         $transactionCurrency = $data[RequestApiInterface::TRANSACTION_CURRENCY] ?? '';
 
-        $hash = md5($apiPassPhrase) . $merchantUUID . $transactionAmount . $transactionCurrency;
+        $hash = hash('md5', $apiPassPhrase) . $merchantUUID . $transactionAmount . $transactionCurrency;
 
-        return md5(strtolower($hash));
+        return hash('md5',strtolower($hash));
     }
 
     /**
@@ -111,8 +111,8 @@ class HashGenerator
 
         $transactionID = $data[RequestApiInterface::TRANSACTION_ID] ?? '';
 
-        return md5(
-            md5($apiPassPhrase) . strtolower($merchantUUID . $transactionID)
+        return hash('md5',
+            hash('md5',$apiPassPhrase) . strtolower($merchantUUID . $transactionID)
         );
     }
 
@@ -131,8 +131,8 @@ class HashGenerator
         $settlementFrom = $data[RequestApiInterface::SETTLEMENT_FROM] ?? '';
         $settlementTo = $data[RequestApiInterface::SETTLEMENT_TO] ?? '';
 
-        return md5(
-            md5($apiPassPhrase) . strtolower($merchantUUID) . $settlementFrom . $settlementTo
+        return hash('md5',
+            hash('md5', $apiPassPhrase) . strtolower($merchantUUID) . $settlementFrom . $settlementTo
         );
     }
 }

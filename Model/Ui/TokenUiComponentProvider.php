@@ -10,6 +10,7 @@ use Magento\Vault\Model\Ui\TokenUiComponentInterface;
 use Magento\Vault\Model\Ui\TokenUiComponentProviderInterface;
 use Magento\Vault\Model\Ui\TokenUiComponentInterfaceFactory;
 use Magento\Framework\UrlInterface;
+use MerchantWarrior\Payment\Model\Config;
 
 class TokenUiComponentProvider implements TokenUiComponentProviderInterface
 {
@@ -29,6 +30,11 @@ class TokenUiComponentProvider implements TokenUiComponentProviderInterface
     private $serializer;
 
     /**
+     * @var Config
+     */
+    private $config;
+
+    /**
      * @param TokenUiComponentInterfaceFactory $componentFactory
      * @param SerializerInterface $serializer
      * @param UrlInterface $urlBuilder
@@ -36,11 +42,13 @@ class TokenUiComponentProvider implements TokenUiComponentProviderInterface
     public function __construct(
         TokenUiComponentInterfaceFactory $componentFactory,
         SerializerInterface $serializer,
-        UrlInterface $urlBuilder
+        UrlInterface $urlBuilder,
+        Config $config
     ) {
         $this->componentFactory = $componentFactory;
         $this->serializer = $serializer;
         $this->urlBuilder = $urlBuilder;
+        $this->config = $config;
     }
 
     /**
@@ -53,6 +61,7 @@ class TokenUiComponentProvider implements TokenUiComponentProviderInterface
     public function getComponentForToken(PaymentTokenInterface $paymentToken): TokenUiComponentInterface
     {
         $jsonDetails = $this->serializer->unserialize($paymentToken->getTokenDetails() ?: '{}');
+        $jsonDetails['cardID'] = $paymentToken->getGatewayToken();
         return $this->componentFactory->create(
             [
                 'config' => [
@@ -60,7 +69,7 @@ class TokenUiComponentProvider implements TokenUiComponentProviderInterface
                     TokenUiComponentProviderInterface::COMPONENT_DETAILS => $jsonDetails,
                     TokenUiComponentProviderInterface::COMPONENT_PUBLIC_HASH => $paymentToken->getPublicHash()
                 ],
-                'name' => 'MerchantWarrior_Payment/js/view/payment/method-renderer/vault'
+                'name' => 'MerchantWarrior_Payment/js/view/payment/method-renderer/'.($this->config->isSandBoxModeEnabled()? "vaultSandbox" : "vault")
             ]
         );
     }
