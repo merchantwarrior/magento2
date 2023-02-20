@@ -6,6 +6,7 @@ namespace MerchantWarrior\Payment\Gateway\Request;
 
 use Magento\Payment\Gateway\Request\BuilderInterface;
 use MerchantWarrior\Payment\Model\Api\RequestApiInterface;
+use Magento\Framework\App\ProductMetadataInterface;
 
 /**
  * Address data builder
@@ -22,11 +23,17 @@ class AddressDataBuilder extends AbstractDataBuilder implements BuilderInterface
     public function build(array $buildSubject): array
     {
         $paymentDO = $this->readPayment($buildSubject);
-
         $order = $paymentDO->getOrder();
         $billingAddress = $order->getBillingAddress();
 
-        $customerAddress = implode(', ', $billingAddress->getStreet());
+        $productMetadata = \Magento\Framework\App\ObjectManager::getInstance()->get(ProductMetadataInterface::class);
+        $version = $productMetadata->getVersion();
+
+        if (version_compare($version, '2.4.4', '>=')) {
+            $customerAddress = $billingAddress->getStreetLine1().$billingAddress->getStreetLine2();
+        } else {
+            $customerAddress = implode(', ', $billingAddress->getStreet());
+        }
         
         return [
             RequestApiInterface::CUSTOMER_COUNTRY   => $billingAddress->getCountryId(),
