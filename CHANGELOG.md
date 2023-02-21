@@ -19,3 +19,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ## [1.0.4] - 29-11-2022
 ### Added
 - Added admin configuration to enable/disable 3ds. 
+
+## [1.0.5] - 21-02-2022
+### Added
+- Added vault transactions 3DS feature
+- Added version compatibility adjustment for AddressDataBuilder
