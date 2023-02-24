@@ -25,6 +25,6 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Added vault transactions 3DS feature
 - Added version compatibility adjustment for AddressDataBuilder
 
-## [1.0.5] - 24-02-2022
+## [1.0.6] - 24-02-2022
 ### Added
 - Minor fix
