@@ -348,7 +348,7 @@ define([
                     this.tdsCheck.checkTDS(
                         this.payframeToken,
                         this.payframeKey,
-                        this.getFormattedPrice(quote.totals().grand_total),
+                        this.getFormattedPrice(quote.totals().base_grand_total),
                         quote.totals().base_currency_code,
                         this.getItemsSku()
                     );
