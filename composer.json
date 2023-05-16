@@ -11,7 +11,7 @@
         }
     ],
     "require": {
-        "php": "~7.3.0||~7.4.0||~8.0.0||~8.1.0",
+        "php": ">=7.3.0",
         "magento/framework": ">=102.0.3",
         "magento/module-vault": ">=101.1.3",
         "magento/module-payment": ">=100.3.3",
