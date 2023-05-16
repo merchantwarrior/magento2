@@ -259,7 +259,7 @@ define([
                     vaultClass.tdsCheck.checkTDS(
                         vaultClass.details.cardID,
                         vaultClass.details.cardKey,
-                        vaultClass.getFormattedPrice(quote.totals().grand_total),
+                        vaultClass.getFormattedPrice(quote.totals().base_grand_total),
                         quote.totals().base_currency_code,
                         vaultClass.getItemsSku(),
                         tdsAdditionalInfo,
