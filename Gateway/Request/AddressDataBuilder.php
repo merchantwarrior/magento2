@@ -29,7 +29,7 @@ class AddressDataBuilder extends AbstractDataBuilder implements BuilderInterface
         $productMetadata = \Magento\Framework\App\ObjectManager::getInstance()->get(ProductMetadataInterface::class);
         $version = $productMetadata->getVersion();
 
-        if (version_compare($version, '2.4.4-p2', '>=')) {
+        if (version_compare($version, '2.4.4-p2', '>=') || !method_exists($billingAddress, "getStreet")) {
             $customerAddress = $billingAddress->getStreetLine1().$billingAddress->getStreetLine2();
         } else {
             $customerAddress = implode(', ', $billingAddress->getStreet());
