@@ -28,3 +28,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ## [1.0.6] - 24-02-2022
 ### Added
 - Minor fix
+
+## [1.0.7] - 27-09-2023
+### Added
+- Added support for Magento 2.4.0
+- Suppressed superfluous error messages from Payframe
