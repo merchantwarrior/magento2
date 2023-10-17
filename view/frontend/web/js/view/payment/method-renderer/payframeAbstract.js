@@ -383,8 +383,6 @@ define([
          */
         _tdsCallBack(liabilityShifted, tdsToken) {
             this.tdsToken = tdsToken;
-
-            
             if (liabilityShifted) {
                 // If the bank has taken liability for the transaction,
                 // submit the tdsToken with a processCard or processAuth transaction
@@ -399,7 +397,6 @@ define([
 
                 if (
                     this.tdsCheck.mwTDSMessage === '3DS Failed'
-                    && this.tdsCheck.mwTDSResult === 'U'
                 ) {
                     globalMessageList.addErrorMessage({
                         message: this.tdsCheck.mwTDSMessage
