@@ -3,7 +3,7 @@
     <default>
         <payment>
             <merchant_warrior>
-                <active>1</active>
+                <active>0</active>
                 <merchant_uuid></merchant_uuid>
                 <enable_3ds>0</enable_3ds>
                 <sandbox_mode>1</sandbox_mode>
@@ -36,7 +36,7 @@
                 <group>merchant_warrior</group>
             </merchant_warrior>
             <merchant_warrior_payframe>
-                <active>1</active>
+                <active>0</active>
                 <model>MerchantWarriorPayFrameFacade</model>
                 <title>Merchant Warrior PayFrame</title>
                 <payment_action>authorize_capture</payment_action>

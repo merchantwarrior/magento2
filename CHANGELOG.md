@@ -37,3 +37,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ## [1.0.8] - 17-10-2023
 ### Added
 - Minor fix
+
+## [1.0.9] - 04-12-2023
+### Changed
+- Removed duplicate configuration
+- Updated default option value
